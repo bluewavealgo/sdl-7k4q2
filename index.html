@@ -363,6 +363,17 @@ tfoot td{font-weight:600;background:var(--soft)}
         </div>
       </div>
       <div class="fsec">
+        <div class="eyebrow">Ship particulars (as in your CDC / DG Shipping record)</div>
+        <div class="fgrid">
+          <label class="f"><span>Official number</span><input id="c_officialNo" autocomplete="off"></label>
+          <label class="f"><span>GT (gross tonnage)</span><input id="c_gt" type="number" min="0" inputmode="numeric"></label>
+          <label class="f"><span>Propulsion power (kW)</span><input id="c_propulsionKw" type="number" min="0" inputmode="numeric"></label>
+          <label class="f"><span>Propelling days</span><input id="c_propellingDays" type="number" min="0" inputmode="numeric"></label>
+          <label class="f"><span>Trade area</span><select id="c_tradeArea"><option value="">Select…</option><option>Foreign Going</option><option>Near Coastal Voyage (NCV)</option><option>Home Trade</option><option>Coastal</option></select></label>
+          <label class="f" style="grid-column:span 3"><span>Nature of watchkeeping</span><input id="c_watch" list="watchList" autocomplete="off"><datalist id="watchList"><option value="On regular watch - on both main engines and boilers simultaneously"><option value="On regular watch - on main engines"><option value="On regular watch - on boilers"><option value="Day work"><option value="Navigational watch"></datalist></label>
+        </div>
+      </div>
+      <div class="fsec">
         <div class="eyebrow">Dates</div>
         <div class="fgrid">
           <label class="f"><span>1 · Left India (passport exit)</span><input type="date" id="c_left"></label>
@@ -748,13 +759,17 @@ function filteredContracts(){
     return true;
   }).sort((a,b)=>(dn(b.on)||0)-(dn(a.on)||0));
 }
+const nf=n=>(n===""||n==null||isNaN(+n))?"":Number(n).toLocaleString("en-IN");
+function partLine(c){const a=[];
+  if(c.officialNo)a.push("Off. No. "+esc(c.officialNo));if(nf(c.gt))a.push("GT "+nf(c.gt));if(nf(c.propulsionKw))a.push(nf(c.propulsionKw)+" kW");if(c.tradeArea)a.push(esc(c.tradeArea));
+  return (a.length?`<span>${a.join(" · ")}</span>`:'<span class="muted">—</span>')+(c.watch?`<span class="sub">${esc(c.watch)}</span>`:"");}
 function shipDaysIn(c,f){const sp=shipSpan(c);if(!sp)return 0;return f?overlap(sp[0],sp[1],fyStart(f),fyEnd(f)):sp[1]-sp[0]+1;}
 function renderTable(){
   const fF=$("fFY").value?+$("fFY").value:null,list=filteredContracts();
   const n=["fFY","fType","fRank","fCompany","fFleet","fFlag"].map(id=>$(id).value).concat($("fVessel").value.trim()).filter(Boolean).length;
   $("filterNote").textContent=n?`${list.length} of ${S.contracts.length} contracts shown`:`${S.contracts.length} contract${S.contracts.length===1?"":"s"}`;
   if(!list.length){$("ctable").innerHTML=`<tr><td class="empty">${S.contracts.length?"No contracts match these filters.":"No contracts yet. Use “New entry” to log your first ship."}</td></tr>`;return;}
-  let tot=0,totF=0;
+  let tot=0,totF=0;const totP=list.reduce((a,c)=>a+(+c.propellingDays||0),0);
   const rows=list.map(c=>{const sp=shipSpan(c),d=sp?sp[1]-sp[0]+1:0;tot+=d;const inF=fF!=null?shipDaysIn(c,fF):null;if(inF!=null)totF+=inF;
     const planned=["left","on","off","arr"].some(k=>{const v=dn(c[k]);return v!=null&&v>TODAY;});
     return `<tr><td><b>${esc(c.vessel)}</b>${planned?' <span class="pill plan">planned</span>':""}<span class="sub">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span>${c.flag||c.registry?`<span class="sub">${esc(c.flag||"")}${c.flag&&c.registry?" · ":""}${c.registry?"Reg. "+esc(c.registry):""}</span>`:""}</td>
@@ -764,9 +779,11 @@ function renderTable(){
       <td class="mono">${c.off?fmt(dn(c.off)):'<span class="pill plan">onboard</span>'}<span class="sub">${c.off?(c.offIndia?"India":"Abroad")+(c.offPort?" · "+esc(c.offPort):""):""}</span></td>
       <td class="mono">${fmt(dn(c.arr))}</td>
       <td class="n">${d}<span class="sub">${sp?ymd(sp[0],sp[1]):""}</span></td>${fF!=null?`<td class="n">${inF}</td>`:""}
+      <td class="n">${c.propellingDays!==""&&c.propellingDays!=null?esc(c.propellingDays):"—"}</td>
+      <td style="white-space:normal;min-width:220px">${partLine(c)}</td>
       <td><div class="row-act"><button data-edit="${esc(c.id)}">Edit</button><button class="btn-danger" data-del="${esc(c.id)}">Delete</button></div></td></tr>`;}).join("");
-  $("ctable").innerHTML=`<thead><tr><th>Vessel · rank</th><th>Type · company · fleet</th><th>Left India</th><th>Sign-on</th><th>Sign-off</th><th>Arrived India</th><th class="n">Days on ship</th>${fF!=null?`<th class="n">In FY ${fyLabel(fF)}</th>`:""}<th></th></tr></thead><tbody>${rows}</tbody>
-  <tfoot><tr><td colspan="6">Total sea service (shown contracts)</td><td class="n">${tot}<span class="sub">${approx(tot)}</span></td>${fF!=null?`<td class="n">${totF}<span class="sub">${approx(totF)}</span></td>`:""}<td></td></tr></tfoot>`;
+  $("ctable").innerHTML=`<thead><tr><th>Vessel · rank</th><th>Type · company · fleet</th><th>Left India</th><th>Sign-on</th><th>Sign-off</th><th>Arrived India</th><th class="n">Days on ship</th>${fF!=null?`<th class="n">In FY ${fyLabel(fF)}</th>`:""}<th class="n">Propelling days</th><th>Ship particulars</th><th></th></tr></thead><tbody>${rows}</tbody>
+  <tfoot><tr><td colspan="6">Total sea service (shown contracts)</td><td class="n">${tot}<span class="sub">${approx(tot)}</span></td>${fF!=null?`<td class="n">${totF}<span class="sub">${approx(totF)}</span></td>`:""}<td class="n">${totP||"—"}</td><td></td><td></td></tr></tfoot>`;
 }
 function renderSums(){
   const fF=$("fFY").value?+$("fFY").value:null,list=filteredContracts();
@@ -896,7 +913,7 @@ const radio=n=>document.querySelector(`input[name=${n}]:checked`).value;
 const setRadio=(n,v)=>{document.querySelector(`input[name=${n}][value=${v}]`).checked=true;};
 function rankVal(){return F("c_rank").value==="__other"?F("c_rankOther").value.trim():F("c_rank").value;}
 F("c_rank").addEventListener("change",()=>{$("rankOtherWrap").hidden=F("c_rank").value!=="__other";});
-function readForm(){return {id:F("c_id").value||uid(),vessel:F("c_vessel").value.trim(),type:F("c_type").value,company:F("c_company").value.trim(),fleet:F("c_fleet").value.trim(),rank:rankVal(),imo:F("c_imo").value.trim(),flag:F("c_flag").value.trim(),registry:F("c_registry").value.trim(),notes:F("c_notes").value.trim(),
+function readForm(){return {id:F("c_id").value||uid(),vessel:F("c_vessel").value.trim(),type:F("c_type").value,company:F("c_company").value.trim(),fleet:F("c_fleet").value.trim(),rank:rankVal(),imo:F("c_imo").value.trim(),flag:F("c_flag").value.trim(),registry:F("c_registry").value.trim(),officialNo:F("c_officialNo").value.trim(),gt:F("c_gt").value===""?"":+F("c_gt").value,propulsionKw:F("c_propulsionKw").value===""?"":+F("c_propulsionKw").value,propellingDays:F("c_propellingDays").value===""?"":+F("c_propellingDays").value,tradeArea:F("c_tradeArea").value,watch:F("c_watch").value.trim(),notes:F("c_notes").value.trim(),
   left:F("c_left").value,on:F("c_on").value,off:F("c_off").value,arr:F("c_arr").value,onIndia:radio("onIn")==="india",offIndia:radio("offIn")==="india",onPort:F("c_onport").value.trim(),offPort:F("c_offport").value.trim(),coastal:F("c_coastal").checked};}
 function validate(c){
   if(!c.vessel)return "Enter the vessel name.";if(!c.type)return "Choose the type of ship.";if(!c.rank)return "Choose your rank.";if(!c.on)return "Enter the CDC sign-on date.";
@@ -915,7 +932,7 @@ function calcLine(){
 function resetForm(){$("cform").reset();F("c_id").value="";setRadio("onIn","abroad");setRadio("offIn","abroad");$("rankOtherWrap").hidden=true;$("formTitle").textContent="Add contract / voyage";$("saveBtn").textContent="Save contract";$("formErr").textContent="";calcLine();}
 function editContract(id){
   const c=S.contracts.find(x=>x.id===id);if(!c)return;
-  ["vessel","type","company","fleet","imo","flag","registry","notes"].forEach(k=>F("c_"+k).value=c[k]||"");
+  ["vessel","type","company","fleet","imo","flag","registry","officialNo","gt","propulsionKw","propellingDays","tradeArea","watch","notes"].forEach(k=>F("c_"+k).value=c[k]==null?"":c[k]);
   F("c_id").value=c.id;F("c_left").value=c.left||"";F("c_on").value=c.on||"";F("c_off").value=c.off||"";F("c_arr").value=c.arr||"";F("c_onport").value=c.onPort||"";F("c_offport").value=c.offPort||"";F("c_coastal").checked=!!c.coastal;
   if(!c.rank)F("c_rank").value="";else if(ALLRANKS.includes(c.rank))F("c_rank").value=c.rank;else{F("c_rank").value="__other";F("c_rankOther").value=c.rank;}
   $("rankOtherWrap").hidden=F("c_rank").value!=="__other";
@@ -956,9 +973,9 @@ async function save(filename,data,label){
 }
 $("expJson").addEventListener("click",()=>{const d=new Date();save(`sea-days-ledger-${OFFLINE?"offline":"online"}-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`,JSON.stringify(snapshot(),null,2),"Backup");});
 $("expCsv").addEventListener("click",()=>{
-  const h=["Vessel","Type","Company","Fleet","Rank","IMO","Flag","Port of registry","Left India","Sign-on","Sign-on port","Sign-on in India","Sign-off","Sign-off port","Sign-off in India","Arrived India","Days on ship","Notes"];
+  const h=["Vessel","Type","Company","Fleet","Rank","IMO","Flag","Port of registry","Official No.","GT","Propulsion kW","Propelling days","Trade area","Nature of watchkeeping","Left India","Sign-on","Sign-on port","Sign-on in India","Sign-off","Sign-off port","Sign-off in India","Arrived India","Days on ship","Notes"];
   const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
-  const rows=filteredContracts().map(c=>{const sp=shipSpan(c);return [c.vessel,c.type,c.company,c.fleet,c.rank,c.imo,c.flag,c.registry,c.left,c.on,c.onPort,c.onIndia?"Yes":"No",c.off,c.offPort,c.offIndia?"Yes":"No",c.arr,sp?sp[1]-sp[0]+1:"",c.notes].map(q).join(",");});
+  const rows=filteredContracts().map(c=>{const sp=shipSpan(c);return [c.vessel,c.type,c.company,c.fleet,c.rank,c.imo,c.flag,c.registry,c.officialNo,c.gt,c.propulsionKw,c.propellingDays,c.tradeArea,c.watch,c.left,c.on,c.onPort,c.onIndia?"Yes":"No",c.off,c.offPort,c.offIndia?"Yes":"No",c.arr,sp?sp[1]-sp[0]+1:"",c.notes].map(q).join(",");});
   save("sea-service-register.csv",[h.map(q).join(",")].concat(rows).join("\n"),"CSV");
 });
 $("impJson").addEventListener("change",e=>{
