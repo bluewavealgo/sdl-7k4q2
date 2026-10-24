@@ -80,6 +80,11 @@ label.f>span,div.f>span{font-weight:500}
 .navchips a:hover{background:#ffffff22;border-color:var(--glow)}
 .badge[hidden]{display:none}
 .badge{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-family:var(--f-mono);font-size:.7rem;display:inline-grid;place-items:center}
+.refreshrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+.refreshbtn{display:inline-flex;align-items:center;gap:6px;background:#ffffff14;border:1px solid #ffffff2e;color:var(--hero-ink);border-radius:999px;padding:6px 14px;font-size:.84rem}
+.refreshbtn:hover{border-color:var(--glow);background:#ffffff22}
+.refreshbtn.spin svg{animation:spin 0.9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .save-state{font-family:var(--f-mono);font-size:.74rem;color:var(--hero-dim);margin-top:14px}
 .bridge{background:linear-gradient(180deg,#ffffff14,#ffffff08);border:1px solid #ffffff24;border-radius:18px;padding:18px 20px;backdrop-filter:blur(6px);box-shadow:0 30px 60px -30px #000a;display:flex;flex-direction:column;gap:10px}
 .bridge .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
@@ -287,6 +292,7 @@ tfoot td{font-weight:600;background:var(--soft)}
         <a href="#results">Year results</a>
         <a href="#register">Sea-service register</a>
       </nav>
+      <div class="refreshrow"><button type="button" id="refreshBtn" class="refreshbtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg><span>Refresh</span></button><span class="save-state" id="lastRefreshed" style="margin-top:0"></span></div>
       <div class="save-state" id="saveState">Loading…</div>
     </div>
     <div class="bridge" id="bridge" aria-live="polite"></div>
@@ -546,7 +552,7 @@ async function initStore(){
     ref=db.collection("data/users/"+id).doc("ledger");
     const snap=await ref.get();
     const remote=snap.exists?snap.data():null;
-    if(remote){adopt(remote);let changed=false;if(local)changed=merge(local);render();if(changed){persist();setSave("Synced entries made in this browser to your account");}else setSave("Loaded from your account");}
+    if(remote){adopt(remote);let changed=false;if(local)changed=merge(local);render();showRefreshed(Date.now());if(changed){persist();setSave("Synced entries made in this browser to your account");}else setSave("Loaded from your account");}
     else if(local){persist();setSave("Syncing entries made in this browser to your account…");}
     else setSave("Showing examples · your entries will save to your account");
   }catch(e){setSave(local?"Loaded from this browser":"Showing examples");}
@@ -620,7 +626,9 @@ $("newsSearch").addEventListener("input",()=>renderNews());
 function ranges(c,edge){
   const out=[],e1=edge?1:0;const on=dn(c.on),off=dn(c.off),left=dn(c.left),arr=dn(c.arr);
   const shipEnd=on!=null?(off!=null?off:Math.max(TODAY,on)):null;
-  if(on!=null&&!c.coastal)out.push([on,shipEnd,"ship"]);
+  /* passport dates, when given, decide the stay; CDC dates still count for an Indian-port voyage (Rule 126 / Rule 8) or when no passport date is entered */
+  const hasPass=left!=null||arr!=null,eligible=!!(c.onIndia||c.offIndia);
+  if(on!=null&&!c.coastal&&(!hasPass||eligible))out.push([on,shipEnd,"ship"]);
   if(left!=null){let e=arr!=null?arr-e1:(shipEnd!=null?shipEnd:TODAY);if(arr==null&&left<=TODAY&&e<TODAY)e=TODAY;out.push([left+e1,e,"phys"]);}
   else if(arr!=null){out.push([on!=null?on:arr,arr-e1,"phys"]);}
   return out.filter(r=>r[1]>=r[0]);
@@ -636,7 +644,8 @@ function compute(){
   const fys=[...fyset].sort((a,b)=>a-b);
   const lo=Math.min(fyStart(fys[0]),minD),hi=fyEnd(fys[fys.length-1]);
   const len=hi-lo+1,out=new Uint8Array(len),ship=new Uint8Array(len);
-  S.contracts.forEach(c=>{ranges(c,edge).forEach(([s,e,k])=>{for(let d=Math.max(s,lo);d<=Math.min(e,hi);d++){out[d-lo]=1;if(k==="ship")ship[d-lo]=1;}});});
+  S.contracts.forEach(c=>{ranges(c,edge).forEach(([s,e])=>{for(let d=Math.max(s,lo);d<=Math.min(e,hi);d++)out[d-lo]=1;});
+    const sp=c.coastal?null:shipSpan(c);if(sp)for(let d=Math.max(sp[0],lo);d<=Math.min(sp[1],hi);d++)ship[d-lo]=1;});
   const res={};
   fys.forEach(f=>{
     const s=fyStart(f),e=fyEnd(f),days=e-s+1;const inData=dataFrom!=null&&f>=dataFrom&&f<=dataTo;
@@ -780,7 +789,7 @@ function renderTable(){
     const planned=["left","on","off","arr"].some(k=>{const v=dn(c[k]);return v!=null&&v>TODAY;});
     return `<tr><td><b>${esc(c.vessel)}</b>${planned?' <span class="pill plan">planned</span>':""}<span class="sub">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span>${c.flag||c.registry?`<span class="sub">${esc(c.flag||"")}${c.flag&&c.registry?" · ":""}${c.registry?"Reg. "+esc(c.registry):""}</span>`:""}</td>
       <td><span class="tchip" style="--tc:${typeColor(c.type)}">${esc(c.type)}</span><span class="sub">${esc(c.company||"—")}${c.fleet?" · "+esc(c.fleet):""}</span></td>
-      <td class="mono">${fmt(dn(c.left))}</td>
+      <td class="mono">${fmt(dn(c.left))}<span class="sub">${c.left||c.arr?"Counted by passport dates":"Counted by CDC dates"}</span></td>
       <td class="mono">${fmt(dn(c.on))}<span class="sub">${c.onIndia?"India":"Abroad"}${c.onPort?" · "+esc(c.onPort):""}</span></td>
       <td class="mono">${c.off?fmt(dn(c.off)):'<span class="pill plan">onboard</span>'}<span class="sub">${c.off?(c.offIndia?"India":"Abroad")+(c.offPort?" · "+esc(c.offPort):""):""}</span></td>
       <td class="mono">${fmt(dn(c.arr))}</td>
@@ -1091,6 +1100,28 @@ $("impJson").addEventListener("change",e=>{
   rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!o||!Array.isArray(o.contracts))throw 0;const n0=S.example?0:S.contracts.length;const changed=merge(o);render();persist();setSave(changed?`Merged: ${S.contracts.length} contracts now (${Math.max(0,S.contracts.length-n0)} added)`:"Nothing new in that file");}catch(_){setSave("That file is not a Sea Days Ledger backup.");}e.target.value="";};
   rd.readAsText(file);
 });
+
+/* ---------- refresh ---------- */
+function showRefreshed(t){if(t)lsSet("sdlRefreshed",String(t));const v=+(lsGet("sdlRefreshed")||0);$("lastRefreshed").textContent=v?"Last refreshed: "+new Date(v).toLocaleString(undefined,{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";}
+async function refreshAll(){
+  const btn=$("refreshBtn");if(btn.classList.contains("spin"))return;btn.classList.add("spin");$("refreshBtn").querySelector("span").textContent="Refreshing…";
+  try{
+    if(ref){
+      const snap=await ref.get();
+      if(snap.exists){const remote=snap.data();const mine=S.example?null:snapshot();adopt(remote);let changed=false;if(mine)changed=merge(mine);render();if(changed)persist();}
+      setSave("Up to date with your account");showRefreshed(Date.now());
+    }else if(OFFLINE&&"serviceWorker" in navigator&&location.protocol.startsWith("http")){
+      showRefreshed(Date.now());
+      try{const reg=await navigator.serviceWorker.getRegistration();if(reg&&navigator.onLine)await reg.update();}catch(e){}
+      location.reload();return;
+    }else{
+      const local=loadLocal();if(local){adopt(local);render();}setSave(navigator.onLine===false?"Offline · showing what is saved on this device":"Reloaded what is saved on this device");showRefreshed(Date.now());
+    }
+  }catch(e){setSave(navigator.onLine===false?"No internet · showing what is saved on this device":"Could not refresh right now. Try again in a moment.");}
+  finally{btn.classList.remove("spin");btn.querySelector("span").textContent="Refresh";}
+}
+$("refreshBtn").addEventListener("click",refreshAll);
+showRefreshed(lsGet("sdlRefreshed")?null:Date.now());
 
 window.addEventListener("online",()=>{if(!S.example)persist();});
 window.addEventListener("offline",()=>setSave("Offline · entries are kept in this browser and sync when you reconnect"));
