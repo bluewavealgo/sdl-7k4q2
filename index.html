@@ -313,7 +313,7 @@ tfoot td{font-weight:600;background:var(--soft)}
       <div class="chart-card"><div class="ch"><div><h3>Years at a glance</h3><div class="small muted">Each ring is a financial year. The ring fills with days outside India; the white tick is the NRI target.</div></div></div><div class="chart-body" id="chRings"></div></div>
       <div class="chart-card"><div class="ch"><div><h3>Days outside India per year</h3><div class="small muted">Solid = done, light = planned. Dashed line = days needed for NRI.</div></div></div><div class="bars-wrap" id="chBars"></div></div>
       <div class="chart-card"><div class="ch"><div><h3>Sea time by ship type</h3><div class="small muted ovScope"></div></div></div><div class="chart-body" id="chType"></div></div>
-      <div class="chart-card"><div class="ch"><div><h3 id="chMixTitle">Sea time by rank</h3><div class="small muted ovScope"></div></div><div class="seg" id="mixSeg" role="group" aria-label="Group sea time by"><button type="button" data-mix="rank" aria-pressed="true">Rank</button><button type="button" data-mix="company" aria-pressed="false">Company</button><button type="button" data-mix="fleet" aria-pressed="false">Fleet</button></div></div><div class="chart-body" id="chMix"></div></div>
+      <div class="chart-card"><div class="ch"><div><h3 id="chMixTitle">Sea time by rank</h3><div class="small muted ovScope"></div></div><div class="seg" id="mixSeg" role="group" aria-label="Group sea time by"><button type="button" data-mix="rank" aria-pressed="true">Rank</button><button type="button" data-mix="company" aria-pressed="false">Company</button><button type="button" data-mix="fleet" aria-pressed="false">Fleet</button><button type="button" data-mix="flag" aria-pressed="false">Flag</button></div></div><div class="chart-body" id="chMix"></div></div>
     </div>
   </section>
 
@@ -353,6 +353,8 @@ tfoot td{font-weight:600;background:var(--soft)}
           <label class="f s2"><span>Name of vessel *</span><input id="c_vessel" placeholder="MT Ocean Star" autocomplete="off"></label>
           <label class="f"><span>Type of ship *</span><select id="c_type"></select></label>
           <label class="f"><span>IMO number</span><input id="c_imo" inputmode="numeric" autocomplete="off"></label>
+          <label class="f"><span>Ship's flag</span><input id="c_flag" list="flagList" placeholder="e.g. Marshall Islands" autocomplete="off"><datalist id="flagList"></datalist></label>
+          <label class="f"><span>Port of registry</span><input id="c_registry" list="registryList" placeholder="e.g. Majuro" autocomplete="off"><datalist id="registryList"></datalist></label>
           <label class="f"><span>Company</span><input id="c_company" list="companyList" placeholder="e.g. Anglo-Eastern" autocomplete="off"><datalist id="companyList"></datalist></label>
           <label class="f"><span>Fleet</span><input id="c_fleet" list="fleetList" placeholder="e.g. Tanker Fleet 2" autocomplete="off"><datalist id="fleetList"></datalist></label>
           <label class="f"><span>Rank *</span><select id="c_rank"></select></label>
@@ -391,6 +393,7 @@ tfoot td{font-weight:600;background:var(--soft)}
       <label class="f"><span>Rank</span><select id="fRank"></select></label>
       <label class="f"><span>Company</span><select id="fCompany"></select></label>
       <label class="f"><span>Fleet</span><select id="fFleet"></select></label>
+      <label class="f"><span>Ship's flag</span><select id="fFlag"></select></label>
       <label class="f"><span>Vessel name or IMO</span><input id="fVessel" placeholder="e.g. Horizon or 9876543" autocomplete="off"></label>
       <div class="f"><span>&nbsp;</span><button id="fReset" class="btn-ghost">Reset filters</button></div>
     </div>
@@ -665,6 +668,10 @@ function render(){
   fillSelect($("fRank"),[["","All ranks"]].concat(usedRanks.map(t=>[t,t])),$("fRank").value);
   fillSelect($("fCompany"),[["","All companies"]].concat(uniq("company").map(t=>[t,t])),$("fCompany").value);
   fillSelect($("fFleet"),[["","All fleets"]].concat(uniq("fleet").map(t=>[t,t])),$("fFleet").value);
+  fillSelect($("fFlag"),[["","All flags"]].concat(uniq("flag").map(t=>[t,t])),$("fFlag").value);
+  const FLAGS=["Panama","Liberia","Marshall Islands","Singapore","Malta","Bahamas","Hong Kong","Greece","Cyprus","Isle of Man","India","Norway","Denmark","United Kingdom","Japan","Portugal","Antigua and Barbuda","Belgium","Netherlands","Saudi Arabia","Qatar","United Arab Emirates"];
+  $("flagList").innerHTML=[...new Set(uniq("flag").concat(FLAGS))].map(f=>`<option value="${esc(f)}">`).join("");
+  $("registryList").innerHTML=uniq("registry").map(f=>`<option value="${esc(f)}">`).join("");
   $("companyList").innerHTML=uniq("company").map(f=>`<option value="${esc(f)}">`).join("");
   $("fleetList").innerHTML=uniq("fleet").map(f=>`<option value="${esc(f)}">`).join("");
   $("exampleBanner").hidden=!S.example;$("edgeSet").checked=S.settings.edge!==false;
@@ -732,10 +739,10 @@ function renderFY(C){
   }).join("");
 }
 function filteredContracts(){
-  const fF=$("fFY").value,fT=$("fType").value,fR=$("fRank").value,fC=$("fCompany").value,fL=$("fFleet").value,fV=$("fVessel").value.trim().toLowerCase();
+  const fF=$("fFY").value,fT=$("fType").value,fR=$("fRank").value,fC=$("fCompany").value,fL=$("fFleet").value,fG=$("fFlag").value,fV=$("fVessel").value.trim().toLowerCase();
   return S.contracts.filter(c=>{
     if(fT&&c.type!==fT)return false;if(fR&&(c.rank||"").trim()!==fR)return false;
-    if(fC&&(c.company||"").trim()!==fC)return false;if(fL&&(c.fleet||"").trim()!==fL)return false;
+    if(fC&&(c.company||"").trim()!==fC)return false;if(fL&&(c.fleet||"").trim()!==fL)return false;if(fG&&(c.flag||"").trim()!==fG)return false;
     if(fV&&!((c.vessel||"").toLowerCase().includes(fV)||String(c.imo||"").replace(/\D/g,"").includes(fV.replace(/^imo\s*/,"").replace(/\D/g,"")||"\u0000")))return false;
     if(fF){const sp=shipSpan(c);if(!sp||!overlap(sp[0],sp[1],fyStart(+fF),fyEnd(+fF)))return false;}
     return true;
@@ -744,13 +751,13 @@ function filteredContracts(){
 function shipDaysIn(c,f){const sp=shipSpan(c);if(!sp)return 0;return f?overlap(sp[0],sp[1],fyStart(f),fyEnd(f)):sp[1]-sp[0]+1;}
 function renderTable(){
   const fF=$("fFY").value?+$("fFY").value:null,list=filteredContracts();
-  const n=["fFY","fType","fRank","fCompany","fFleet"].map(id=>$(id).value).concat($("fVessel").value.trim()).filter(Boolean).length;
+  const n=["fFY","fType","fRank","fCompany","fFleet","fFlag"].map(id=>$(id).value).concat($("fVessel").value.trim()).filter(Boolean).length;
   $("filterNote").textContent=n?`${list.length} of ${S.contracts.length} contracts shown`:`${S.contracts.length} contract${S.contracts.length===1?"":"s"}`;
   if(!list.length){$("ctable").innerHTML=`<tr><td class="empty">${S.contracts.length?"No contracts match these filters.":"No contracts yet. Use “New entry” to log your first ship."}</td></tr>`;return;}
   let tot=0,totF=0;
   const rows=list.map(c=>{const sp=shipSpan(c),d=sp?sp[1]-sp[0]+1:0;tot+=d;const inF=fF!=null?shipDaysIn(c,fF):null;if(inF!=null)totF+=inF;
     const planned=["left","on","off","arr"].some(k=>{const v=dn(c[k]);return v!=null&&v>TODAY;});
-    return `<tr><td><b>${esc(c.vessel)}</b>${planned?' <span class="pill plan">planned</span>':""}<span class="sub">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span></td>
+    return `<tr><td><b>${esc(c.vessel)}</b>${planned?' <span class="pill plan">planned</span>':""}<span class="sub">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span>${c.flag||c.registry?`<span class="sub">${esc(c.flag||"")}${c.flag&&c.registry?" · ":""}${c.registry?"Reg. "+esc(c.registry):""}</span>`:""}</td>
       <td><span class="tchip" style="--tc:${typeColor(c.type)}">${esc(c.type)}</span><span class="sub">${esc(c.company||"—")}${c.fleet?" · "+esc(c.fleet):""}</span></td>
       <td class="mono">${fmt(dn(c.left))}</td>
       <td class="mono">${fmt(dn(c.on))}<span class="sub">${c.onIndia?"India":"Abroad"}${c.onPort?" · "+esc(c.onPort):""}</span></td>
@@ -855,7 +862,7 @@ function renderCharts(C){
   const mm={};list.forEach(c=>{const d=shipDaysIn(c,fF);if(!d)return;let k=(c[mixKey]||"").trim()||"Not set";if(!top.includes(k))k="Other";mm[k]=(mm[k]||0)+d;});
   donut($("chMix"),Object.entries(mm).map(([l,v])=>({l,v,c:l==="Other"?"var(--cx)":`var(--c${top.indexOf(l)})`})).sort((a,b)=>b.v-a.v),null,"Sea time by "+mixKey);
   $("chMixTitle").textContent="Sea time by "+mixKey;
-  const n=["fType","fRank","fCompany","fFleet"].map(id=>$(id).value).concat($("fVessel").value.trim()).filter(Boolean).length;
+  const n=["fType","fRank","fCompany","fFleet","fFlag"].map(id=>$(id).value).concat($("fVessel").value.trim()).filter(Boolean).length;
   $("ovNote").textContent=n?"Ship charts follow your filters":"Use the filters below to narrow the ship charts";
 }
 $("mixSeg").addEventListener("click",e=>{const b=e.target.closest("[data-mix]");if(!b)return;mixKey=b.dataset.mix;$("mixSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderCharts(window.__ledger);});
@@ -889,7 +896,7 @@ const radio=n=>document.querySelector(`input[name=${n}]:checked`).value;
 const setRadio=(n,v)=>{document.querySelector(`input[name=${n}][value=${v}]`).checked=true;};
 function rankVal(){return F("c_rank").value==="__other"?F("c_rankOther").value.trim():F("c_rank").value;}
 F("c_rank").addEventListener("change",()=>{$("rankOtherWrap").hidden=F("c_rank").value!=="__other";});
-function readForm(){return {id:F("c_id").value||uid(),vessel:F("c_vessel").value.trim(),type:F("c_type").value,company:F("c_company").value.trim(),fleet:F("c_fleet").value.trim(),rank:rankVal(),imo:F("c_imo").value.trim(),notes:F("c_notes").value.trim(),
+function readForm(){return {id:F("c_id").value||uid(),vessel:F("c_vessel").value.trim(),type:F("c_type").value,company:F("c_company").value.trim(),fleet:F("c_fleet").value.trim(),rank:rankVal(),imo:F("c_imo").value.trim(),flag:F("c_flag").value.trim(),registry:F("c_registry").value.trim(),notes:F("c_notes").value.trim(),
   left:F("c_left").value,on:F("c_on").value,off:F("c_off").value,arr:F("c_arr").value,onIndia:radio("onIn")==="india",offIndia:radio("offIn")==="india",onPort:F("c_onport").value.trim(),offPort:F("c_offport").value.trim(),coastal:F("c_coastal").checked};}
 function validate(c){
   if(!c.vessel)return "Enter the vessel name.";if(!c.type)return "Choose the type of ship.";if(!c.rank)return "Choose your rank.";if(!c.on)return "Enter the CDC sign-on date.";
@@ -908,7 +915,7 @@ function calcLine(){
 function resetForm(){$("cform").reset();F("c_id").value="";setRadio("onIn","abroad");setRadio("offIn","abroad");$("rankOtherWrap").hidden=true;$("formTitle").textContent="Add contract / voyage";$("saveBtn").textContent="Save contract";$("formErr").textContent="";calcLine();}
 function editContract(id){
   const c=S.contracts.find(x=>x.id===id);if(!c)return;
-  ["vessel","type","company","fleet","imo","notes"].forEach(k=>F("c_"+k).value=c[k]||"");
+  ["vessel","type","company","fleet","imo","flag","registry","notes"].forEach(k=>F("c_"+k).value=c[k]||"");
   F("c_id").value=c.id;F("c_left").value=c.left||"";F("c_on").value=c.on||"";F("c_off").value=c.off||"";F("c_arr").value=c.arr||"";F("c_onport").value=c.onPort||"";F("c_offport").value=c.offPort||"";F("c_coastal").checked=!!c.coastal;
   if(!c.rank)F("c_rank").value="";else if(ALLRANKS.includes(c.rank))F("c_rank").value=c.rank;else{F("c_rank").value="__other";F("c_rankOther").value=c.rank;}
   $("rankOtherWrap").hidden=F("c_rank").value!=="__other";
@@ -935,9 +942,9 @@ $("ctable").addEventListener("click",e=>{
   else{pendingDel=del.dataset.del;del.textContent="Confirm delete";setTimeout(()=>{if(pendingDel===del.dataset.del){pendingDel=null;del.textContent="Delete";}},4000);}
 });
 $("fyList").addEventListener("change",e=>{const cb=e.target.closest("[data-o]");if(!cb)return;const f=cb.closest("[data-fy]").dataset.fy;S.fy[f]=Object.assign({},S.fy[f],{[cb.dataset.o]:cb.checked});render();persist();});
-["fFY","fType","fRank","fCompany","fFleet","fStatus"].forEach(id=>$(id).addEventListener("change",render));
+["fFY","fType","fRank","fCompany","fFleet","fFlag","fStatus"].forEach(id=>$(id).addEventListener("change",render));
 $("fVessel").addEventListener("input",()=>{renderTable();renderSums();renderCharts(window.__ledger);});
-$("fReset").addEventListener("click",()=>{["fFY","fType","fRank","fCompany","fFleet","fStatus"].forEach(id=>$(id).value="");$("fVessel").value="";render();});
+$("fReset").addEventListener("click",()=>{["fFY","fType","fRank","fCompany","fFleet","fFlag","fStatus"].forEach(id=>$(id).value="");$("fVessel").value="";render();});
 $("edgeSet").addEventListener("change",e=>{S.settings.edge=e.target.checked;render();persist();});
 $("hAdd").addEventListener("click",()=>{const f=$("hFY").value,v=$("hDays").value;if(v===""||+v<0||+v>366)return;if(S.example)leaveExample();S.fy[f]=Object.assign({},S.fy[f],{india:Math.round(+v)});$("hDays").value="";render();persist();});
 $("hList").addEventListener("click",e=>{const b=e.target.closest("[data-hdel]");if(!b)return;if(S.fy[b.dataset.hdel])delete S.fy[b.dataset.hdel].india;render();persist();});
@@ -949,9 +956,9 @@ async function save(filename,data,label){
 }
 $("expJson").addEventListener("click",()=>{const d=new Date();save(`sea-days-ledger-${OFFLINE?"offline":"online"}-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`,JSON.stringify(snapshot(),null,2),"Backup");});
 $("expCsv").addEventListener("click",()=>{
-  const h=["Vessel","Type","Company","Fleet","Rank","IMO","Left India","Sign-on","Sign-on port","Sign-on in India","Sign-off","Sign-off port","Sign-off in India","Arrived India","Days on ship","Notes"];
+  const h=["Vessel","Type","Company","Fleet","Rank","IMO","Flag","Port of registry","Left India","Sign-on","Sign-on port","Sign-on in India","Sign-off","Sign-off port","Sign-off in India","Arrived India","Days on ship","Notes"];
   const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
-  const rows=filteredContracts().map(c=>{const sp=shipSpan(c);return [c.vessel,c.type,c.company,c.fleet,c.rank,c.imo,c.left,c.on,c.onPort,c.onIndia?"Yes":"No",c.off,c.offPort,c.offIndia?"Yes":"No",c.arr,sp?sp[1]-sp[0]+1:"",c.notes].map(q).join(",");});
+  const rows=filteredContracts().map(c=>{const sp=shipSpan(c);return [c.vessel,c.type,c.company,c.fleet,c.rank,c.imo,c.flag,c.registry,c.left,c.on,c.onPort,c.onIndia?"Yes":"No",c.off,c.offPort,c.offIndia?"Yes":"No",c.arr,sp?sp[1]-sp[0]+1:"",c.notes].map(q).join(",");});
   save("sea-service-register.csv",[h.map(q).join(",")].concat(rows).join("\n"),"CSV");
 });
 $("impJson").addEventListener("change",e=>{
