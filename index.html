@@ -395,6 +395,12 @@ tfoot td{font-weight:600;background:var(--soft)}
     </form>
   </details>
 
+  <section class="panel" id="profileImport">
+    <div class="panel-h"><div class="ph"><span class="sec-ico" style="--ic:var(--c1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg></span><div><h2>Upload your seafarer profile</h2><div class="small muted">The “Seafarer Profile” PDF from the DG Shipping e-Governance portal. It is read on this device and never uploaded anywhere.</div></div></div>
+      <div class="row-act"><label class="btn btn-primary" for="profilePdf">Choose profile PDF</label><input type="file" id="profilePdf" accept="application/pdf,.pdf" hidden></div></div>
+    <div class="panel-b" id="pImpBody" hidden></div>
+  </section>
+
   <section class="panel">
     <div class="panel-h"><div class="ph"><span class="sec-ico" style="--ic:var(--c2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg></span><h2>Filters</h2></div><span class="small muted" id="filterNote"></span></div>
     <div class="filters">
@@ -802,6 +808,108 @@ function renderHist(C){
   const ent=Object.entries(S.fy).filter(([k,v])=>v&&v.india!=null&&v.india!=="").sort((a,b)=>b[0]-a[0]);
   $("hList").innerHTML=ent.length?ent.map(([k,v])=>`<span class="pill UNK" style="margin:0 6px 6px 0">FY ${fyLabel(+k)}: ${v.india} days <button data-hdel="${k}" style="border:0;background:none;padding:0 0 0 4px;color:inherit;cursor:pointer" aria-label="Remove FY ${fyLabel(+k)}">✕</button></span>`).join(""):'<span class="muted">No earlier years entered.</span>';
 }
+
+/* ---------- DG Shipping seafarer profile import ---------- */
+/* shared DG Shipping profile parser (copied verbatim into the page) */
+function sdlLinesFromItems(items){
+  const rows=[];
+  items.forEach(it=>{if(!it.str||!it.str.trim())return;const y=Math.round(it.transform[5]),x=it.transform[4];
+    let row=rows.find(r=>Math.abs(r.y-y)<=2);if(!row){row={y,parts:[]};rows.push(row);}row.parts.push({x,s:it.str});});
+  rows.sort((a,b)=>b.y-a.y);
+  return rows.map(r=>r.parts.sort((a,b)=>a.x-b.x).map(p=>p.s).join(" ").replace(/\s+/g," ").trim());
+}
+const SDL_KEYS=[["vessel","Ship Name"],["flag","Flag"],["officialNo","Official No\\.?"],["registry","Port of Registry"],["imo","IMO Number"],["ptype","Ship Type"],["gt","\\bGT"],["tradeArea","Trade Area"],["rank","Rank"],["watch","Nature of watch ?keeping"],["on","Service From \\(Date\\)"],["off","Service To \\(Date\\)"],["artM","Article of Months"],["artD","Article Days"],["propulsionKw","Propulsion power ?\\(KW\\)"],["ptypeProp","Propulsion Type"],["propellingDays","Propelling days"],["remarks","Remarks"]];
+function sdlParseProfile(text){
+  const t=text.replace(/\r/g,"");
+  const keyRe=new RegExp("("+SDL_KEYS.map(k=>k[1]).join("|")+")\\s*:","gi");
+  const starts=[];const startRe=/\d+\s*\.\s*Ship Name\s*:/gi;let m;
+  while((m=startRe.exec(t)))starts.push(m.index);
+  const recs=[];
+  starts.forEach((s,i)=>{
+    let chunk=t.slice(s,i+1<starts.length?starts[i+1]:t.length);
+    chunk=chunk.replace(/^\d+\s*\.\s*/,"");
+    const cut=chunk.search(/Report generated on|Total no of record|Post Sea Training|Page \d+ of \d+/i);
+    const hits=[];let k;keyRe.lastIndex=0;
+    while((k=keyRe.exec(chunk)))hits.push({name:k[1],start:k.index,end:keyRe.lastIndex});
+    const f={};
+    hits.forEach((h,j)=>{
+      const key=SDL_KEYS.find(x=>new RegExp("^"+x[1]+"$","i").test(h.name.trim()));if(!key||f[key[0]]!=null)return;
+      let stop=j+1<hits.length?hits[j+1].start:chunk.length;
+      if(cut>h.end&&cut<stop)stop=cut;
+      f[key[0]]=chunk.slice(h.end,stop).replace(/\s+/g," ").trim();
+    });
+    if(!f.vessel||!f.on)return;
+    const iso=d=>{const mm=String(d||"").match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);return mm?`${mm[3]}-${mm[2].padStart(2,"0")}-${mm[1].padStart(2,"0")}`:"";};
+    const num=v=>{const n=parseFloat(String(v||"").replace(/,/g,""));return isNaN(n)?"":n;};
+    recs.push({vessel:f.vessel,flag:f.flag||"",officialNo:f.officialNo||"",registry:f.registry||"",imo:(String(f.imo||"").match(/\d{7}/)||[""])[0],
+      ptype:f.ptype||"",gt:num(f.gt),tradeArea:f.tradeArea||"",rank:f.rank||"",watch:f.watch||"",on:iso(f.on),off:iso(f.off),
+      propulsionKw:num(f.propulsionKw),propellingDays:num(f.propellingDays)});
+  });
+  return recs.filter(r=>r.on);
+}
+
+const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+function loadPdfJs(){if(window.pdfjsLib)return Promise.resolve();return new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=PDFJS+"pdf.min.js";sc.onload=()=>{try{window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";res();}catch(e){rej(e);}};sc.onerror=()=>rej(new Error("load"));document.head.appendChild(sc);});}
+const titleCase=v=>String(v||"").toLowerCase().replace(/(^|[\s\-\/(])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\bOf\b/g,"of").replace(/\bAnd\b/g,"and");
+function normFlag(f){let v=titleCase(f.trim());if(/^marshall island$/i.test(v))v="Marshall Islands";if(/^isle of man$/i.test(v))v="Isle of Man";return v;}
+function mapType(t){const x=String(t||"").toLowerCase();
+  if(/lng/.test(x))return "LNG Carrier";if(/lpg|gas carrier|lpg\/|liquefied petroleum/.test(x))return "LPG Carrier";
+  if(/oil.*chem|chem.*oil/.test(x))return "Oil/Chem Product Tanker";if(/chemical/.test(x))return "Chemical Tanker";if(/product/.test(x))return "Product Tanker";
+  if(/crude|oil tanker|^tanker/.test(x))return "Oil Tanker (Crude)";if(/bulk|ore/.test(x))return "Bulk Carrier";if(/container/.test(x))return "Container Ship";
+  if(/general cargo|multi.?purpose/.test(x))return "General Cargo";if(/car carrier|pctc|pcc|ro.?ro/.test(x))return "Car Carrier (PCTC)";return "Offshore / Other";}
+function defaultRank(r){const x=String(r||"").toLowerCase();
+  if(ALLRANKS.some(a=>a.toLowerCase()===x))return ALLRANKS.find(a=>a.toLowerCase()===x);
+  const R=[[/trainee marine engineer|\btme\b/,"Junior Engineer"],[/oicew|watch ?keeping engineer/,"4th Engineer"],[/chief engineer/,"Chief Engineer"],[/(2nd|second) engineer/,"2nd Engineer"],[/(3rd|third) engineer/,"3rd Engineer"],[/(4th|fourth) engineer/,"4th Engineer"],[/junior engineer/,"Junior Engineer"],[/electro|\beto\b/,"ETO (Electro-Technical Officer)"],[/electrical officer/,"Electrical Officer"],[/gas engineer/,"Gas Engineer"],[/master|captain/,"Master / Captain"],[/chief (mate|officer)/,"Chief Officer"],[/(2nd|second) (mate|officer)/,"2nd Officer"],[/(3rd|third) (mate|officer)|oicnw|navigational watch officer|watch ?keeping (navigat|deck)/,"3rd Officer"],[/deck cadet|trainee (navigat|deck)/,"Deck Cadet / Trainee"],[/engine cadet/,"Engine Cadet / TME"],[/bosun|boatswain/,"Bosun"],[/able|\bab\b/,"AB (Able Seaman)"],[/ordinary|\bos\b/,"OS (Ordinary Seaman)"],[/pump/,"Pumpman"],[/motorman/,"Motorman"],[/oiler/,"Oiler"],[/wiper/,"Wiper"],[/fitter/,"Fitter"],[/chief cook/,"Chief Cook"],[/cook/,"2nd Cook"],[/steward|messman/,"Messman / Steward"]];
+  const hit=R.find(([re])=>re.test(x));return hit?hit[1]:r;}
+let PIMP=null;
+const normName=v=>String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"").replace(/^(MV|MT|MS|LNGC|LPGC|SS)/,"");
+function findExisting(r){const id="dgs-"+(r.imo||normName(r.vessel))+"-"+r.on;
+  return S.example?null:S.contracts.find(c=>c.id===id||(r.imo&&c.imo===r.imo&&c.on===r.on)||(normName(c.vessel)===normName(r.vessel)&&c.on===r.on));}
+function candidate(r,map){return {vessel:r.vessel,type:mapType(r.ptype),rank:map[r.rank]!=null?map[r.rank]:defaultRank(r.rank),imo:r.imo,flag:r.flag?normFlag(r.flag):"",registry:r.registry?titleCase(r.registry):"",officialNo:r.officialNo,gt:r.gt,tradeArea:r.tradeArea?titleCase(r.tradeArea):"",propulsionKw:r.propulsionKw,propellingDays:r.propellingDays,watch:r.watch,on:r.on,off:r.off};}
+const blank=v=>v===""||v==null;
+function planImport(){
+  const map=PIMP.map;return PIMP.recs.map(r=>{const cand=candidate(r,map),ex=findExisting(r);
+    if(!ex)return {r,cand,ex:null,fill:Object.keys(cand).filter(k=>!blank(cand[k])),status:"new"};
+    const fill=Object.keys(cand).filter(k=>blank(ex[k])&&!blank(cand[k]));return {r,cand,ex,fill,status:fill.length?"update":"same"};});
+}
+function renderImport(){
+  const body=$("pImpBody");if(!PIMP){body.hidden=true;return;}body.hidden=false;
+  const plan=planImport(),nNew=plan.filter(p=>p.status==="new").length,nUp=plan.filter(p=>p.status==="update").length;
+  const ranks=[...new Set(PIMP.recs.map(r=>r.rank).filter(Boolean))];
+  const opts=v=>`<option value="">(keep as written)</option>`+Object.entries(RANKS).map(([g,items])=>`<optgroup label="${g}">${items.map(i=>`<option ${i===v?"selected":""}>${esc(i)}</option>`).join("")}</optgroup>`).join("");
+  body.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+   <div><b>${PIMP.recs.length} sea-service record${PIMP.recs.length===1?"":"s"} found</b> in ${esc(PIMP.name)}. <span class="pill NR">${nNew} new</span> <span class="pill RNOR">${nUp} with missing details to fill</span> <span class="pill UNK">${plan.length-nNew-nUp} already up to date</span></div>
+   <div class="small muted">Nothing you already entered is overwritten. Existing ships only get details that are blank in your app (for example a sign-off date that was missing).</div>
+   ${ranks.length?`<div><div class="eyebrow" style="margin-bottom:6px">Rank names in the PDF → rank in the app</div><div class="fgrid">${ranks.map((rk,i)=>`<label class="f"><span>${esc(rk)}</span><select data-rk="${i}">${opts(PIMP.map[rk]!=null?PIMP.map[rk]:(ALLRANKS.includes(defaultRank(rk))?defaultRank(rk):""))}</select></label>`).join("")}</div></div>`:""}
+   <div class="tbl-wrap"><table><thead><tr><th>Vessel</th><th>Type</th><th>Rank</th><th>Sign-on</th><th>Sign-off</th><th>Result</th></tr></thead><tbody>${plan.map(p=>`<tr><td><b>${esc(p.cand.vessel)}</b><span class="sub">${p.cand.imo?"IMO "+esc(p.cand.imo):""}</span></td><td>${esc(p.cand.type)}</td><td>${esc(p.cand.rank||"—")}</td><td class="mono">${fmt(dn(p.cand.on))}</td><td class="mono">${fmt(dn(p.cand.off))}</td><td>${p.status==="new"?'<span class="pill NR">New ship</span>':p.status==="update"?`<span class="pill RNOR">Fill ${p.fill.length} detail${p.fill.length===1?"":"s"}</span>`:'<span class="pill UNK">Up to date</span>'}</td></tr>`).join("")}</tbody></table></div>
+   <div class="actions" style="margin-top:0"><button class="btn-primary" id="pImpGo" ${nNew+nUp?"":"disabled"}>${nNew+nUp?`Add ${nNew} new ship${nNew===1?"":"s"}${nUp?` and update ${nUp}`:""}`:"Nothing new to add"}</button><button class="btn-ghost" id="pImpCancel">Close</button></div></div>`;
+  body.querySelectorAll("[data-rk]").forEach(sel=>sel.addEventListener("change",()=>{PIMP.map[ranks[+sel.dataset.rk]]=sel.value||ranks[+sel.dataset.rk];renderImport();}));
+  $("pImpCancel").onclick=()=>{PIMP=null;renderImport();};
+  $("pImpGo").onclick=()=>{
+    if(S.example)leaveExample();const now=Date.now();let added=0,updated=0;
+    planImport().forEach(p=>{
+      if(p.status==="new"){S.contracts.push(Object.assign({id:"dgs-"+(p.cand.imo||normName(p.cand.vessel))+"-"+p.cand.on,company:"",fleet:"",left:"",arr:"",onIndia:false,offIndia:false,onPort:"",offPort:"",coastal:false,notes:"From DG Shipping profile",source:"DGS profile",u:now},p.cand));added++;}
+      else if(p.status==="update"){p.fill.forEach(k=>p.ex[k]=p.cand[k]);p.ex.u=now;updated++;}
+    });
+    S.settings.rankMap=Object.assign({},S.settings.rankMap||{},PIMP.map);
+    PIMP=null;render();renderImport();persist();
+    setTimeout(()=>setSave(`Profile imported: ${added} ship${added===1?"":"s"} added, ${updated} updated`),700);
+    $("register").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+  };
+}
+$("profilePdf").addEventListener("change",async e=>{
+  const file=e.target.files[0];e.target.value="";if(!file)return;
+  const body=$("pImpBody");body.hidden=false;body.innerHTML='<div class="muted">Reading your profile…</div>';
+  try{
+    await loadPdfJs();
+    const pdf=await window.pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;let lines=[];
+    for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const tc=await pg.getTextContent();lines=lines.concat(sdlLinesFromItems(tc.items));}
+    const recs=sdlParseProfile(lines.join("\n"));
+    if(!recs.length){body.innerHTML='<div class="err">No sea-service records were found in this PDF. Use the “Seafarer Profile” PDF downloaded from the DG Shipping e-Governance portal. Scanned or photographed copies cannot be read.</div>';return;}
+    const map={};const saved=S.settings.rankMap||{};recs.forEach(r=>{if(r.rank&&map[r.rank]==null&&saved[r.rank]!=null)map[r.rank]=saved[r.rank];});
+    PIMP={name:file.name,recs,map};renderImport();
+  }catch(err){body.innerHTML=`<div class="err">${navigator.onLine===false&&!window.pdfjsLib?"The PDF reader needs internet the first time. Connect once and try again.":"This file could not be read. Check that it is the DG Shipping Seafarer Profile PDF."}</div>`;}
+});
 
 /* ---------- charts ---------- */
 const stColor=s=>({NR:"var(--ok)",RNOR:"var(--warn)",ROR:"var(--bad)"}[s]||"var(--unk)");
