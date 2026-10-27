@@ -36,7 +36,7 @@
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--hero-a)}
 .wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-main.wrap{padding-block:22px 56px;display:flex;flex-direction:column;gap:22px}
+main.wrap{padding-block:22px 110px;display:flex;flex-direction:column;gap:22px}
 h1,h2,h3{font-family:var(--f-display);font-weight:600;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
 h2{font-size:1.5rem;text-transform:uppercase;letter-spacing:.03em}
 h3{font-size:1.15rem}
@@ -80,10 +80,14 @@ label.f>span,div.f>span{font-weight:500}
 .navchips a:hover{background:#ffffff22;border-color:var(--glow)}
 .badge[hidden]{display:none}
 .badge{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-family:var(--f-mono);font-size:.7rem;display:inline-grid;place-items:center}
-.refreshrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}
-.refreshbtn{display:inline-flex;align-items:center;gap:6px;background:#ffffff14;border:1px solid #ffffff2e;color:var(--hero-ink);border-radius:999px;padding:6px 14px;font-size:.84rem}
-.refreshbtn:hover{border-color:var(--glow);background:#ffffff22}
-.refreshbtn.spin svg{animation:spin 0.9s linear infinite}
+.refreshdock{position:fixed;z-index:40;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);border:0;border-radius:16px;padding:10px 16px 10px 12px;box-shadow:0 14px 34px -12px #000a;text-align:left;max-width:calc(100vw - 32px)}
+.refreshdock:hover{filter:brightness(1.12)}
+.refreshdock .ico{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);flex:none;position:relative}
+.refreshdock .ico svg{width:18px;height:18px}
+.refreshdock b{display:block;font-size:.92rem;font-weight:600;line-height:1.2}
+.refreshdock small{display:block;font-family:var(--f-mono);font-size:.7rem;opacity:.75;line-height:1.3}
+.refreshdock .upd{position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:var(--ok);border:2px solid var(--ink)}
+.refreshdock.spin .ico svg{animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .save-state{font-family:var(--f-mono);font-size:.74rem;color:var(--hero-dim);margin-top:14px}
 .bridge{background:linear-gradient(180deg,#ffffff14,#ffffff08);border:1px solid #ffffff24;border-radius:18px;padding:18px 20px;backdrop-filter:blur(6px);box-shadow:0 30px 60px -30px #000a;display:flex;flex-direction:column;gap:10px}
@@ -292,7 +296,6 @@ tfoot td{font-weight:600;background:var(--soft)}
         <a href="#results">Year results</a>
         <a href="#register">Sea-service register</a>
       </nav>
-      <div class="refreshrow"><button type="button" id="refreshBtn" class="refreshbtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg><span>Refresh</span></button><span class="save-state" id="lastRefreshed" style="margin-top:0"></span></div>
       <div class="save-state" id="saveState">Loading…</div>
     </div>
     <div class="bridge" id="bridge" aria-live="polite"></div>
@@ -304,6 +307,7 @@ tfoot td{font-weight:600;background:var(--soft)}
   </div>
 </header>
 
+<button type="button" class="refreshdock" id="refreshBtn" aria-describedby="lastRefreshed"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg><span class="upd" id="updDot" hidden></span></span><span><b id="refreshLbl">Refresh</b><small id="lastRefreshed">Not refreshed yet</small></span></button>
 <main class="wrap">
   <div class="banner" id="offlineBanner" hidden style="border-color:var(--sea);background:color-mix(in srgb,var(--sea) 9%,var(--paper))">
     <div><b>Offline app.</b> Everything you enter is saved on this device. When you have internet, tap <b>Export sync file</b> below, then open the online Sea Days Ledger and use <b>Import / merge file</b>. Entries combine; nothing is overwritten.</div>
@@ -552,7 +556,7 @@ async function initStore(){
     ref=db.collection("data/users/"+id).doc("ledger");
     const snap=await ref.get();
     const remote=snap.exists?snap.data():null;
-    if(remote){adopt(remote);let changed=false;if(local)changed=merge(local);render();showRefreshed(Date.now());if(changed){persist();setSave("Synced entries made in this browser to your account");}else setSave("Loaded from your account");}
+    if(remote){adopt(remote);let changed=false;if(local)changed=merge(local);render();if(changed){persist();setSave("Synced entries made in this browser to your account");}else setSave("Loaded from your account");}
     else if(local){persist();setSave("Syncing entries made in this browser to your account…");}
     else setSave("Showing examples · your entries will save to your account");
   }catch(e){setSave(local?"Loaded from this browser":"Showing examples");}
@@ -566,9 +570,11 @@ function offlineApp(local){
 function noShared(msg){NEWS=NEWS||[];NOTICES=NOTICES||[];$("newsList").innerHTML=`<div class="empty">${esc(msg)}</div>`;$("noticeList").innerHTML=`<div class="empty">${esc(msg)}</div>`;}
 
 /* ---------- shared: news + notices ---------- */
-function subscribeShared(db){
-  db.collection("news").orderBy("date","desc").limit(60).onSnapshot(s=>{NEWS=s.docs.map(d=>Object.assign({id:d.id},d.data()));renderNews();},()=>{NEWS=[];renderNews("News could not load right now.");});
-  db.collection("notices").orderBy("createdAt","desc").limit(40).onSnapshot(s=>{NOTICES=s.docs.map(d=>Object.assign({id:d.id},d.data()));renderNotices();},()=>{NOTICES=[];renderNotices("Notices could not load right now.");});
+/* news and notices load when the page opens and when you press Refresh, never on their own */
+function subscribeShared(db){return loadShared(db);}
+async function loadShared(db){db=db||DB;if(!db)return;
+  try{const n=await db.collection("news").orderBy("date","desc").limit(60).get();NEWS=n.docs.map(d=>Object.assign({id:d.id},d.data()));renderNews();}catch(e){NEWS=NEWS||[];renderNews("News could not load right now.");}
+  try{const t=await db.collection("notices").orderBy("createdAt","desc").limit(40).get();NOTICES=t.docs.map(d=>Object.assign({id:d.id},d.data()));renderNotices();}catch(e){NOTICES=NOTICES||[];renderNotices("Notices could not load right now.");}
 }
 function relDate(s){const n=dn(s);if(n==null)return "";const diff=TODAY-n;return diff<=0?"Today":diff===1?"Yesterday":diff<7?diff+" days ago":fmt(n);}
 function renderNewsTopics(){
@@ -608,7 +614,7 @@ $("composer").addEventListener("submit",async e=>{
   if(!t&&!b){$("nErr").textContent="Write a title or message first.";return;}
   if(!DB){$("nErr").textContent="Notices need you to be signed in.";return;}
   $("nErr").textContent="Posting…";
-  try{await DB.collection("notices").add({title:t||"Update",body:b,level:$("nLevel").value,createdAt:Date.now()});$("nTitle").value="";$("nBody").value="";$("nErr").textContent="Posted";lsSet("sdlNoticesSeen",String(Date.now()));setTimeout(()=>$("nErr").textContent="",2500);}
+  try{await DB.collection("notices").add({title:t||"Update",body:b,level:$("nLevel").value,createdAt:Date.now()});$("nTitle").value="";$("nBody").value="";$("nErr").textContent="Posted";loadShared();lsSet("sdlNoticesSeen",String(Date.now()));setTimeout(()=>$("nErr").textContent="",2500);}
   catch(err){$("nErr").textContent="Could not post ("+(err&&err.code||"error")+").";}
 });
 let pendingN=null;
@@ -616,7 +622,7 @@ $("noticeList").addEventListener("click",async e=>{
   const b=e.target.closest("[data-ndel]");if(!b||!DB)return;
   if(pendingN!==b.dataset.ndel){pendingN=b.dataset.ndel;b.textContent="Confirm delete";setTimeout(()=>{if(pendingN===b.dataset.ndel){pendingN=null;b.textContent="Delete";}},4000);return;}
   pendingN=null;b.textContent="Deleting…";
-  try{await DB.collection("notices").doc(b.dataset.ndel).delete();}catch(err){b.textContent="Delete failed";}
+  try{await DB.collection("notices").doc(b.dataset.ndel).delete();loadShared();}catch(err){b.textContent="Delete failed";}
 });
 $("markRead").addEventListener("click",()=>{lsSet("sdlNoticesSeen",String(Date.now()));renderNotices();});
 $("newsTopics").addEventListener("click",e=>{const b=e.target.closest("[data-topic]");if(!b)return;newsTopic=b.dataset.topic;renderNews();});
@@ -1101,32 +1107,48 @@ $("impJson").addEventListener("change",e=>{
   rd.readAsText(file);
 });
 
-/* ---------- refresh ---------- */
-function showRefreshed(t){if(t)lsSet("sdlRefreshed",String(t));const v=+(lsGet("sdlRefreshed")||0);$("lastRefreshed").textContent=v?"Last refreshed: "+new Date(v).toLocaleString(undefined,{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):"";}
+/* ---------- refresh (only when you press it) ---------- */
+function showRefreshed(t){if(t)lsSet("sdlRefreshed",String(t));const v=+(lsGet("sdlRefreshed")||0);$("lastRefreshed").textContent=v?"Last refreshed "+new Date(v).toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"Not refreshed yet";}
+function showUpdateReady(){const on=!!window.sdlUpdateReady;$("updDot").hidden=!on;$("refreshLbl").textContent=on?"Refresh · update ready":"Refresh";}
+document.addEventListener("sdl-update",showUpdateReady);
 async function refreshAll(){
-  const btn=$("refreshBtn");if(btn.classList.contains("spin"))return;btn.classList.add("spin");$("refreshBtn").querySelector("span").textContent="Refreshing…";
+  const btn=$("refreshBtn");if(btn.classList.contains("spin"))return;btn.classList.add("spin");$("refreshLbl").textContent="Refreshing…";
   try{
+    if(OFFLINE&&typeof window.sdlAppUpdate==="function"){showRefreshed(Date.now());if(await window.sdlAppUpdate())return;}
     if(ref){
       const snap=await ref.get();
-      if(snap.exists){const remote=snap.data();const mine=S.example?null:snapshot();adopt(remote);let changed=false;if(mine)changed=merge(mine);render();if(changed)persist();}
-      setSave("Up to date with your account");showRefreshed(Date.now());
-    }else if(OFFLINE&&"serviceWorker" in navigator&&location.protocol.startsWith("http")){
-      showRefreshed(Date.now());
-      try{const reg=await navigator.serviceWorker.getRegistration();if(reg&&navigator.onLine)await reg.update();}catch(e){}
-      location.reload();return;
+      if(snap.exists){const mine=S.example?null:snapshot();adopt(snap.data());let changed=false;if(mine)changed=merge(mine);render();if(changed)persist();}
+      await loadShared();
+      setSave("Up to date with your account");
     }else{
-      const local=loadLocal();if(local){adopt(local);render();}setSave(navigator.onLine===false?"Offline · showing what is saved on this device":"Reloaded what is saved on this device");showRefreshed(Date.now());
+      const local=loadLocal();if(local){adopt(local);render();}
+      setSave(navigator.onLine===false?"Offline · showing what is saved on this device":"Showing the latest saved on this device");
     }
+    showRefreshed(Date.now());
   }catch(e){setSave(navigator.onLine===false?"No internet · showing what is saved on this device":"Could not refresh right now. Try again in a moment.");}
-  finally{btn.classList.remove("spin");btn.querySelector("span").textContent="Refresh";}
+  finally{btn.classList.remove("spin");showUpdateReady();}
 }
 $("refreshBtn").addEventListener("click",refreshAll);
-showRefreshed(lsGet("sdlRefreshed")?null:Date.now());
+showRefreshed();showUpdateReady();
 
 window.addEventListener("online",()=>{if(!S.example)persist();});
 window.addEventListener("offline",()=>setSave("Offline · entries are kept in this browser and sync when you reconnect"));
 resetForm();render();renderNewsTopics();initStore();
 })();
 </script>
-<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
-try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}</script></body></html>
+<script>
+(function(){
+  /* the app never updates or reloads by itself: a new version is downloaded quietly and applied only when you press Refresh */
+  if(!("serviceWorker" in navigator))return;let reg=null;
+  function flag(){window.sdlUpdateReady=!!(reg&&reg.waiting&&navigator.serviceWorker.controller);document.dispatchEvent(new Event("sdl-update"));}
+  function watch(w){if(w)w.addEventListener("statechange",()=>{if(w.state==="installed")flag();});}
+  addEventListener("load",async()=>{try{reg=await navigator.serviceWorker.register("sw.js");flag();reg.addEventListener("updatefound",()=>watch(reg.installing));if(navigator.onLine)reg.update().catch(()=>{});}catch(e){}});
+  window.sdlAppUpdate=async function(){
+    if(!reg)return false;
+    try{if(!reg.waiting&&navigator.onLine){await reg.update();const w=reg.installing;if(w)await new Promise(res=>{w.addEventListener("statechange",()=>{if(w.state!=="installing")res();});setTimeout(res,20000);});}}catch(e){}
+    if(reg.waiting&&navigator.serviceWorker.controller){navigator.serviceWorker.addEventListener("controllerchange",()=>location.reload(),{once:true});reg.waiting.postMessage("skipWaiting");return true;}
+    return false;
+  };
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+})();
+</script></body></html>
