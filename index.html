@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202610301034">
+<link rel="stylesheet" href="app.css?v=202610301115">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body>
@@ -29,7 +29,8 @@
       <a href="#dashboard" data-v="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 3v6h8V3z"/></svg><span>Dashboard</span></a>
       <a href="#years" data-v="years"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14l2.5 2.5L16 12"/></svg><span>Year <span class="lbl-long">results</span></span></a>
       <a href="#ships" data-v="ships"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l2 4h14l2-4z"/><path d="M6 17V9h12v8M12 9V3l5 3"/></svg><span>Sea <span class="lbl-long">service</span></span></a>
-      <a href="#upload" data-v="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg><span>Upload <span class="lbl-long">profile</span></span></a>
+      <a href="#upload" data-v="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg><span>Upload <span class="lbl-long">seafarer profile</span></span></a>
+      <a href="#complete" data-v="complete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4h6M9 4a2 2 0 0 0-2 2v0h10v0a2 2 0 0 0-2-2M7 6H5v15h14V6h-2"/><path d="M8.5 13.5l2.2 2.2 4.8-4.8"/></svg><span><span class="lbl-long">Complete details</span><span class="lbl-short">Details</span></span><b class="badge" id="cdBadge" hidden>0</b></a>
       <div class="sep"></div>
       <a href="#notices" data-v="notices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg><span>Notices</span><b class="badge" id="noticeBadge" hidden>0</b></a>
       <a href="#news" data-v="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/></svg><span><span class="lbl-long">Maritime </span>News</span><b class="badge" id="newsBadge" hidden>0</b></a>
@@ -152,7 +153,7 @@
     </section>
 
     <!-- UPLOAD -->
-    <section class="view" id="v-upload" data-title="Upload profile" hidden>
+    <section class="view" id="v-upload" data-title="Upload seafarer profile" hidden>
       <div class="vhead"><div><h1>Upload seafarer profile</h1><p class="muted">Add your sea service straight from the “Seafarer Profile” PDF you download from the DG Shipping e-Governance portal.</p></div></div>
       <div class="banner info" id="upOnline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5v.01M2 9a15 15 0 0 1 20 0"/></svg><div><b>Works only when you're online.</b> The PDF is read on this device and is never uploaded anywhere.</div></div>
       <div class="card card-b" style="display:flex;flex-direction:column;gap:12px">
@@ -160,10 +161,27 @@
           <li>Download your latest Seafarer Profile PDF from the DG Shipping portal.</li>
           <li>Choose the file below. The app reads the “Sea Going Service” records only.</li>
           <li>Check the preview. New ships are added; ships you already have only get details that are blank. Nothing is overwritten.</li>
+          <li>Then open <a href="#complete">Complete details</a> to add what the profile doesn't include: passport dates, sign-on and sign-off ports, company and fleet.</li>
         </ol>
         <div class="actions"><label class="btn btn-primary" for="profilePdf" id="pickLbl">Choose profile PDF</label><input type="file" id="profilePdf" accept="application/pdf,.pdf" hidden><span class="small muted" id="upState"></span></div>
       </div>
       <div class="card card-b" id="pImpBody" hidden></div>
+    </section>
+
+    <!-- COMPLETE DETAILS -->
+    <section class="view" id="v-complete" data-title="Complete details" hidden>
+      <div class="vhead"><div><h1>Complete details</h1><p class="muted">Your seafarer profile doesn't include these. Passport dates are used only to count NRI days; CDC dates are used for all sea time.</p></div></div>
+      <div class="card card-b cd-top">
+        <div id="cdProgress"></div>
+        <div class="filters">
+          <div class="f always"><span>Show</span><div class="chips" id="cdShow" role="group" aria-label="Show"><button type="button" data-s="todo" aria-pressed="true">Needs details</button><button type="button" data-s="all" aria-pressed="false">All contracts</button></div></div>
+          <label class="f"><span>Financial year</span><select id="cdFY"></select></label>
+          <label class="f wide"><span>Vessel name or IMO</span><input id="cdQ" placeholder="e.g. Al Amerat" autocomplete="off"></label>
+        </div>
+        <div class="banner warn small" style="align-items:center;justify-content:space-between;flex-wrap:wrap"><div><b>No passport dates to hand?</b> Fill the blanks as an estimate (left India the day before sign-on, arrived India the day after sign-off). Estimated dates are marked so you can correct them from your passport later.</div><button type="button" class="btn-sm" id="cdEstAll">Estimate all blank passport dates</button></div>
+      </div>
+      <div id="cdList" style="display:flex;flex-direction:column;gap:12px"></div>
+      <datalist id="cdCompany"></datalist><datalist id="cdFleet"></datalist>
     </section>
 
     <!-- NOTICES -->
@@ -269,6 +287,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202610301034"></script>
+<script src="app.js?v=202610301115"></script>
 </body>
 </html>

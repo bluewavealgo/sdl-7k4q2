@@ -19,6 +19,7 @@ const fyLabel=f=>f+"-"+String((f+1)%100).padStart(2,"0");
 function span(y,m,d){const p=[];if(y)p.push(y+"y");if(m||y)p.push(m+"m");p.push(d+"d");return p.join(" ");}
 function ymd(a,b){const s=new Date(a*DAY),e=new Date((b+1)*DAY);let y=e.getUTCFullYear()-s.getUTCFullYear(),m=e.getUTCMonth()-s.getUTCMonth(),d=e.getUTCDate()-s.getUTCDate();
   if(d<0){m--;d+=new Date(Date.UTC(e.getUTCFullYear(),e.getUTCMonth(),0)).getUTCDate();}if(m<0){y--;m+=12;}return span(y,m,d);}
+const yrs=d=>(Math.max(0,d)/365).toFixed(2); /* sea time in decimal years: days ÷ 365 */
 function approx(days){const y=Math.floor(days/365);const r=days-y*365;const m=Math.floor(r/30);return span(y,m,r-m*30);}
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const nf=n=>(n===""||n==null||isNaN(+n))?"":Number(n).toLocaleString("en-IN");
@@ -135,6 +136,19 @@ function compute(){
   });
   return {res,order,dataFrom};
 }
+/* passport dates count NRI days; flag contracts that still need exact dates */
+function passIssue(c){
+  const on=dn(c.on);if(on==null||on>TODAY)return "";
+  const est=c.passEst||{};
+  const needArr=c.off&&dn(c.off)<=TODAY;
+  if(!c.left||(needArr&&!c.arr))return "missing";
+  if(est.left||(needArr&&est.arr))return "estimated";
+  return "";
+}
+function fyPassIssues(f){const s=fyStart(f),e=fyEnd(f);let missing=0,estimated=0;S.contracts.forEach(c=>{const sp=shipSpan(c);if(!sp||!overlap(sp[0],sp[1],s,e))return;const k=passIssue(c);if(k==="missing")missing++;else if(k==="estimated")estimated++;});return {missing,estimated};}
+function passNote(f,short){const p=fyPassIssues(f);if(!p.missing&&!p.estimated)return "";
+  const parts=[];if(p.missing)parts.push(`${p.missing} contract${p.missing===1?" has":"s have"} no passport dates`);if(p.estimated)parts.push(`${p.estimated} use${p.estimated===1?"s":""} estimated dates`);
+  return `<div class="warnline">Exact passport dates needed: ${parts.join(", ")}. ${short?"":"This result is an estimate from CDC dates until you add them. "}<a href="#complete">Complete details</a></div>`;}
 const statusName=s=>({NR:"Non-Resident (NRI)",RNOR:"Resident but Not Ordinarily Resident",ROR:"Resident and Ordinarily Resident",UNK:"Not enough data"}[s]);
 const stColor=s=>({NR:"var(--ok)",RNOR:"var(--warn)",ROR:"var(--bad)"}[s]||"var(--unk)");
 function taxLine(r){
@@ -146,7 +160,7 @@ function taxLine(r){
 const actLabel=f=>f>=2026?"Income-tax Act, 2025 · Rule 8 (crew)":"Income-tax Act, 1961 · Rule 126 (crew)";
 
 /* ======================= routing ======================= */
-const VIEWS=["dashboard","years","ships","upload","notices","news","account","help","about"];
+const VIEWS=["dashboard","years","ships","upload","complete","notices","news","account","help","about"];
 let VIEW="dashboard",noticesPrevSeen=0;
 function show(v){
   if(!VIEWS.includes(v))v="dashboard";VIEW=v;
@@ -155,6 +169,7 @@ function show(v){
   document.title=($("v-"+v).dataset.title)+" · Sea Days Ledger";
   if(v==="notices"){noticesPrevSeen=+(lsGet("sdlNoticesSeen")||0);lsSet("sdlNoticesSeen",String(Date.now()));renderNotices();}
   if(v==="upload")renderUploadState();
+  if(v==="complete")renderComplete();
   if(v==="news"){newsPrevSeen=+(lsGet("sdlNewsSeen")||0);lsSet("sdlNewsSeen",String(Date.now()));renderNews();}
   if(v==="account")renderAccount();
   window.scrollTo(0,0);
@@ -182,7 +197,10 @@ function render(){
   $("edgeSet").checked=S.settings.edge!==false;
   $("exampleBanner").hidden=!S.example;
   $("exampleBanner").innerHTML=S.example?`<div class="banner example"><div><b>These are example voyages.</b> Upload your seafarer profile or add a contract, and the examples disappear.</div><div class="actions"><a class="btn btn-primary btn-sm" href="#upload">Upload profile</a><a class="btn btn-sm" href="#ships" id="exAdd">Add contract</a></div></div>`:"";
-  renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();
+  renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();renderCdBadge();
+  fillSelect($("cdFY"),[["","All years"]].concat(fyOpts),$("cdFY").value);
+  $("cdCompany").innerHTML=uniq("company").map(f=>`<option value="${esc(f)}">`).join("");$("cdFleet").innerHTML=uniq("fleet").map(f=>`<option value="${esc(f)}">`).join("");
+  if(VIEW==="complete"&&!cdEditing)renderComplete();
 }
 
 /* ---------- dashboard ---------- */
@@ -211,8 +229,8 @@ function renderDashboard(){
     <div class="kvs"><div class="kv"><b>${need}</b><span>days outside needed</span></div><div class="kv"><b>${more}</b><span>more days outside to go</span></div><div class="kv"><b>${allow}</b><span>more India days allowed</span></div></div>`;
     const total=S.contracts.reduce((a,c)=>a+shipDaysIn(c,null),0),prop=S.contracts.reduce((a,c)=>a+(+c.propellingDays||0),0),ships=new Set(S.contracts.map(c=>c.imo||c.vessel)).size;
     const msg=more>0?`Stay outside India for <b>${more} more day${more===1?"":"s"}</b> before 31 March ${f+1} to stay NRI this year.`:`You have <b>${out} days</b> outside India this year, ${out-need} more than the ${need} needed. You're on track to stay NRI.`;
-    $("nextStep").innerHTML=`<div class="eyebrow">What this means</div><p class="msg">${msg}</p>
-      <div class="tiles"><div class="tile"><b>${nf(total)}</b><span>days at sea · ${approx(total)}</span></div><div class="tile"><b>${S.contracts.length}</b><span>contracts on ${ships} ship${ships===1?"":"s"}</span></div><div class="tile"><b>${nf(prop)||"—"}</b><span>propelling days</span></div><div class="tile"><b>${C.order.filter(x=>C.res[x].status==="NR").length}/${C.order.filter(x=>C.res[x].india!=null).length}</b><span>years as NRI</span></div></div>
+    $("nextStep").innerHTML=`<div class="eyebrow">What this means</div><p class="msg">${msg}</p>${passNote(f,true)}
+      <div class="tiles"><div class="tile"><b>${yrs(total)} yrs</b><span>${nf(total)} days at sea · ${approx(total)}</span></div><div class="tile"><b>${S.contracts.length}</b><span>contracts on ${ships} ship${ships===1?"":"s"}</span></div><div class="tile"><b>${nf(prop)||"—"}</b><span>propelling days</span></div><div class="tile"><b>${C.order.filter(x=>C.res[x].status==="NR").length}/${C.order.filter(x=>C.res[x].india!=null).length}</b><span>years as NRI</span></div></div>
       <div class="actions"><a class="btn btn-sm" href="#years">See every year</a><a class="btn btn-sm" href="#ships">Sea service</a></div>`;
   }
   renderRings();renderBars();renderDonuts();
@@ -255,9 +273,9 @@ function donut(el,rows,label){
   const total=rows.reduce((s,r)=>s+r.v,0);
   if(!total){el.innerHTML='<div class="empty">No sea time for this choice.</div>';return;}
   const cx=110,cy=110,ro=96,ri=64;let a=0,g="";
-  rows.forEach(r=>{const a1=a+r.v/total*Math.PI*2;g+=`<path class="mark" d="${sector(cx,cy,ro,ri,a,a1)}" fill="${r.c}" stroke="var(--paper)" stroke-width="2" fill-rule="evenodd" data-tip="${esc(r.l+"\n"+r.v+" days · "+approx(r.v)+"\n"+Math.round(r.v/total*100)+"%")}"/>`;a=a1;});
-  g+=`<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="24" fill="var(--ink)" font-weight="500">${nf(total)}</text><text x="${cx}" y="${cy+18}" text-anchor="middle" font-size="9" fill="var(--muted)" letter-spacing="1">DAYS AT SEA</text><text x="${cx}" y="${cy+32}" text-anchor="middle" font-size="9" fill="var(--muted)">${approx(total)}</text>`;
-  el.innerHTML=`<svg viewBox="0 0 220 220" role="img" aria-label="${esc(label)}">${g}</svg><div class="lg">${rows.map(r=>`<div class="li"><span class="sw" style="background:${r.c}"></span><span class="nm" title="${esc(r.l)}">${esc(r.l)}</span><span class="v">${r.v}d · ${Math.round(r.v/total*100)}%</span></div>`).join("")}</div>`;
+  rows.forEach(r=>{const a1=a+r.v/total*Math.PI*2;g+=`<path class="mark" d="${sector(cx,cy,ro,ri,a,a1)}" fill="${r.c}" stroke="var(--paper)" stroke-width="2" fill-rule="evenodd" data-tip="${esc(r.l+"\n"+yrs(r.v)+" yrs · "+r.v+" days · "+approx(r.v)+"\n"+Math.round(r.v/total*100)+"%")}"/>`;a=a1;});
+  g+=`<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="24" fill="var(--ink)" font-weight="500">${yrs(total)}</text><text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9" fill="var(--muted)" letter-spacing="1">YEARS AT SEA</text><text x="${cx}" y="${cy+30}" text-anchor="middle" font-size="9" fill="var(--muted)">${nf(total)} days</text>`;
+  el.innerHTML=`<svg viewBox="0 0 220 220" role="img" aria-label="${esc(label)}">${g}</svg><div class="lg">${rows.map(r=>`<div class="li"><span class="sw" style="background:${r.c}"></span><span class="nm" title="${esc(r.l)}">${esc(r.l)}</span><span class="v">${yrs(r.v)} yrs · ${Math.round(r.v/total*100)}%</span></div>`).join("")}</div>`;
 }
 let mixKey="rank";
 function renderDonuts(){
@@ -285,13 +303,13 @@ function renderYears(){
     <div class="fy-h"><div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><h3>FY ${fyLabel(f)}</h3><span class="small muted">${fmt(r.s)} – ${fmt(r.e)} · ${r.days} days · ${actLabel(f)}</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${r.current?'<span class="pill plan">In progress</span>':""}${r.outPlan?'<span class="pill plan">Includes planned dates</span>':""}<span class="pill ${st}">${st==="UNK"?"No data":st}</span></div></div>
     <div class="fy-b"><div>
-      <div class="stats"><div class="stat hl"><b>${r.inData?r.outside:"—"}</b><span>days outside India</span></div><div class="stat"><b>${ind==null?"—":ind}</b><span>days in India${r.override!=null?" (entered)":(r.current||r.future?" (projected)":"")}</span></div><div class="stat"><b>${r.inData?r.shipD:"—"}</b><span>days on ship (CDC)</span></div><div class="stat"><b>${need}</b><span>days outside needed</span></div></div>
+      <div class="stats"><div class="stat hl"><b>${r.inData?r.outside:"—"}</b><span>days outside India</span></div><div class="stat"><b>${ind==null?"—":ind}</b><span>days in India${r.override!=null?" (entered)":(r.current||r.future?" (projected)":"")}</span></div><div class="stat"><b>${r.inData?r.shipD:"—"}</b><span>days on ship (CDC)${r.inData?" · "+yrs(r.shipD)+" yrs":""}</span></div><div class="stat"><b>${need}</b><span>days outside needed</span></div></div>
       ${r.inData?`<div class="meter" title="Days outside India against the ${need}-day target"><div class="fill" style="width:${opct}%;background:var(--${r.outside>=need?"ok":(r.outside>=need-20?"warn":"bad")})"></div><div class="thr" style="left:${need/r.days*100}%"></div></div>
       <div class="small muted" style="margin-top:4px">${r.outside>=need?`${r.outside-need} day${r.outside-need===1?"":"s"} to spare`:`${more} more day${more===1?"":"s"} outside needed`}</div>
       <div class="strip" role="img" aria-label="Each day of the year: outside or in India">${r.cells.map(c=>`<i class="${c}"></i>`).join("")}</div><div class="strip-marks">${"AMJJASONDJFM".split("").map(m=>`<span>${m}</span>`).join("")}</div>
       <div class="legend" style="margin-top:6px"><span><i style="background:var(--sea)"></i>Outside India</span><span><i style="background:var(--plan)"></i>Planned</span><span><i style="background:var(--land)"></i>In India</span></div>`:`<p class="small muted" style="margin-top:10px">${r.override!=null?"Days entered under Earlier years.":"No contracts in this year."}</p>`}
     </div>
-    <div class="verdict"><b>${esc(t.h)}</b><ul>${t.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>${(r.flags||[]).map(x=>`<div class="warnline">${esc(x)}</div>`).join("")}
+    <div class="verdict">${passNote(f)}<b>${esc(t.h)}</b><ul>${t.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>${(r.flags||[]).map(x=>`<div class="warnline">${esc(x)}</div>`).join("")}
       <div class="fyopts">
         <label><input type="checkbox" data-o="inc15" ${o.inc15?"checked":""}><span>Indian income (excluding foreign income) above ₹15 lakh</span></label>
         <label><input type="checkbox" data-o="abroadTax" ${o.abroadTax?"checked":""}><span>Tax resident of another country this year</span></label>
@@ -323,7 +341,7 @@ function renderShips(){
   const n=["fFY","fType","fRank","fCompany","fFleet","fFlag"].map(id=>$(id).value).concat($("fVessel").value.trim()).filter(Boolean).length;
   $("sFilterToggle").textContent=n?`Filters (${n})`:"More filters";
   const tot=list.reduce((a,c)=>a+shipDaysIn(c,fF),0),prop=list.reduce((a,c)=>a+(+c.propellingDays||0),0);
-  $("shipTiles").innerHTML=`<div class="tile"><b>${list.length}${n?` <small class="muted" style="font-size:.7rem">of ${S.contracts.length}</small>`:""}</b><span>contracts${n?" match":""}</span></div><div class="tile"><b>${nf(tot)}</b><span>days at sea${fF!=null?` in FY ${fyLabel(fF)}`:""} · ${approx(tot)}</span></div><div class="tile"><b>${nf(prop)||"—"}</b><span>propelling days</span></div>`;
+  $("shipTiles").innerHTML=`<div class="tile"><b>${list.length}${n?` <small class="muted" style="font-size:.7rem">of ${S.contracts.length}</small>`:""}</b><span>contracts${n?" match":""}</span></div><div class="tile"><b>${yrs(tot)} yrs</b><span>${nf(tot)} days at sea${fF!=null?` in FY ${fyLabel(fF)}`:""} · ${approx(tot)}</span></div><div class="tile"><b>${nf(prop)||"—"}</b><span>propelling days</span></div>`;
   if(!list.length){$("ctable").innerHTML=`<tbody><tr><td class="empty">${S.contracts.length?"No contracts match these filters.":"No contracts yet. Upload your seafarer profile or add a contract."}</td></tr></tbody>`;}
   else{
     const rows=list.map(c=>{const sp=shipSpan(c),d=sp?sp[1]-sp[0]+1:0,planned=["left","on","off","arr"].some(k=>{const v=dn(c[k]);return v!=null&&v>TODAY;}),pass=c.left||c.arr;
@@ -331,9 +349,9 @@ function renderShips(){
       <td data-l="Type · company"><span class="tchip" style="--tc:${typeColor(c.type)}">${esc(c.type)}</span><span class="sub">${esc(c.company||"—")}${c.fleet?" · "+esc(c.fleet):""}</span></td>
       <td data-l="Sign-on" class="mono">${fmt(dn(c.on))}<span class="sub">${c.onIndia?"Indian port":"Abroad"}${c.onPort?" · "+esc(c.onPort):""}</span></td>
       <td data-l="Sign-off" class="mono">${c.off?fmt(dn(c.off)):'<span class="pill plan">onboard</span>'}<span class="sub">${c.off?(c.offIndia?"Indian port":"Abroad")+(c.offPort?" · "+esc(c.offPort):""):""}</span></td>
-      <td data-l="Passport" class="mono">${pass?`${fmt(dn(c.left))} → ${fmt(dn(c.arr))}`:"—"}<span class="sub">${pass?"Counted by passport":"Counted by CDC"}</span></td>
-      <td data-l="Days on ship" class="n">${d}<span class="sub">${sp?ymd(sp[0],sp[1]):""}</span></td>
-      ${fF!=null?`<td data-l="In FY ${fyLabel(fF)}" class="n">${shipDaysIn(c,fF)}</td>`:""}
+      <td data-l="Passport" class="mono">${pass?`${fmt(dn(c.left))} → ${fmt(dn(c.arr))}`:"—"}<span class="sub">${passIssue(c)==="estimated"?"Estimated dates":pass?"Counted by passport":"Needs passport dates"}</span></td>
+      <td data-l="Days on ship" class="n">${d}<span class="sub">${yrs(d)} yrs</span><span class="sub">${sp?ymd(sp[0],sp[1]):""}</span></td>
+      ${fF!=null?`<td data-l="In FY ${fyLabel(fF)}" class="n">${shipDaysIn(c,fF)}<span class="sub">${yrs(shipDaysIn(c,fF))} yrs</span></td>`:""}
       <td data-l="Ship particulars" class="wrap">${partLine(c)}${c.propellingDays!==""&&c.propellingDays!=null?`<span class="sub">${esc(c.propellingDays)} propelling days</span>`:""}</td>
 </tr>`;}).join("");
     $("ctable").innerHTML=`<thead><tr><th>Vessel</th><th>Type · company</th><th>Sign-on</th><th>Sign-off</th><th>Passport</th><th class="n">Days on ship</th>${fF!=null?`<th class="n">In FY ${fyLabel(fF)}</th>`:""}<th>Ship particulars</th></tr></thead><tbody>${rows}</tbody>`;
@@ -341,7 +359,7 @@ function renderShips(){
   const m={};list.forEach(c=>{const k=(c[totKey]||"").trim()||"Not set";m[k]=m[k]||{d:0,n:0,p:0};m[k].d+=shipDaysIn(c,fF);m[k].n++;m[k].p+=(+c.propellingDays||0);});
   const rows=Object.entries(m).sort((a,b)=>b[1].d-a[1].d),max=Math.max(1,...rows.map(r=>r[1].d)),T=rows.reduce((s,r)=>s+r[1].d,0);
   const label={type:"Ship type",rank:"Rank",company:"Company",fleet:"Fleet",flag:"Flag"}[totKey];
-  $("totTable").innerHTML=rows.length?`<thead><tr><th>${label}</th><th class="n">Contracts</th><th class="n">Days</th><th class="n">Y M D</th><th class="n">Propelling</th></tr></thead><tbody>${rows.map(([k,v])=>`<tr><td style="min-width:160px">${esc(k)}<div class="bar"><i style="width:${v.d/max*100}%;--tc:${totKey==="type"?typeColor(k):"var(--sea)"}"></i></div></td><td class="n">${v.n}</td><td class="n">${nf(v.d)}</td><td class="n">${approx(v.d)}</td><td class="n">${nf(v.p)||"—"}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${rows.reduce((s,r)=>s+r[1].n,0)}</td><td class="n">${nf(T)}</td><td class="n">${approx(T)}</td><td class="n">${nf(rows.reduce((s,r)=>s+r[1].p,0))||"—"}</td></tr></tfoot>`:`<tbody><tr><td class="empty">Nothing to total.</td></tr></tbody>`;
+  $("totTable").innerHTML=rows.length?`<thead><tr><th>${label}</th><th class="n">Contracts</th><th class="n">Years</th><th class="n">Days</th><th class="n">Y M D</th><th class="n">Propelling</th></tr></thead><tbody>${rows.map(([k,v])=>`<tr><td style="min-width:160px">${esc(k)}<div class="bar"><i style="width:${v.d/max*100}%;--tc:${totKey==="type"?typeColor(k):"var(--sea)"}"></i></div></td><td class="n">${v.n}</td><td class="n">${yrs(v.d)}</td><td class="n">${nf(v.d)}</td><td class="n">${approx(v.d)}</td><td class="n">${nf(v.p)||"—"}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${rows.reduce((s,r)=>s+r[1].n,0)}</td><td class="n">${yrs(T)}</td><td class="n">${nf(T)}</td><td class="n">${approx(T)}</td><td class="n">${nf(rows.reduce((s,r)=>s+r[1].p,0))||"—"}</td></tr></tfoot>`:`<tbody><tr><td class="empty">Nothing to total.</td></tr></tbody>`;
 }
 
 /* ---------- contract form ---------- */
@@ -361,7 +379,7 @@ function validate(c){
   if(A!=null&&X!=null&&A<X&&!c.offIndia)return "Arrival in India is before sign-off.";if(A!=null&&L!=null&&A<L)return "Arrival in India is before leaving India.";return "";}
 function calcLine(){
   const c=readForm(),O=dn(c.on);if(O==null){$("calcline").innerHTML='<span class="muted">Enter the sign-on date to see days onboard.</span>';return;}
-  const X=dn(c.off)!=null?dn(c.off):Math.max(TODAY,O),parts=[`<span>On ship: <b class="mono">${X-O+1}</b> days (${ymd(O,X)})${c.off?"":" so far"}</span>`],byF={};
+  const X=dn(c.off)!=null?dn(c.off):Math.max(TODAY,O),parts=[`<span>On ship: <b class="mono">${X-O+1}</b> days · <b class="mono">${yrs(X-O+1)}</b> yrs (${ymd(O,X)})${c.off?"":" so far"}</span>`],byF={};
   for(let d=O;d<=X;d++){const f=fyOf(d);byF[f]=(byF[f]||0)+1;}
   Object.entries(byF).forEach(([f,n])=>parts.push(`<span>FY ${fyLabel(+f)}: <b class="mono">${n}</b></span>`));
   parts.push(`<span class="muted">${c.left||c.arr?"Counted by passport dates":"Counted by CDC dates"}</span>`);
@@ -379,7 +397,7 @@ $("c_rank").addEventListener("change",()=>{$("rankOtherWrap").hidden=$("c_rank")
 $("cform").addEventListener("input",calcLine);$("cform").addEventListener("change",calcLine);
 $("cform").addEventListener("submit",e=>{e.preventDefault();const c=readForm(),err=validate(c);if(err){$("formErr").textContent=err;return;}
   if(S.example)leaveExample();c.u=Date.now();const ex=S.contracts.find(x=>x.id===c.id);
-  if(ex){["source"].forEach(k=>{if(ex[k]!=null)c[k]=ex[k];});S.contracts=S.contracts.map(x=>x.id===c.id?c:x);}else S.contracts.push(c);
+  if(ex){["source"].forEach(k=>{if(ex[k]!=null)c[k]=ex[k];});if(ex.passEst){const pe={};["left","arr"].forEach(k=>{if(ex.passEst[k]&&ex[k]===c[k])pe[k]=true;});if(Object.keys(pe).length)c.passEst=pe;}S.contracts=S.contracts.map(x=>x.id===c.id?c:x);}else S.contracts.push(c);
   saveLocal();closeForm();render();toast(ex?"Contract updated":"Contract saved on this device");});
 $("addBtn").addEventListener("click",()=>openForm(null));$("formClose").addEventListener("click",closeForm);$("cancelBtn").addEventListener("click",closeForm);
 let pendingDel=null;
@@ -402,6 +420,69 @@ $("fyList").addEventListener("change",e=>{const cb=e.target.closest("[data-o]");
 $("edgeSet").addEventListener("change",e=>{S.settings.edge=e.target.checked;saveLocal();render();});
 $("hAdd").addEventListener("click",()=>{const f=$("hFY").value,v=$("hDays").value;if(v===""||+v<0||+v>366){toast("Enter days in India between 0 and 366.");return;}if(S.example)leaveExample();S.fy[f]=Object.assign({},S.fy[f],{india:Math.round(+v)});$("hDays").value="";saveLocal();render();});
 $("hList").addEventListener("click",e=>{const b=e.target.closest("[data-hdel]");if(!b)return;if(S.fy[b.dataset.hdel])delete S.fy[b.dataset.hdel].india;saveLocal();render();});
+
+/* ---------- complete details ---------- */
+let cdShow="todo",cdEditing=false;
+function cdMissing(c){
+  const m=[],on=dn(c.on),past=on!=null&&on<=TODAY,offPast=c.off&&dn(c.off)<=TODAY;
+  if(past&&!c.left)m.push("left");if(offPast&&!c.arr)m.push("arr");
+  if(!c.onPort)m.push("onPort");if(c.off&&!c.offPort)m.push("offPort");
+  if(!c.company)m.push("company");if(!c.fleet)m.push("fleet");return m;}
+function cdState(c){const m=cdMissing(c),est=Object.keys(c.passEst||{}).filter(k=>c.passEst[k]);return {m,est,done:!m.length&&!est.length};}
+function renderCdBadge(){const n=S.example?0:S.contracts.filter(c=>!cdState(c).done).length;$("cdBadge").hidden=!n;$("cdBadge").textContent=n;}
+const LBL={left:"left India",arr:"arrived India",onPort:"sign-on port",offPort:"sign-off port",company:"company",fleet:"fleet"};
+function cdHead(c){const st=cdState(c),sp=shipSpan(c);
+  return `<div class="t"><b>${esc(c.vessel)}</b> <span class="small muted">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span><div class="small muted mono">CDC ${fmt(dn(c.on))} → ${c.off?fmt(dn(c.off)):"onboard"}${sp?` · ${sp[1]-sp[0]+1} days · ${yrs(sp[1]-sp[0]+1)} yrs`:""}</div></div>
+  <div>${st.done?'<span class="pill NR">Complete</span>':`${st.m.length?`<span class="pill RNOR" title="${esc(st.m.map(k=>LBL[k]).join(", "))}">${st.m.length} missing</span>`:""}${st.est.length?` <span class="pill plan">${st.est.length} estimated</span>`:""}`}</div>`;}
+function cdCard(c){const st=cdState(c),est=c.passEst||{},miss=k=>st.m.includes(k)?" missing":"";
+  return `<article class="card cd ${st.done?"done":"todo"}" data-id="${esc(c.id)}"><div class="cd-h">${cdHead(c)}</div>
+  <div class="fgrid">
+    <label class="f"><span>Left India (passport)${est.left?'<span class="estag">ESTIMATED</span>':""}</span><input type="date" data-k="left" class="${miss("left").trim()}" value="${esc(c.left||"")}"></label>
+    <label class="f"><span>Arrived India (passport)${est.arr?'<span class="estag">ESTIMATED</span>':""}</span><input type="date" data-k="arr" class="${miss("arr").trim()}" value="${esc(c.arr||"")}"></label>
+    <div class="f"><span>Sign-on port</span><div class="portrow"><input data-k="onPort" class="${miss("onPort").trim()}" value="${esc(c.onPort||"")}" placeholder="e.g. Fujairah" autocomplete="off"><select data-k="onIndia"><option value="abroad" ${c.onIndia?"":"selected"}>Abroad</option><option value="india" ${c.onIndia?"selected":""}>Indian port</option></select></div></div>
+    <div class="f"><span>Sign-off port</span><div class="portrow"><input data-k="offPort" class="${miss("offPort").trim()}" value="${esc(c.offPort||"")}" placeholder="e.g. Singapore" autocomplete="off"><select data-k="offIndia"><option value="abroad" ${c.offIndia?"":"selected"}>Abroad</option><option value="india" ${c.offIndia?"selected":""}>Indian port</option></select></div></div>
+    <label class="f"><span>Company</span><input data-k="company" list="cdCompany" class="${miss("company").trim()}" value="${esc(c.company||"")}" autocomplete="off"></label>
+    <label class="f"><span>Fleet</span><input data-k="fleet" list="cdFleet" class="${miss("fleet").trim()}" value="${esc(c.fleet||"")}" autocomplete="off"></label>
+  </div>
+  <div class="actions"><button type="button" class="btn-sm" data-act="prev">Same company &amp; fleet as previous contract</button>${(!c.left||!c.arr)&&c.on?'<button type="button" class="btn-sm" data-act="est">Estimate passport dates</button>':""}${st.est.length?'<span class="small muted">Estimated dates are used until you enter the real ones from your passport.</span>':""}</div></article>`;}
+function cdList(){
+  const fF=$("cdFY").value,q=$("cdQ").value.trim().toLowerCase(),qd=q.replace(/\D/g,"");
+  return S.contracts.filter(c=>(cdShow==="all"||!cdState(c).done)&&(!fF||shipDaysIn(c,+fF))&&(!q||(c.vessel||"").toLowerCase().includes(q)||(qd&&String(c.imo||"").includes(qd)))).sort((a,b)=>(dn(b.on)||0)-(dn(a.on)||0));}
+function renderCdProgress(){const all=S.example?[]:S.contracts,done=all.filter(c=>cdState(c).done).length,pct=all.length?Math.round(done/all.length*100):0;
+  $("cdProgress").innerHTML=`<div class="prog"><div><b>${done} of ${all.length}</b> contract${all.length===1?"":"s"} complete${all.length-done?` · <b>${all.length-done}</b> need details`:""}</div><div class="pbar"><i style="width:${pct}%"></i></div></div>`;}
+function renderComplete(){
+  renderCdProgress();$("cdShow").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.s===cdShow)));
+  if(S.example){$("cdList").innerHTML='<div class="card empty">Upload your seafarer profile first, then complete the missing details here.</div>';return;}
+  const list=cdList();
+  $("cdList").innerHTML=list.length?list.map(cdCard).join(""):`<div class="card empty">${cdShow==="todo"?"All contracts are complete. Nice work.":"No contracts match these filters."}</div>`;
+}
+function cdUpdateCard(c){const el=document.querySelector(`.cd[data-id="${CSS.escape(c.id)}"]`);if(!el)return;const st=cdState(c);el.className="card cd "+(st.done?"done":"todo");el.querySelector(".cd-h").innerHTML=cdHead(c);
+  el.querySelectorAll("[data-k]").forEach(i=>{if(i.tagName==="INPUT")i.classList.toggle("missing",st.m.includes(i.dataset.k));});
+  ["left","arr"].forEach(k=>{const lab=el.querySelector(`[data-k="${k}"]`).closest("label").querySelector("span");lab.innerHTML=(k==="left"?"Left India (passport)":"Arrived India (passport)")+((c.passEst||{})[k]?'<span class="estag">ESTIMATED</span>':"");});}
+function cdSave(c,quiet){c.u=Date.now();saveLocal();cdEditing=true;try{render();}finally{cdEditing=false;}cdUpdateCard(c);renderCdProgress();if(!quiet)toast("Saved on this device",1600);}
+$("cdList").addEventListener("change",e=>{const i=e.target.closest("[data-k]");if(!i)return;const card=i.closest(".cd"),c=S.contracts.find(x=>x.id===card.dataset.id);if(!c)return;const k=i.dataset.k;
+  if(k==="onIndia"||k==="offIndia")c[k]=i.value==="india";
+  else{const v=i.value.trim();
+    if(k==="left"||k==="arr"){if(v&&c.on){const L=k==="left"?dn(v):dn(c.left),A=k==="arr"?dn(v):dn(c.arr);if(L!=null&&A!=null&&A<L){toast("Arrival in India can't be before leaving India.");i.value=c[k]||"";return;}}
+      if(c.passEst&&c.passEst[k]){delete c.passEst[k];if(!Object.keys(c.passEst).length)delete c.passEst;}}
+    c[k]=v;}
+  cdSave(c);});
+const addDays=(s,n)=>{const d=dn(s);if(d==null)return "";const x=new Date((d+n)*DAY);return x.getUTCFullYear()+"-"+pad(x.getUTCMonth()+1)+"-"+pad(x.getUTCDate());};
+function estimate(c){let ch=false;c.passEst=c.passEst||{};
+  if(!c.left&&c.on&&dn(c.on)<=TODAY){c.left=addDays(c.on,-1);c.passEst.left=true;ch=true;}
+  if(!c.arr&&c.off&&dn(c.off)<=TODAY){c.arr=addDays(c.off,1);c.passEst.arr=true;ch=true;}
+  if(!Object.keys(c.passEst).length)delete c.passEst;return ch;}
+$("cdList").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const card=b.closest(".cd"),c=S.contracts.find(x=>x.id===card.dataset.id);if(!c)return;
+  if(b.dataset.act==="est"){if(estimate(c)){cdSave(c,true);toast("Estimated dates filled. Correct them from your passport when you can.",4500);card.outerHTML=cdCard(c);}return;}
+  if(b.dataset.act==="prev"){const o=dn(c.on)||0,cands=S.contracts.filter(x=>x!==c&&(x.company||x.fleet));
+    const prev=cands.filter(x=>(dn(x.on)||0)<o).sort((a,b2)=>(dn(b2.on)||0)-(dn(a.on)||0))[0]||cands.filter(x=>(dn(x.on)||0)>=o).sort((a,b2)=>(dn(a.on)||0)-(dn(b2.on)||0))[0];
+    if(!prev){toast("No other contract has a company or fleet yet.");return;}
+    let ch=false;if(!c.company&&prev.company){c.company=prev.company;ch=true;}if(!c.fleet&&prev.fleet){c.fleet=prev.fleet;ch=true;}
+    if(!ch){toast("Company and fleet are already filled.");return;}cdSave(c,true);card.outerHTML=cdCard(c);toast("Copied from "+prev.vessel);}
+});
+$("cdEstAll").addEventListener("click",()=>{if(S.example)return;let n=0;S.contracts.forEach(c=>{if(estimate(c)){c.u=Date.now();n++;}});if(!n){toast("No blank passport dates to estimate.");return;}saveLocal();render();renderComplete();toast(`Estimated passport dates for ${n} contract${n===1?"":"s"}. They're marked ESTIMATED until you correct them.`,5000);});
+$("cdShow").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(!b)return;cdShow=b.dataset.s;renderComplete();});
+$("cdFY").addEventListener("change",renderComplete);$("cdQ").addEventListener("input",renderComplete);
 
 /* ---------- notices ---------- */
 let NOTICES=lsJSON("sdlNotices",[]),nLevel="";noticesPrevSeen=+(lsGet("sdlNoticesSeen")||0);
@@ -682,7 +763,8 @@ function renderImport(){
     planImport().forEach(p=>{if(p.status==="new"){S.contracts.push(Object.assign({id:"dgs-"+(p.cand.imo||normName(p.cand.vessel))+"-"+p.cand.on,company:"",fleet:"",left:"",arr:"",onIndia:false,offIndia:false,onPort:"",offPort:"",coastal:false,notes:"From DG Shipping profile",source:"DGS profile",u:now},p.cand));added++;}
       else if(p.status==="update"){p.fill.forEach(k=>p.ex[k]=p.cand[k]);p.ex.u=now;updated++;}});
     S.settings.rankMap=Object.assign({},S.settings.rankMap||{},PIMP.map);PIMP=null;saveLocal();render();renderImport();
-    toast(`${added} ship${added===1?"":"s"} added, ${updated} updated. Press Sync to save them to your account.`,6000);location.hash="ships";};
+    const todo=S.contracts.filter(c=>!cdState(c).done).length;
+    toast(`${added} ship${added===1?"":"s"} added, ${updated} updated.${todo?` ${todo} need details: fill them in here.`:""} Press Sync to save to your account.`,7000);location.hash=todo?"complete":"ships";};
 }
 $("profilePdf").addEventListener("change",async e=>{
   const file=e.target.files[0];e.target.value="";if(!file)return;
