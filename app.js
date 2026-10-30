@@ -37,8 +37,23 @@ const RANKS={"Deck":["Master / Captain","Chief Officer","2nd Officer","3rd Offic
  "Catering":["Chief Cook","2nd Cook","Messman / Steward"]};
 const ALLRANKS=[].concat(...Object.values(RANKS));
 const FLAGS=["Panama","Liberia","Marshall Islands","Singapore","Malta","Bahamas","Hong Kong","Greece","Cyprus","Isle of Man","India","Norway","Denmark","United Kingdom","Japan","Portugal","Antigua and Barbuda","Belgium","Netherlands","Saudi Arabia","Qatar","United Arab Emirates"];
-const TOPICS=["All","India & Seafarers","Tankers","LNG & Gas","Safety & Security","Markets & Trade","Regulation"];
-const TOPIC_COL={"India & Seafarers":"var(--c1)","Tankers":"var(--c0)","LNG & Gas":"var(--c6)","Safety & Security":"var(--c7)","Markets & Trade":"var(--c2)","Regulation":"var(--c3)"};
+const TOPICS=["All","India & Seafarers","Tankers","LNG & Gas","Safety & Security","Markets & Trade","Regulation","General"];
+/* news comes straight from public shipping feeds, fetched by this device only when Sync is pressed (no server, no Claude) */
+const FEEDS=[
+ {name:"Marine Insight",url:"https://www.marineinsight.com/feed/"},
+ {name:"gCaptain",url:"https://gcaptain.com/feed/"},
+ {name:"Splash247",url:"https://splash247.com/feed/"},
+ {name:"SAFETY4SEA",url:"https://safety4sea.com/feed/"},
+ {name:"Google News",url:"https://news.google.com/rss/search?q=%22DG+Shipping%22+OR+%22Indian+seafarers%22+OR+%22Indian+seafarer%22+when:14d&hl=en-IN&gl=IN&ceid=IN:en",gn:true},
+ {name:"Google News",url:"https://news.google.com/rss/search?q=tanker+OR+%22LNG+carrier%22+OR+%22LPG+carrier%22+shipping+when:7d&hl=en-IN&gl=IN&ceid=IN:en",gn:true}];
+const TOPIC_RULES=[["India & Seafarers",/\b(india|indian|dg shipping|dgs|dgma|directorate general of shipping|mumbai|jnpt|kandla|deendayal|chennai|kochi|cochin|vizag|paradip|mundra|seafarers?|crew change|crew welfare)\b/i],
+ ["Safety & Security",/\b(pira(cy|tes?)|attack|houthi|hijack|collision|fire|explosion|sank|sink(ing|s)?|grounded|grounding|detain(ed|s)?|detention|spill|rescue|missing|casualt|seized|capsiz|accident|injur|killed|dead)/i],
+ ["LNG & Gas",/\b(lng|lpg|gas carrier|ammonia carrier|vlgc)\b/i],
+ ["Tankers",/\b(tankers?|vlcc|suezmax|aframax|lr2|mr tanker|crude|product tanker|chemical tanker|shadow fleet)\b/i],
+ ["Regulation",/\b(imo|mepc|regulation|marpol|solas|stcw|mlc|eexi|cii|emission|sanction|flag state|port state|psc|rule)\b/i],
+ ["Markets & Trade",/\b(rates?|freight|market|demand|charter|earnings|price|orderbook|newbuild|trade|exports?|imports?)\b/i]];
+const topicOf=t=>{const hit=TOPIC_RULES.find(([,re])=>re.test(t));return hit?hit[0]:"General";};
+const TOPIC_COL={"India & Seafarers":"var(--c1)","Tankers":"var(--c0)","LNG & Gas":"var(--c6)","Safety & Security":"var(--c7)","Markets & Trade":"var(--c2)","Regulation":"var(--c3)","General":"var(--cx)"};
 
 /* ======================= state ======================= */
 const EXAMPLE={v:2,example:true,settings:{edge:true},fy:{},deleted:[],updatedAt:0,contracts:[
@@ -138,6 +153,7 @@ function show(v){
   document.title=($("v-"+v).dataset.title)+" · Sea Days Ledger";
   if(v==="notices"){noticesPrevSeen=+(lsGet("sdlNoticesSeen")||0);lsSet("sdlNoticesSeen",String(Date.now()));renderNotices();}
   if(v==="upload")renderUploadState();
+  if(v==="news"){newsPrevSeen=+(lsGet("sdlNewsSeen")||0);lsSet("sdlNewsSeen",String(Date.now()));renderNews();}
   if(v==="account")renderAccount();
   window.scrollTo(0,0);
 }
@@ -399,17 +415,23 @@ function renderNotices(){
 $("nFilter").addEventListener("click",e=>{const b=e.target.closest("[data-l]");if(!b)return;nLevel=b.dataset.l;$("nFilter").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderNotices();});
 
 /* ---------- news ---------- */
-let NEWS=lsJSON("sdlNews",{items:[]}),newsTopic="All";
+let NEWS=lsJSON("sdlNews",{items:[]}),newsTopic="All",newsOnlyNew=false,newsPrevSeen=+(lsGet("sdlNewsSeen")||0);
+function newsNewCount(){const seen=+(lsGet("sdlNewsSeen")||0);return (NEWS.items||[]).filter(n=>(+n.addedAt||0)>seen).length;}
+function renderNewsBadge(){const n=newsNewCount();$("newsBadge").hidden=!n;$("newsBadge").textContent=n;}
 function relDate(s){const n=dn(s);if(n==null)return "";const d=TODAY-n;return d<=0?"Today":d===1?"Yesterday":d<7?d+" days ago":fmt(n);}
 function renderNews(){
+  renderNewsBadge();
   $("newsTopics").innerHTML=TOPICS.map(t=>`<button type="button" aria-pressed="${t===newsTopic}" data-topic="${esc(t)}">${esc(t)}</button>`).join("");
-  $("newsUpdated").textContent=NEWS.updatedAt?`Headlines for seafarers · last updated ${when(NEWS.updatedAt)}. New headlines arrive when you press Sync.`:"Headlines for seafarers. Press Sync while online to load the latest.";
-  const q=$("newsSearch").value.trim().toLowerCase(),items=(NEWS.items||[]).filter(n=>(newsTopic==="All"||n.topic===newsTopic)&&(!q||(String(n.title)+" "+String(n.summary||"")+" "+String(n.source||"")).toLowerCase().includes(q))).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  if(!items.length){$("newsList").innerHTML=`<div class="empty">${(NEWS.items||[]).length?"No headlines match this topic or search.":"No headlines yet. Press Sync while online."}</div>`;return;}
-  $("newsList").innerHTML=items.map(n=>{const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^https:\/\//i.test(String(n.url||""))?n.url:"#";
-    return `<a class="news" href="${esc(safe)}" target="_blank" rel="noopener noreferrer"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><div><div class="hl">${esc(n.title)}</div>${n.summary?`<div class="gist">${esc(n.summary)}</div>`:""}<div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||"var(--cx)"}">${esc(n.topic||"News")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span></div></div></a>`;}).join("");
+  $("newsOnlyNew").setAttribute("aria-pressed",String(newsOnlyNew));
+  $("newsUpdated").textContent=NEWS.updatedAt?`Last updated ${when(NEWS.updatedAt)}. New headlines arrive only when you press Sync.`:"Press Sync while online to load the latest headlines.";
+  const q=$("newsSearch").value.trim().toLowerCase(),seen=newsPrevSeen;
+  const items=(NEWS.items||[]).filter(n=>(newsTopic==="All"||n.topic===newsTopic)&&(!newsOnlyNew||(+n.addedAt||0)>seen)&&(!q||(String(n.title)+" "+String(n.summary||"")+" "+String(n.source||"")).toLowerCase().includes(q))).sort((a,b)=>(+b.ts||0)-(+a.ts||0)||String(b.date).localeCompare(String(a.date)));
+  if(!items.length){$("newsList").innerHTML=`<div class="empty">${(NEWS.items||[]).length?(newsOnlyNew?"No new headlines since you last looked.":"No headlines match this topic or search."):"No headlines yet. Press Sync while online."}</div>`;return;}
+  $("newsList").innerHTML=items.map(n=>{const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^https:\/\//i.test(String(n.url||""))?n.url:"#",isNew=(+n.addedAt||0)>seen;
+    return `<a class="news" href="${esc(safe)}" target="_blank" rel="noopener noreferrer"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><div><div class="hl">${isNew?'<span class="newtag">NEW</span> ':""}${esc(n.title)}</div>${n.summary?`<div class="gist">${esc(n.summary)}</div>`:""}<div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||"var(--cx)"}">${esc(n.topic||"General")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span></div></div></a>`;}).join("");
 }
 $("newsTopics").addEventListener("click",e=>{const b=e.target.closest("[data-topic]");if(!b)return;newsTopic=b.dataset.topic;renderNews();});
+$("newsOnlyNew").addEventListener("click",()=>{newsOnlyNew=!newsOnlyNew;renderNews();});
 $("newsSearch").addEventListener("input",renderNews);
 
 /* ======================= Firebase (loaded only when needed, online) ======================= */
@@ -481,7 +503,31 @@ $("noticeList").addEventListener("click",async e=>{const b=e.target.closest("[da
   try{const f=await fbReady();await f.db.collection("notices").doc(b.dataset.ndel).delete();await fetchNotices();renderNotices();toast("Notice deleted");}catch(err){b.textContent="Couldn't delete";}
 });
 async function fetchNotices(){const f=await fbReady();const q=await f.db.collection("notices").orderBy("createdAt","desc").limit(40).get();NOTICES=q.docs.map(d=>Object.assign({id:d.id},d.data()));lsSet("sdlNotices",JSON.stringify(NOTICES));}
-async function fetchNews(){const r=await fetch("news.json?ts="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("news");const j=await r.json();if(j&&Array.isArray(j.items)){NEWS=j;lsSet("sdlNews",JSON.stringify(NEWS));}}
+function timed(url,ms){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms||12000);return fetch(url,{signal:c.signal,cache:"no-store"}).finally(()=>clearTimeout(t));}
+const plain=h=>{try{return (new DOMParser().parseFromString(String(h||""),"text/html").body.textContent||"").replace(/\s+/g," ").trim();}catch(e){return "";}};
+const words=(t,n)=>{const w=t.split(" ");return w.length>n?w.slice(0,n).join(" ")+"…":t;};
+async function readFeed(f){
+  let raw=[];
+  try{const r=await timed("https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(f.url));const j=await r.json();
+    if(j&&j.status==="ok"&&Array.isArray(j.items))raw=j.items.map(i=>({title:i.title,link:i.link,date:i.pubDate?i.pubDate.replace(" ","T")+"Z":"",desc:i.description||i.content||""}));else throw 0;}
+  catch(e){const r=await timed("https://api.allorigins.win/raw?url="+encodeURIComponent(f.url));if(!r.ok)throw new Error("feed");
+    const x=new DOMParser().parseFromString(await r.text(),"text/xml");
+    raw=[...x.querySelectorAll("item")].slice(0,20).map(i=>({title:i.querySelector("title")?.textContent||"",link:i.querySelector("link")?.textContent||"",date:i.querySelector("pubDate")?.textContent||"",desc:i.querySelector("description")?.textContent||"",src:i.querySelector("source")?.textContent||""}));}
+  return raw.map(i=>{let title=plain(i.title),source=f.name;
+    if(f.gn){const m=title.match(/^(.*) - ([^-]{2,60})$/);if(m){title=m[1].trim();source=m[2].trim();}else if(i.src)source=i.src;}
+    const ts=Date.parse(i.date)||0,d=ts?new Date(ts):null;
+    return {title,source,url:String(i.link||"").trim(),ts,date:d?d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()):"",summary:f.gn?"":words(plain(i.desc).replace(/The post .*? appeared first on .*$/i,"").trim(),28),topic:topicOf(title+" "+(f.gn?"":plain(i.desc)))};
+  }).filter(n=>n.title&&/^https:\/\//i.test(n.url));
+}
+async function fetchNews(){
+  const res=await Promise.allSettled(FEEDS.map(readFeed)),fresh=[].concat(...res.filter(r=>r.status==="fulfilled").map(r=>r.value));
+  if(!fresh.length)throw new Error("news");
+  const key=n=>n.title.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,70),now=Date.now(),have=new Map((NEWS.items||[]).map(n=>[key(n),n])),urls=new Set((NEWS.items||[]).map(n=>n.url));
+  fresh.forEach(n=>{const k=key(n);if(!have.has(k)&&!urls.has(n.url)){n.addedAt=now;have.set(k,n);urls.add(n.url);}});
+  const cutoff=now-14*DAY;
+  NEWS={updatedAt:now,items:[...have.values()].filter(n=>(+n.ts||Date.parse(n.date)||now)>=cutoff).sort((a,b)=>(+b.ts||0)-(+a.ts||0)).slice(0,80),failed:res.filter(r=>r.status==="rejected").length};
+  lsSet("sdlNews",JSON.stringify(NEWS));
+}
 
 /* ======================= Sync (only when pressed) ======================= */
 let syncing=false;

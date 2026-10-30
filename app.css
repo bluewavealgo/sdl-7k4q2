@@ -284,3 +284,4 @@ details.more[open]>summary::before{content:"− "}
   .tbl-wrap.cards{overflow:visible}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+#newsOnlyNew[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
