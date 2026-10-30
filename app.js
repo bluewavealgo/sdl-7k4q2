@@ -146,7 +146,7 @@ function taxLine(r){
 const actLabel=f=>f>=2026?"Income-tax Act, 2025 · Rule 8 (crew)":"Income-tax Act, 1961 · Rule 126 (crew)";
 
 /* ======================= routing ======================= */
-const VIEWS=["dashboard","years","ships","upload","notices","news","account","help"];
+const VIEWS=["dashboard","years","ships","upload","notices","news","account","help","about"];
 let VIEW="dashboard",noticesPrevSeen=0;
 function show(v){
   if(!VIEWS.includes(v))v="dashboard";VIEW=v;

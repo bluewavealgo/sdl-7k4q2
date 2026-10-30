@@ -62,6 +62,22 @@ label.f>span,div.f>span{font-weight:500}
 .hoist svg{width:22px;height:15px;border-radius:2px;box-shadow:0 1px 4px #0007}
 .brand-name{font-family:var(--f-display);font-weight:800;font-size:1.55rem;text-transform:uppercase;line-height:.95;letter-spacing:.02em}
 .brand-name em{font-style:normal;color:transparent;background:linear-gradient(90deg,var(--glow),var(--gold));-webkit-background-clip:text;background-clip:text}
+.by-bw{display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--rail-dim);font-size:.72rem;margin-top:2px}
+.by-bw .wm{height:20px;width:auto}
+.by-bw .ic{display:none;width:30px;height:auto}
+.by-bw:hover{color:var(--rail-ink)}
+.about-hero{border-radius:18px;padding:28px 24px;background:radial-gradient(700px 300px at 85% -30%,#0d5c7a 0%,transparent 60%),linear-gradient(160deg,#04121f,#0a3350);display:flex;flex-direction:column;gap:12px}
+.about-hero img{width:min(420px,100%);height:auto}
+.about-hero p{color:#cfe2ee;font-size:1.05rem;max-width:56ch}
+.about-sec{display:flex;flex-direction:column;gap:10px}
+.about-sec p{max-width:70ch;line-height:1.6}
+.ticks{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.ticks li{padding-left:24px;position:relative;line-height:1.5}
+.ticks li::before{content:"";position:absolute;left:2px;top:6px;width:12px;height:7px;border-left:2.5px solid var(--sea);border-bottom:2.5px solid var(--sea);transform:rotate(-45deg)}
+.trader-links{display:flex;gap:10px;flex-wrap:wrap}
+.trader-links svg{width:20px;height:20px}
+.bw-foot{display:flex;align-items:center;gap:14px;padding:14px 16px;flex-wrap:wrap}
+.bw-foot img{flex:none}
 .nav{display:flex;flex-direction:column;gap:3px}
 .nav a{display:flex;align-items:center;gap:11px;color:var(--rail-dim);text-decoration:none;padding:9px 10px;border-radius:10px;font-weight:500;position:relative}
 .nav a svg{width:19px;height:19px;flex:none}
@@ -261,6 +277,9 @@ details.more[open]>summary::before{content:"− "}
   .rail{padding-left:max(6px,env(safe-area-inset-left,0px));padding-right:6px;gap:12px}
   .brand{align-items:center;padding:0}
   .brand-name,.hoist span{display:none}
+  .by-bw span,.by-bw .wm{display:none}
+  .by-bw .ic{display:block}
+  .rail-ver{font-size:.52rem;overflow-wrap:anywhere;padding:0}
   .hoist{flex-direction:column;gap:3px}
   .nav a{flex-direction:column;gap:3px;padding:8px 2px;font-size:.6rem;text-align:center;line-height:1.1}
   .nav a[aria-current=page]::before{left:-6px}
