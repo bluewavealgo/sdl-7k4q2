@@ -91,7 +91,7 @@ function ranges(c,edge){
   /* passport dates, when given, decide the stay; the CDC period still counts for an Indian-port voyage (Rule 126 / Rule 8) or when no passport date is entered */
   const hasPass=left!=null||arr!=null,eligible=!!(c.onIndia||c.offIndia);
   if(on!=null&&!c.coastal&&(!hasPass||eligible))out.push([on,shipEnd]);
-  if(left!=null){let e=arr!=null?arr-e1:(shipEnd!=null?shipEnd:TODAY);if(arr==null&&left<=TODAY&&e<TODAY)e=TODAY;out.push([left+e1,e]);}
+  if(left!=null){const e=arr!=null?arr-e1:(off!=null?off:Math.max(TODAY,shipEnd!=null?shipEnd:TODAY));out.push([left+e1,e]);}
   else if(arr!=null){out.push([on!=null?on:arr,arr-e1]);}
   return out.filter(r=>r[1]>=r[0]);
 }
@@ -137,18 +137,26 @@ function compute(){
   return {res,order,dataFrom};
 }
 /* passport dates count NRI days; flag contracts that still need exact dates */
+/* back-to-back records on the same ship (e.g. promotion onboard) are one stay: one sign-on, one sign-off */
+const PROMO="Onboard – promoted";
+function sameShip(a,b){return a.imo&&b.imo?String(a.imo)===String(b.imo):normName(a.vessel)===normName(b.vessel);}
+function chainOf(c){
+  const on=dn(c.on),off=dn(c.off);
+  const next=off==null?null:S.contracts.find(x=>x!==c&&sameShip(x,c)&&dn(x.on)!=null&&dn(x.on)-off>=0&&dn(x.on)-off<=1)||null;
+  const prev=on==null?null:S.contracts.find(x=>x!==c&&sameShip(x,c)&&dn(x.off)!=null&&on-dn(x.off)>=0&&on-dn(x.off)<=1)||null;
+  return {prev,next};}
 function passIssue(c){
   const on=dn(c.on);if(on==null||on>TODAY)return "";
-  const est=c.passEst||{};
-  const needArr=c.off&&dn(c.off)<=TODAY;
-  if(!c.left||(needArr&&!c.arr))return "missing";
-  if(est.left||(needArr&&est.arr))return "estimated";
+  const est=c.passEst||{},ch=chainOf(c);
+  const needLeft=!ch.prev,needArr=!ch.next&&c.off&&dn(c.off)<=TODAY;
+  if((needLeft&&!c.left)||(needArr&&!c.arr))return "missing";
+  if((needLeft&&est.left)||(needArr&&est.arr))return "estimated";
   return "";
 }
 function fyPassIssues(f){const s=fyStart(f),e=fyEnd(f);let missing=0,estimated=0;S.contracts.forEach(c=>{const sp=shipSpan(c);if(!sp||!overlap(sp[0],sp[1],s,e))return;const k=passIssue(c);if(k==="missing")missing++;else if(k==="estimated")estimated++;});return {missing,estimated};}
 function passNote(f,short){const p=fyPassIssues(f);if(!p.missing&&!p.estimated)return "";
   const parts=[];if(p.missing)parts.push(`${p.missing} contract${p.missing===1?" has":"s have"} no passport dates`);if(p.estimated)parts.push(`${p.estimated} use${p.estimated===1?"s":""} estimated dates`);
-  return `<div class="warnline">Exact passport dates needed: ${parts.join(", ")}. ${short?"":"This result is an estimate from CDC dates until you add them. "}<a href="#complete">Complete details</a></div>`;}
+  return `<div class="warnline">Exact passport dates needed: ${parts.join(", ")}. ${short?"":"This result is an estimate from CDC dates until you add them. "}<a href="#complete">Pending details</a></div>`;}
 const statusName=s=>({NR:"Non-Resident (NRI)",RNOR:"Resident but Not Ordinarily Resident",ROR:"Resident and Ordinarily Resident",UNK:"Not enough data"}[s]);
 const stColor=s=>({NR:"var(--ok)",RNOR:"var(--warn)",ROR:"var(--bad)"}[s]||"var(--unk)");
 function taxLine(r){
@@ -169,12 +177,12 @@ function show(v){
   document.title=($("v-"+v).dataset.title)+" · Sea Days Ledger";
   if(v==="notices"){noticesPrevSeen=+(lsGet("sdlNoticesSeen")||0);lsSet("sdlNoticesSeen",String(Date.now()));renderNotices();}
   if(v==="upload")renderUploadState();
-  if(v==="complete")renderComplete();
+  if(v==="complete")renderComplete(true);
   if(v==="news"){newsPrevSeen=+(lsGet("sdlNewsSeen")||0);lsSet("sdlNewsSeen",String(Date.now()));renderNews();}
   if(v==="account")renderAccount();
   window.scrollTo(0,0);
 }
-window.addEventListener("hashchange",()=>show(location.hash.slice(1)));
+window.addEventListener("hashchange",()=>{const to=location.hash.slice(1);if(VIEW==="complete"&&to!=="complete"&&cdDirty.size){if(!okToLeave()){history.replaceState(null,"","#complete");return;}cdDirty.clear();}show(to);});
 
 /* ======================= rendering ======================= */
 function fillSelect(el,opts,keep){el.innerHTML=opts.map(o=>o.group?`<optgroup label="${esc(o.group)}">${o.items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("")}</optgroup>`:`<option value="${esc(o[0])}">${esc(o[1])}</option>`).join("");if(keep!=null&&[...el.options].some(x=>x.value==keep))el.value=keep;}
@@ -200,7 +208,7 @@ function render(){
   renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();renderCdBadge();
   fillSelect($("cdFY"),[["","All years"]].concat(fyOpts),$("cdFY").value);
   $("cdCompany").innerHTML=uniq("company").map(f=>`<option value="${esc(f)}">`).join("");$("cdFleet").innerHTML=uniq("fleet").map(f=>`<option value="${esc(f)}">`).join("");
-  if(VIEW==="complete"&&!cdEditing)renderComplete();
+  if(VIEW==="complete"&&!cdEditing)renderComplete();else renderCdProgress();
 }
 
 /* ---------- dashboard ---------- */
@@ -347,9 +355,9 @@ function renderShips(){
     const rows=list.map(c=>{const sp=shipSpan(c),d=sp?sp[1]-sp[0]+1:0,planned=["left","on","off","arr"].some(k=>{const v=dn(c[k]);return v!=null&&v>TODAY;}),pass=c.left||c.arr;
       return `<tr><td data-l="Vessel"><b>${esc(c.vessel)}</b>${planned?' <span class="pill plan">planned</span>':""}<span class="sub">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span>${c.flag||c.registry?`<span class="sub">${esc(c.flag||"")}${c.flag&&c.registry?" · ":""}${c.registry?"Reg. "+esc(c.registry):""}</span>`:""}<div class="row-act" style="margin-top:6px"><button type="button" class="btn-sm" data-edit="${esc(c.id)}">Edit</button><button type="button" class="btn-sm btn-danger" data-del="${esc(c.id)}">Delete</button></div></td>
       <td data-l="Type · company"><span class="tchip" style="--tc:${typeColor(c.type)}">${esc(c.type)}</span><span class="sub">${esc(c.company||"—")}${c.fleet?" · "+esc(c.fleet):""}</span></td>
-      <td data-l="Sign-on" class="mono">${fmt(dn(c.on))}<span class="sub">${c.onIndia?"Indian port":"Abroad"}${c.onPort?" · "+esc(c.onPort):""}</span></td>
-      <td data-l="Sign-off" class="mono">${c.off?fmt(dn(c.off)):'<span class="pill plan">onboard</span>'}<span class="sub">${c.off?(c.offIndia?"Indian port":"Abroad")+(c.offPort?" · "+esc(c.offPort):""):""}</span></td>
-      <td data-l="Passport" class="mono">${pass?`${fmt(dn(c.left))} → ${fmt(dn(c.arr))}`:"—"}<span class="sub">${passIssue(c)==="estimated"?"Estimated dates":pass?"Counted by passport":"Needs passport dates"}</span></td>
+      <td data-l="Sign-on" class="mono">${fmt(dn(c.on))}<span class="sub">${chainOf(c).prev?PROMO:(c.onIndia?"Indian port":"Abroad")+(c.onPort?" · "+esc(c.onPort):"")}</span></td>
+      <td data-l="Sign-off" class="mono">${c.off?fmt(dn(c.off)):'<span class="pill plan">onboard</span>'}<span class="sub">${c.off?(chainOf(c).next?PROMO:(c.offIndia?"Indian port":"Abroad")+(c.offPort?" · "+esc(c.offPort):"")):""}</span></td>
+      <td data-l="Passport" class="mono">${pass?`${chainOf(c).prev?"(same stay)":fmt(dn(c.left))} → ${chainOf(c).next?"(continues)":fmt(dn(c.arr))}`:"—"}<span class="sub">${passIssue(c)==="estimated"?"Estimated dates":pass?"Counted by passport":"Needs passport dates"}</span></td>
       <td data-l="Days on ship" class="n">${d}<span class="sub">${yrs(d)} yrs</span><span class="sub">${sp?ymd(sp[0],sp[1]):""}</span></td>
       ${fF!=null?`<td data-l="In FY ${fyLabel(fF)}" class="n">${shipDaysIn(c,fF)}<span class="sub">${yrs(shipDaysIn(c,fF))} yrs</span></td>`:""}
       <td data-l="Ship particulars" class="wrap">${partLine(c)}${c.propellingDays!==""&&c.propellingDays!=null?`<span class="sub">${esc(c.propellingDays)} propelling days</span>`:""}</td>
@@ -421,68 +429,93 @@ $("edgeSet").addEventListener("change",e=>{S.settings.edge=e.target.checked;save
 $("hAdd").addEventListener("click",()=>{const f=$("hFY").value,v=$("hDays").value;if(v===""||+v<0||+v>366){toast("Enter days in India between 0 and 366.");return;}if(S.example)leaveExample();S.fy[f]=Object.assign({},S.fy[f],{india:Math.round(+v)});$("hDays").value="";saveLocal();render();});
 $("hList").addEventListener("click",e=>{const b=e.target.closest("[data-hdel]");if(!b)return;if(S.fy[b.dataset.hdel])delete S.fy[b.dataset.hdel].india;saveLocal();render();});
 
-/* ---------- complete details ---------- */
-let cdShow="todo",cdEditing=false;
+/* ---------- pending details ---------- */
+let cdShow="todo",cdEditing=false;const cdDirty=new Set();
 function cdMissing(c){
-  const m=[],on=dn(c.on),past=on!=null&&on<=TODAY,offPast=c.off&&dn(c.off)<=TODAY;
-  if(past&&!c.left)m.push("left");if(offPast&&!c.arr)m.push("arr");
-  if(!c.onPort)m.push("onPort");if(c.off&&!c.offPort)m.push("offPort");
+  const m=[],on=dn(c.on),past=on!=null&&on<=TODAY,offPast=c.off&&dn(c.off)<=TODAY,ch=chainOf(c);
+  if(!ch.prev){if(past&&!c.left)m.push("left");if(!c.onPort)m.push("onPort");}
+  if(!ch.next){if(offPast&&!c.arr)m.push("arr");if(c.off&&!c.offPort)m.push("offPort");}
   if(!c.company)m.push("company");if(!c.fleet)m.push("fleet");return m;}
-function cdState(c){const m=cdMissing(c),est=Object.keys(c.passEst||{}).filter(k=>c.passEst[k]);return {m,est,done:!m.length&&!est.length};}
+function cdState(c){const ch=chainOf(c),est=Object.keys(c.passEst||{}).filter(k=>c.passEst[k]&&!(k==="left"&&ch.prev)&&!(k==="arr"&&ch.next));const m=cdMissing(c);return {m,est,done:!m.length&&!est.length};}
 function renderCdBadge(){const n=S.example?0:S.contracts.filter(c=>!cdState(c).done).length;$("cdBadge").hidden=!n;$("cdBadge").textContent=n;}
 const LBL={left:"left India",arr:"arrived India",onPort:"sign-on port",offPort:"sign-off port",company:"company",fleet:"fleet"};
-function cdHead(c){const st=cdState(c),sp=shipSpan(c);
-  return `<div class="t"><b>${esc(c.vessel)}</b> <span class="small muted">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span><div class="small muted mono">CDC ${fmt(dn(c.on))} → ${c.off?fmt(dn(c.off)):"onboard"}${sp?` · ${sp[1]-sp[0]+1} days · ${yrs(sp[1]-sp[0]+1)} yrs`:""}</div></div>
-  <div>${st.done?'<span class="pill NR">Complete</span>':`${st.m.length?`<span class="pill RNOR" title="${esc(st.m.map(k=>LBL[k]).join(", "))}">${st.m.length} missing</span>`:""}${st.est.length?` <span class="pill plan">${st.est.length} estimated</span>`:""}`}</div>`;}
-function cdCard(c){const st=cdState(c),est=c.passEst||{},miss=k=>st.m.includes(k)?" missing":"";
-  return `<article class="card cd ${st.done?"done":"todo"}" data-id="${esc(c.id)}"><div class="cd-h">${cdHead(c)}</div>
+function topCompanies(){const m={};S.contracts.forEach(c=>{const k=(c.company||"").trim();if(k)m[k]=(m[k]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]);}
+function cdHead(c,dirty){const st=cdState(c),sp=shipSpan(c),ch=chainOf(c);
+  return `<div class="t"><b>${esc(c.vessel)}</b> <span class="small muted">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span><div class="small muted mono">CDC ${fmt(dn(c.on))} → ${c.off?fmt(dn(c.off)):"onboard"}${sp?` · ${sp[1]-sp[0]+1} days · ${yrs(sp[1]-sp[0]+1)} yrs`:""}</div>${ch.prev||ch.next?`<div class="small" style="color:var(--sea);margin-top:2px">One stay on this ship${ch.prev?` · continues from ${esc(ch.prev.rank||"previous record")}`:""}${ch.next?` · continues as ${esc(ch.next.rank||"next record")}`:""}</div>`:""}</div>
+  <div>${dirty?'<span class="pill RNOR">Unsaved changes</span>':st.done?'<span class="pill NR">Complete</span>':`${st.m.length?`<span class="pill RNOR" title="${esc(st.m.map(k=>LBL[k]).join(", "))}">${st.m.length} missing</span>`:""}${st.est.length?` <span class="pill plan">${st.est.length} estimated</span>`:""}`}</div>`;}
+function cdCard(c){const st=cdState(c),est=c.passEst||{},ch=chainOf(c),miss=k=>st.m.includes(k)?"missing":"",na=(c.fleet||"").toUpperCase()==="NA",tc=topCompanies().filter(x=>x!==c.company);
+  const fixed=(label,text)=>`<div class="f"><span>${label}</span><input value="${esc(text)}" disabled></div>`;
+  return `<article class="card cd ${st.done?"done":"todo"}" data-id="${esc(c.id)}"><div class="cd-h">${cdHead(c,false)}</div>
   <div class="fgrid">
-    <label class="f"><span>Left India (passport)${est.left?'<span class="estag">ESTIMATED</span>':""}</span><input type="date" data-k="left" class="${miss("left").trim()}" value="${esc(c.left||"")}"></label>
-    <label class="f"><span>Arrived India (passport)${est.arr?'<span class="estag">ESTIMATED</span>':""}</span><input type="date" data-k="arr" class="${miss("arr").trim()}" value="${esc(c.arr||"")}"></label>
-    <div class="f"><span>Sign-on port</span><div class="portrow"><input data-k="onPort" class="${miss("onPort").trim()}" value="${esc(c.onPort||"")}" placeholder="e.g. Fujairah" autocomplete="off"><select data-k="onIndia"><option value="abroad" ${c.onIndia?"":"selected"}>Abroad</option><option value="india" ${c.onIndia?"selected":""}>Indian port</option></select></div></div>
-    <div class="f"><span>Sign-off port</span><div class="portrow"><input data-k="offPort" class="${miss("offPort").trim()}" value="${esc(c.offPort||"")}" placeholder="e.g. Singapore" autocomplete="off"><select data-k="offIndia"><option value="abroad" ${c.offIndia?"":"selected"}>Abroad</option><option value="india" ${c.offIndia?"selected":""}>Indian port</option></select></div></div>
-    <label class="f"><span>Company</span><input data-k="company" list="cdCompany" class="${miss("company").trim()}" value="${esc(c.company||"")}" autocomplete="off"></label>
-    <label class="f"><span>Fleet</span><input data-k="fleet" list="cdFleet" class="${miss("fleet").trim()}" value="${esc(c.fleet||"")}" autocomplete="off"></label>
+    ${ch.prev?fixed("Left India (passport)","Not needed · same stay"):`<label class="f"><span>Left India (passport)${est.left?'<span class="estag">ESTIMATED</span>':""}</span><input type="date" data-k="left" class="${miss("left")}" value="${esc(c.left||"")}"></label>`}
+    ${ch.next?fixed("Arrived India (passport)","Not needed · stay continues"):`<label class="f"><span>Arrived India (passport)${est.arr?'<span class="estag">ESTIMATED</span>':""}</span><input type="date" data-k="arr" class="${miss("arr")}" value="${esc(c.arr||"")}"></label>`}
+    ${ch.prev?fixed("Sign-on port",PROMO):`<div class="f"><span>Sign-on port</span><div class="portrow"><input data-k="onPort" class="${miss("onPort")}" value="${esc(c.onPort||"")}" placeholder="e.g. Fujairah" autocomplete="off"><select data-k="onIndia"><option value="abroad" ${c.onIndia?"":"selected"}>Abroad</option><option value="india" ${c.onIndia?"selected":""}>Indian port</option></select></div></div>`}
+    ${ch.next?fixed("Sign-off port",PROMO):`<div class="f"><span>Sign-off port</span><div class="portrow"><input data-k="offPort" class="${miss("offPort")}" value="${esc(c.offPort||"")}" placeholder="e.g. Singapore" autocomplete="off"><select data-k="offIndia"><option value="abroad" ${c.offIndia?"":"selected"}>Abroad</option><option value="india" ${c.offIndia?"selected":""}>Indian port</option></select></div></div>`}
+    <div class="f"><span>Company</span><input data-k="company" list="cdCompany" class="${miss("company")}" value="${esc(c.company||"")}" placeholder="Type or tap a name below" autocomplete="off">${tc.length?`<div class="fillchips">${tc.map(n=>`<button type="button" class="btn-sm" data-fill="${esc(n)}">${esc(n)}</button>`).join("")}</div>`:""}</div>
+    <div class="f"><span>Fleet</span><input data-k="fleet" list="cdFleet" class="${miss("fleet")}" value="${esc(na?"NA":c.fleet||"")}" ${na?"disabled":""} autocomplete="off"><label class="nachk"><input type="checkbox" data-na ${na?"checked":""}> Not known (NA)</label></div>
   </div>
-  <div class="actions"><button type="button" class="btn-sm" data-act="prev">Same company &amp; fleet as previous contract</button>${(!c.left||!c.arr)&&c.on?'<button type="button" class="btn-sm" data-act="est">Estimate passport dates</button>':""}${st.est.length?'<span class="small muted">Estimated dates are used until you enter the real ones from your passport.</span>':""}</div></article>`;}
+  <div class="actions"><button type="button" class="btn-primary btn-sm" data-act="save" disabled>Save</button><button type="button" class="btn-sm btn-ghost" data-act="cancel" disabled>Cancel</button><button type="button" class="btn-sm" data-act="prev">Same company &amp; fleet as previous contract</button>${(!ch.prev&&!c.left&&c.on)||(!ch.next&&!c.arr&&c.off)?'<button type="button" class="btn-sm" data-act="est">Estimate passport dates</button>':""}</div></article>`;}
 function cdList(){
   const fF=$("cdFY").value,q=$("cdQ").value.trim().toLowerCase(),qd=q.replace(/\D/g,"");
   return S.contracts.filter(c=>(cdShow==="all"||!cdState(c).done)&&(!fF||shipDaysIn(c,+fF))&&(!q||(c.vessel||"").toLowerCase().includes(q)||(qd&&String(c.imo||"").includes(qd)))).sort((a,b)=>(dn(b.on)||0)-(dn(a.on)||0));}
 function renderCdProgress(){const all=S.example?[]:S.contracts,done=all.filter(c=>cdState(c).done).length,pct=all.length?Math.round(done/all.length*100):0;
-  $("cdProgress").innerHTML=`<div class="prog"><div><b>${done} of ${all.length}</b> contract${all.length===1?"":"s"} complete${all.length-done?` · <b>${all.length-done}</b> need details`:""}</div><div class="pbar"><i style="width:${pct}%"></i></div></div>`;}
-function renderComplete(){
+  $("cdProgress").innerHTML=`<div class="prog"><div><b>${done} of ${all.length}</b> contract${all.length===1?"":"s"} complete${all.length-done?` · <b>${all.length-done}</b> pending`:""}</div><div class="pbar"><i style="width:${pct}%"></i></div></div>`;}
+function renderComplete(force){
   renderCdProgress();$("cdShow").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.s===cdShow)));
-  if(S.example){$("cdList").innerHTML='<div class="card empty">Upload your seafarer profile first, then complete the missing details here.</div>';return;}
+  if(cdDirty.size&&!force)return;
+  cdDirty.clear();
+  if(S.example){$("cdList").innerHTML='<div class="card empty">Upload your seafarer profile first, then complete the pending details here.</div>';return;}
   const list=cdList();
-  $("cdList").innerHTML=list.length?list.map(cdCard).join(""):`<div class="card empty">${cdShow==="todo"?"All contracts are complete. Nice work.":"No contracts match these filters."}</div>`;
+  $("cdList").innerHTML=list.length?list.map(cdCard).join(""):`<div class="card empty">${cdShow==="todo"?"No pending details. Every contract is complete.":"No contracts match these filters."}</div>`;
 }
-function cdUpdateCard(c){const el=document.querySelector(`.cd[data-id="${CSS.escape(c.id)}"]`);if(!el)return;const st=cdState(c);el.className="card cd "+(st.done?"done":"todo");el.querySelector(".cd-h").innerHTML=cdHead(c);
-  el.querySelectorAll("[data-k]").forEach(i=>{if(i.tagName==="INPUT")i.classList.toggle("missing",st.m.includes(i.dataset.k));});
-  ["left","arr"].forEach(k=>{const lab=el.querySelector(`[data-k="${k}"]`).closest("label").querySelector("span");lab.innerHTML=(k==="left"?"Left India (passport)":"Arrived India (passport)")+((c.passEst||{})[k]?'<span class="estag">ESTIMATED</span>':"");});}
-function cdSave(c,quiet){c.u=Date.now();saveLocal();cdEditing=true;try{render();}finally{cdEditing=false;}cdUpdateCard(c);renderCdProgress();if(!quiet)toast("Saved on this device",1600);}
-$("cdList").addEventListener("change",e=>{const i=e.target.closest("[data-k]");if(!i)return;const card=i.closest(".cd"),c=S.contracts.find(x=>x.id===card.dataset.id);if(!c)return;const k=i.dataset.k;
-  if(k==="onIndia"||k==="offIndia")c[k]=i.value==="india";
-  else{const v=i.value.trim();
-    if(k==="left"||k==="arr"){if(v&&c.on){const L=k==="left"?dn(v):dn(c.left),A=k==="arr"?dn(v):dn(c.arr);if(L!=null&&A!=null&&A<L){toast("Arrival in India can't be before leaving India.");i.value=c[k]||"";return;}}
-      if(c.passEst&&c.passEst[k]){delete c.passEst[k];if(!Object.keys(c.passEst).length)delete c.passEst;}}
-    c[k]=v;}
-  cdSave(c);});
+function cdMarkDirty(card){const id=card.dataset.id,c=S.contracts.find(x=>x.id===id);if(!c)return;cdDirty.add(id);card.classList.add("dirty");card.querySelector(".cd-h").innerHTML=cdHead(c,true);card.querySelectorAll('[data-act=save],[data-act=cancel]').forEach(b=>b.disabled=false);}
+function okToLeave(){return !cdDirty.size||confirm("You have unsaved changes in Pending details. Leave without saving?");}
+function cdSaveCard(card){
+  const c=S.contracts.find(x=>x.id===card.dataset.id);if(!c)return;const get=k=>card.querySelector(`[data-k="${k}"]`);
+  const L=get("left"),A=get("arr");const lv=L?L.value:c.left,av=A?A.value:c.arr;
+  if(lv&&av&&dn(av)<dn(lv)){toast("Arrival in India can't be before leaving India.");return;}
+  c.passEst=Object.assign({},c.passEst||{});
+  [["left",L],["arr",A]].forEach(([k,el])=>{if(!el)return;if(el.value!==(c[k]||""))delete c.passEst[k];if(el.dataset.est==="1"&&el.value===el.dataset.estv)c.passEst[k]=true;c[k]=el.value;});
+  if(!Object.keys(c.passEst).length)delete c.passEst;
+  ["onPort","offPort","company"].forEach(k=>{const el=get(k);if(el)c[k]=el.value.trim();});
+  ["onIndia","offIndia"].forEach(k=>{const el=get(k);if(el)c[k]=el.value==="india";});
+  const na=card.querySelector("[data-na]"),fl=get("fleet");c.fleet=na&&na.checked?"NA":(fl?fl.value.trim():c.fleet);
+  c.u=Date.now();saveLocal();cdDirty.delete(c.id);cdEditing=true;try{render();}finally{cdEditing=false;}
+  card.outerHTML=cdCard(c);
+  /* refresh the other untouched cards so new company names appear as tap-to-fill buttons */
+  document.querySelectorAll("#cdList .cd").forEach(el=>{if(cdDirty.has(el.dataset.id)||el.dataset.id===c.id)return;const x=S.contracts.find(y=>y.id===el.dataset.id);if(x)el.outerHTML=cdCard(x);});
+  renderCdProgress();toast("Saved",1800);}
+$("cdList").addEventListener("input",e=>{const card=e.target.closest(".cd");if(card&&e.target.closest("[data-k],[data-na]"))cdMarkDirty(card);});
+$("cdList").addEventListener("change",e=>{const card=e.target.closest(".cd");if(!card)return;
+  if(e.target.matches("[data-na]")){const fl=card.querySelector('[data-k="fleet"]');fl.disabled=e.target.checked;fl.value=e.target.checked?"NA":"";}
+  if(e.target.closest("[data-k],[data-na]"))cdMarkDirty(card);});
 const addDays=(s,n)=>{const d=dn(s);if(d==null)return "";const x=new Date((d+n)*DAY);return x.getUTCFullYear()+"-"+pad(x.getUTCMonth()+1)+"-"+pad(x.getUTCDate());};
-function estimate(c){let ch=false;c.passEst=c.passEst||{};
-  if(!c.left&&c.on&&dn(c.on)<=TODAY){c.left=addDays(c.on,-1);c.passEst.left=true;ch=true;}
-  if(!c.arr&&c.off&&dn(c.off)<=TODAY){c.arr=addDays(c.off,1);c.passEst.arr=true;ch=true;}
+function estimate(c){let ch=false;const cc=chainOf(c);c.passEst=c.passEst||{};
+  if(!cc.prev&&!c.left&&c.on&&dn(c.on)<=TODAY){c.left=addDays(c.on,-1);c.passEst.left=true;ch=true;}
+  if(!cc.next&&!c.arr&&c.off&&dn(c.off)<=TODAY){c.arr=addDays(c.off,1);c.passEst.arr=true;ch=true;}
   if(!Object.keys(c.passEst).length)delete c.passEst;return ch;}
-$("cdList").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const card=b.closest(".cd"),c=S.contracts.find(x=>x.id===card.dataset.id);if(!c)return;
-  if(b.dataset.act==="est"){if(estimate(c)){cdSave(c,true);toast("Estimated dates filled. Correct them from your passport when you can.",4500);card.outerHTML=cdCard(c);}return;}
+$("cdList").addEventListener("click",e=>{
+  const fill=e.target.closest("[data-fill]");if(fill){const card=fill.closest(".cd");card.querySelector('[data-k="company"]').value=fill.dataset.fill;cdMarkDirty(card);return;}
+  const b=e.target.closest("[data-act]");if(!b)return;const card=b.closest(".cd"),c=S.contracts.find(x=>x.id===card.dataset.id);if(!c)return;
+  if(b.dataset.act==="save"){cdSaveCard(card);return;}
+  if(b.dataset.act==="cancel"){cdDirty.delete(c.id);card.outerHTML=cdCard(c);return;}
+  if(b.dataset.act==="est"){const cc=chainOf(c);let n=0;
+    const L=card.querySelector('[data-k="left"]'),A=card.querySelector('[data-k="arr"]');
+    if(L&&!L.value&&c.on&&dn(c.on)<=TODAY){L.value=addDays(c.on,-1);L.dataset.est="1";L.dataset.estv=L.value;n++;}
+    if(A&&!A.value&&c.off&&dn(c.off)<=TODAY){A.value=addDays(c.off,1);A.dataset.est="1";A.dataset.estv=A.value;n++;}
+    if(n){cdMarkDirty(card);toast("Estimated dates filled in. Press Save to keep them.",3500);}else toast("No blank passport dates to estimate.");return;}
   if(b.dataset.act==="prev"){const o=dn(c.on)||0,cands=S.contracts.filter(x=>x!==c&&(x.company||x.fleet));
     const prev=cands.filter(x=>(dn(x.on)||0)<o).sort((a,b2)=>(dn(b2.on)||0)-(dn(a.on)||0))[0]||cands.filter(x=>(dn(x.on)||0)>=o).sort((a,b2)=>(dn(a.on)||0)-(dn(b2.on)||0))[0];
     if(!prev){toast("No other contract has a company or fleet yet.");return;}
-    let ch=false;if(!c.company&&prev.company){c.company=prev.company;ch=true;}if(!c.fleet&&prev.fleet){c.fleet=prev.fleet;ch=true;}
-    if(!ch){toast("Company and fleet are already filled.");return;}cdSave(c,true);card.outerHTML=cdCard(c);toast("Copied from "+prev.vessel);}
+    const co=card.querySelector('[data-k="company"]'),fl=card.querySelector('[data-k="fleet"]'),na=card.querySelector("[data-na]");
+    if(prev.company)co.value=prev.company;
+    if(prev.fleet){if(prev.fleet.toUpperCase()==="NA"){na.checked=true;fl.disabled=true;fl.value="NA";}else{na.checked=false;fl.disabled=false;fl.value=prev.fleet;}}
+    cdMarkDirty(card);toast("Copied from "+prev.vessel+". Press Save to keep it.",3000);}
 });
-$("cdEstAll").addEventListener("click",()=>{if(S.example)return;let n=0;S.contracts.forEach(c=>{if(estimate(c)){c.u=Date.now();n++;}});if(!n){toast("No blank passport dates to estimate.");return;}saveLocal();render();renderComplete();toast(`Estimated passport dates for ${n} contract${n===1?"":"s"}. They're marked ESTIMATED until you correct them.`,5000);});
-$("cdShow").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(!b)return;cdShow=b.dataset.s;renderComplete();});
-$("cdFY").addEventListener("change",renderComplete);$("cdQ").addEventListener("input",renderComplete);
+$("cdEstAll").addEventListener("click",()=>{if(S.example)return;if(cdDirty.size){toast("Save or cancel your open changes first.");return;}let n=0;S.contracts.forEach(c=>{if(estimate(c)){c.u=Date.now();n++;}});if(!n){toast("No blank passport dates to estimate.");return;}saveLocal();render();renderComplete(true);toast(`Estimated passport dates for ${n} contract${n===1?"":"s"}. They're marked ESTIMATED until you correct them.`,5000);});
+$("cdShow").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(!b)return;if(!okToLeave())return;cdShow=b.dataset.s;renderComplete(true);});
+$("cdFY").addEventListener("change",()=>{if(okToLeave())renderComplete(true);});$("cdQ").addEventListener("input",()=>{if(!cdDirty.size)renderComplete(true);});
+addEventListener("beforeunload",e=>{if(cdDirty.size){e.preventDefault();e.returnValue="";}});
 
 /* ---------- notices ---------- */
 let NOTICES=lsJSON("sdlNotices",[]),nLevel="";noticesPrevSeen=+(lsGet("sdlNoticesSeen")||0);
@@ -764,7 +797,7 @@ function renderImport(){
       else if(p.status==="update"){p.fill.forEach(k=>p.ex[k]=p.cand[k]);p.ex.u=now;updated++;}});
     S.settings.rankMap=Object.assign({},S.settings.rankMap||{},PIMP.map);PIMP=null;saveLocal();render();renderImport();
     const todo=S.contracts.filter(c=>!cdState(c).done).length;
-    toast(`${added} ship${added===1?"":"s"} added, ${updated} updated.${todo?` ${todo} need details: fill them in here.`:""} Press Sync to save to your account.`,7000);location.hash=todo?"complete":"ships";};
+    toast(`${added} ship${added===1?"":"s"} added, ${updated} updated.${todo?` ${todo} have pending details: fill them in here.`:""} Press Sync to save to your account.`,7000);location.hash=todo?"complete":"ships";};
 }
 $("profilePdf").addEventListener("change",async e=>{
   const file=e.target.files[0];e.target.value="";if(!file)return;

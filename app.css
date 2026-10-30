@@ -245,6 +245,11 @@ details.more[open]>summary::before{content:"− "}
 .estag{font-family:var(--f-mono);font-size:.62rem;background:var(--warn-bg);color:var(--warn);border-radius:4px;padding:0 5px;margin-left:6px;font-weight:500}
 input.missing,select.missing{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 6%,var(--paper))}
 .cd .actions{gap:8px}
+.cd.dirty{border-left-color:var(--accent)}
+.fillchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.fillchips button{border-radius:999px;font-size:.74rem;padding:3px 10px}
+.nachk{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--ink);margin-top:6px;font-weight:400}
+.cd input:disabled{background:var(--soft);color:var(--muted)}
 
 /* ---------- notices / news ---------- */
 .notice{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px}
