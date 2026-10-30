@@ -212,7 +212,7 @@ function render(){
   $("exampleBanner").hidden=!S.example;
   $("exampleBanner").innerHTML=S.example?`<div class="banner example"><div><b>These are example voyages.</b> Upload your seafarer profile or add a contract, and the examples disappear.</div><div class="actions"><a class="btn btn-primary btn-sm" href="#upload">Upload profile</a><a class="btn btn-sm" href="#ships" id="exAdd">Add contract</a></div></div>`:"";
   if(!S.certs)S.certs=[];
-  renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();renderCdBadge();renderCertBadge();if(VIEW==="certs")renderCerts();if(!S.docs)S.docs=[];renderDocBadge();if(VIEW==="docs")renderDocs();
+  renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();renderCdBadge();renderCertBadge();if(VIEW==="certs")renderCerts();if(!S.docs)S.docs=[];renderDocBadge();if(VIEW==="docs")renderDocs();renderStorage();
   fillSelect($("cdFY"),[["","All years"]].concat(fyOpts),$("cdFY").value);
   $("cdCompany").innerHTML=uniq("company").map(f=>`<option value="${esc(f)}">`).join("");$("cdFleet").innerHTML=uniq("fleet").map(f=>`<option value="${esc(f)}">`).join("");
   if(VIEW==="complete"&&!cdEditing)renderComplete();else renderCdProgress();
@@ -1014,7 +1014,8 @@ async function imgToJpeg(file,max){
   finally{URL.revokeObjectURL(url);}
 }
 let PEND=[];
-const docCertOpts=sel=>`<option value="">— none —</option>`+(S.certs||[]).filter(c=>!c.hidden).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(c=>`<option value="${esc(c.id)}" ${c.id===sel?"selected":""}>${esc(c.name)}${c.expires?" · exp "+fmt(dn(c.expires)):""}</option>`).join("");
+const docCertOpts=sel=>{const cs=(S.certs||[]).filter(c=>!c.hidden),cur=cs.filter(c=>certStatus(c)!=="replaced"),old=cs.filter(c=>certStatus(c)==="replaced"),o=c=>`<option value="${esc(c.id)}" ${c.id===sel?"selected":""}>${esc(c.name)}${c.expires?" · exp "+fmt(dn(c.expires)):""}</option>`,srt=l=>l.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+  return `<option value="">— none —</option><optgroup label="Current">${srt(cur).map(o).join("")}</optgroup>${old.length?`<optgroup label="Older (replaced)">${srt(old).map(o).join("")}</optgroup>`:""}`;};
 function guessCat(n){n=n.toLowerCase();return /passport/.test(n)?"Passport":/cdc|discharge/.test(n)?"CDC":/coc|competency/.test(n)?"CoC":/endorse/.test(n)?"Endorsement":/medical|fitness/.test(n)?"Medical":/visa/.test(n)?"Visa":/stcw|course|fire|survival|first aid/.test(n)?"STCW course":"Other";}
 $("docAddLbl").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("docFile").click();}});
 $("docFile").addEventListener("change",async()=>{
@@ -1037,6 +1038,8 @@ $("docForm").addEventListener("submit",async e=>{e.preventDefault();
   if(!name&&!(PEND.length>1&&$("dcCombineRow").hidden)){$("dcErr").textContent="Enter a name for the document.";return;}
   const id=$("dc_id").value;
   if(id){const d=S.docs.find(x=>x.id===id);if(d){Object.assign(d,meta,{name,u:Date.now()});saveLocal();render();renderDocs();}closeDocForm();toast("Document updated");return;}
+  const addSize=PEND.reduce((a,f)=>a+(/^image\//.test(f.type)?500000:f.size),0);
+  if(storageInfo().used+addSize*4/3>FAIR){$("dcErr").textContent=`This would go over the ${mb(FAIR)} document space for your account. Delete old or replaced documents first.`;return;}
   $("dcSave").disabled=true;$("dcSave").textContent="Saving…";
   try{
     if(S.example)leaveExample();S.docs=S.docs||[];
@@ -1071,20 +1074,21 @@ async function thumbFor(d){
 async function renderDocs(){
   await refreshLocal();
   const all=S.example?[]:(S.docs||[]),total=all.reduce((a,d)=>a+(d.size||0),0),waiting=all.filter(d=>!d.chunks).length,away=all.filter(d=>!LOCAL.has(d.id)).length;
-  $("docTiles").innerHTML=`<div class="tile"><b>${all.length}</b><span>documents</span></div><div class="tile"><b>${mb(total)}</b><span>total size</span></div><div class="tile"><b style="color:${waiting?"var(--warn)":"var(--ok)"}">${savedUser()?waiting:"—"}</b><span>${savedUser()?"waiting to sync":"sign in to back up"}</span></div>${away?`<div class="tile"><b>${away}</b><span>in your account, not on this device yet</span></div>`:""}`;
+  $("docTiles").innerHTML=`<div class="tile"><b>${all.length}</b><span>documents</span></div><div class="tile"><b>${mb(storageInfo().used)}</b><span>of ${mb(FAIR)} cloud space used</span></div><div class="tile"><b style="color:${waiting?"var(--warn)":"var(--ok)"}">${savedUser()?waiting:"—"}</b><span>${savedUser()?"waiting to sync":"sign in to back up"}</span></div>${away?`<div class="tile"><b>${away}</b><span>in your account, not on this device yet</span></div>`:""}`;
   const cats=DOC_CATS.filter(c=>all.some(d=>d.cat===c));if(docCat&&!cats.includes(docCat))docCat="";
   $("docCat").innerHTML=`<button type="button" data-c="" aria-pressed="${!docCat}">All</button>`+cats.map(c=>`<button type="button" data-c="${esc(c)}" aria-pressed="${docCat===c}">${esc(c)}</button>`).join("");
   const q=$("docQ").value.trim().toLowerCase();
   const list=all.filter(d=>(!docCat||d.cat===docCat)&&(!q||(d.name+" "+d.cat+" "+(d.notes||"")).toLowerCase().includes(q))).sort((a,b)=>DOC_CATS.indexOf(a.cat)-DOC_CATS.indexOf(b.cat)||String(a.name).localeCompare(String(b.name)));
   if(!all.length){$("docList").innerHTML='<div class="card empty" style="grid-column:1/-1">No documents yet. Tap <b>+ Add document</b> to take a photo or choose a scan or PDF.</div>';renderDocBadge();return;}
   if(!list.length){$("docList").innerHTML='<div class="card empty" style="grid-column:1/-1">No documents match.</div>';return;}
-  $("docList").innerHTML=list.map(d=>{const here=LOCAL.has(d.id),cert=d.cert&&(S.certs||[]).find(c=>c.id===d.cert),cs=!here?["away","In account · download on Sync"]:d.chunks?["ok","✓ In your account"]:savedUser()?["wait","Waiting to sync"]:["away","On this device only"];
-    return `<div class="doc" data-id="${esc(d.id)}"><button type="button" class="thumb" data-open aria-label="Open ${esc(d.name)}"><span class="ph">${here?"…":"Not on this device yet"}</span></button>
+  $("docList").classList.toggle("selecting",SELECTING);
+  $("docList").innerHTML=list.map(d=>{const here=LOCAL.has(d.id),cert=d.cert&&(S.certs||[]).find(c=>c.id===d.cert),xs=cert?docExp(cert):null,cs=!here?["away","In account · download on Sync"]:d.chunks?["ok","✓ In your account"]:savedUser()?["wait","Waiting to sync"]:["away","On this device only"];
+    return `<div class="doc ${xs?xs.k:""} ${PICKED.has(d.id)?"picked":""}" data-id="${esc(d.id)}"><span class="pick" aria-hidden="true">✓</span><button type="button" class="thumb" data-open aria-label="Open ${esc(d.name)}"><span class="ph">${here?"…":"Not on this device yet"}</span></button>
     <div class="db"><div class="dn">${esc(d.name)}</div><div class="dm"><span class="ftype">${d.type==="application/pdf"?"PDF":"JPG"}</span><span>${esc(d.cat||"Other")}</span><span>${mb(d.size||0)}</span>${d.pages>1?`<span>${d.pages} pages</span>`:""}</div>
-    ${cert?`<div class="dm">Linked: ${esc(cert.name)}${cert.expires?" · exp "+fmt(dn(cert.expires)):""}</div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
+    ${cert?`<div class="dm">Linked: ${esc(cert.name)}</div>`:""}${xs?`<div class="dm"><span class="xs ${xs.k}">${xs.t}</span></div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
     <div class="dm"><span class="cs ${cs[0]}">${cs[1]}</span></div>
     <div class="row-act">${here?'<button type="button" class="btn-sm" data-share>Share</button><button type="button" class="btn-sm" data-save>Save</button>':""}<button type="button" class="btn-sm" data-dedit>Edit</button><button type="button" class="btn-sm btn-danger" data-ddel>Delete</button></div></div></div>`;}).join("");
-  renderDocBadge();
+  renderDocBadge();renderSelBar();
   for(const d of list){if(!LOCAL.has(d.id))continue;const t=await thumbFor(d);const el=$("docList").querySelector(`.doc[data-id="${CSS.escape(d.id)}"] .thumb`);if(el)el.innerHTML=t?`<img src="${t}" alt="">`:'<span class="ph">PDF</span>';}
 }
 $("docCat").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;docCat=b.dataset.c;renderDocs();});
@@ -1117,6 +1121,7 @@ $("dvClose").addEventListener("click",closeViewer);$("dvShare").addEventListener
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("docViewer").hidden)closeViewer();});
 let pendingDDel=null;
 $("docList").addEventListener("click",async e=>{const card=e.target.closest(".doc");if(!card)return;const d=(S.docs||[]).find(x=>x.id===card.dataset.id);if(!d)return;
+  if(SELECTING){e.preventDefault();if(!LOCAL.has(d.id)){toast("This file isn't on this device yet. Press Sync while online.");return;}PICKED.has(d.id)?PICKED.delete(d.id):PICKED.add(d.id);card.classList.toggle("picked",PICKED.has(d.id));renderSelBar();return;}
   if(e.target.closest("[data-open]")){openDoc(d);return;}
   if(e.target.closest("[data-share]")){shareDoc(d);return;}
   if(e.target.closest("[data-save]")){saveDoc(d);return;}
@@ -1149,6 +1154,36 @@ async function docsDownload(f,u){
   if(VIEW==="docs")renderDocs();
   return failed?(failed===1?"one document":failed+" documents"):"";
 }
+
+
+/* expiry of the linked certificate, shown on the document card */
+function docExp(c){if(!c||!c.expires)return null;const e=dn(c.expires),n=e-TODAY;
+  if(n<0)return {k:"expired",t:"Expired "+fmt(e)};if(n<=183)return {k:"soon",t:"Expires "+fmt(e)+" · "+relDays(e)};return {k:"valid",t:"Valid until "+fmt(e)};}
+/* choose several documents and share or save them together */
+let SELECTING=false;const PICKED=new Set();
+function renderSelBar(){const n=PICKED.size,all=(S.docs||[]).length;$("docSelBar").hidden=!all||S.example;$("docSelBar").classList.toggle("on",SELECTING);
+  $("docSelToggle").textContent=SELECTING?"Done":"Select several";["docSelAll","docSelShare","docSelSave"].forEach(id=>$(id).hidden=!SELECTING);
+  $("docSelShare").disabled=$("docSelSave").disabled=!n;$("docSelShare").textContent=n?`Share ${n}`:"Share";$("docSelSave").textContent=n?`Save ${n}`:"Save";
+  const size=[...PICKED].reduce((a,id)=>{const d=S.docs.find(x=>x.id===id);return a+(d?d.size||0:0);},0);
+  $("docSelInfo").textContent=SELECTING?(n?`${n} selected · ${mb(size)}`:"Tap documents to select them"):"";}
+$("docSelToggle").addEventListener("click",()=>{SELECTING=!SELECTING;PICKED.clear();renderDocs();});
+$("docSelAll").addEventListener("click",()=>{const cards=[...$("docList").querySelectorAll(".doc")].map(c=>c.dataset.id).filter(id=>LOCAL.has(id));const allOn=cards.every(id=>PICKED.has(id));cards.forEach(id=>allOn?PICKED.delete(id):PICKED.add(id));renderDocs();});
+async function pickedFiles(){const out=[];for(const id of PICKED){const d=S.docs.find(x=>x.id===id);if(!d)continue;try{out.push(await docFile(d));}catch(e){}}
+  const seen={};out.forEach((f,i)=>{const k=f.name.toLowerCase();if(seen[k]){const n=++seen[k];out[i]=new File([f],f.name.replace(/(\.[^.]+)$/,` (${n})$1`),{type:f.type});}else seen[k]=1;});return out;}
+async function saveFiles(files,fromShare){for(const f of files){const url=URL.createObjectURL(f),a=document.createElement("a");a.href=url;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),8000);await new Promise(r=>setTimeout(r,350));}
+  toast(fromShare?`This browser can't share files directly, so ${files.length} file${files.length===1?" was":"s were"} saved. Attach them in WhatsApp or your email.`:`${files.length} file${files.length===1?"":"s"} saved.`,6000);}
+$("docSelShare").addEventListener("click",async()=>{const files=await pickedFiles();if(!files.length)return;
+  if(navigator.canShare&&navigator.canShare({files})){try{await navigator.share({files,title:files.length+" documents"});}catch(e){if(!(e&&e.name==="AbortError"))saveFiles(files);}return;}
+  saveFiles(files,true);});
+$("docSelSave").addEventListener("click",async()=>{const files=await pickedFiles();if(files.length)saveFiles(files);});
+/* storage used: the cloud copy is about a third bigger than the file itself */
+const FAIR=50*1048576;
+function storageInfo(){const docs=S.example?[]:(S.docs||[]),file=docs.reduce((a,d)=>a+(d.size||0),0),cloud=docs.filter(d=>d.chunks).reduce((a,d)=>a+Math.ceil((d.size||0)*4/3)+200*(d.chunks||1),0),pend=docs.filter(d=>!d.chunks).reduce((a,d)=>a+Math.ceil((d.size||0)*4/3),0);return {n:docs.length,file,cloud,pend,used:cloud+pend};}
+function renderStorage(){const s=storageInfo(),pct=Math.min(100,s.used/FAIR*100),col=pct>=90?"var(--bad)":pct>=70?"var(--warn)":"var(--ok)";
+  $("storeCard").innerHTML=`<h2 style="margin-bottom:4px">Document storage</h2><p class="small muted">Each account can keep up to ${mb(FAIR)} of documents in the cloud, so the free space is shared fairly between all seafarers using the app.</p>
+   <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="${FAIR}" aria-valuenow="${s.used}" aria-label="Document storage used"><i style="width:${Math.max(pct,s.used?2:0)}%;background:${col}"></i></div>
+   <div class="small"><b>${mb(s.used)}</b> of ${mb(FAIR)} used · ${s.n} document${s.n===1?"":"s"}${s.pend?` · ${mb(s.pend)} waiting to sync`:""}</div>
+   ${pct>=90?'<p class="small" style="color:var(--bad);margin-top:6px">Almost full. Delete old or replaced documents to make room.</p>':""}<p class="small muted" style="margin-top:6px">On this device: ${mb(s.file)}. Photos are made smaller when you add them.</p><div style="margin-top:8px"><a class="btn btn-sm" href="#docs">Open My documents</a></div>`;}
 
 /* ======================= report for your CA (PDF) ======================= */
 async function makeReport(f){

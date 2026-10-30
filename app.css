@@ -418,3 +418,19 @@ label.btn-primary,label.btn{font-weight:500;border:1px solid var(--accent);borde
 @media (max-width:640px){.alert{grid-template-columns:28px minmax(0,1fr)}.alert>a.btn,.alert>span:last-child{grid-column:2;justify-self:start}
  table.mini{font-size:.76rem} table.mini td,table.mini th{padding:6px 5px}}
 @media (max-width:640px){.sumrow .tile{flex:1 1 calc(50% - 10px)}}
+
+.selbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.selbar .sp{flex:1}
+.selbar.on{position:sticky;top:8px;z-index:5;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 10px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.doc{position:relative}
+.doc .pick{position:absolute;top:8px;left:8px;width:26px;height:26px;border-radius:8px;background:var(--paper);border:2px solid var(--line);display:none;place-items:center;font-weight:700;color:#fff;z-index:2;pointer-events:none}
+.doc-grid.selecting .doc .pick{display:grid}
+.doc-grid.selecting .doc{cursor:pointer}
+.doc.picked{outline:3px solid var(--accent);outline-offset:-1px}
+.doc.picked .pick{background:var(--accent);border-color:var(--accent)}
+.doc .xs{font-size:.72rem;padding:1px 7px;border-radius:999px;font-weight:600}
+.doc .xs.valid{background:var(--ok-bg);color:var(--ok)}.doc .xs.soon{background:var(--warn-bg);color:var(--warn)}.doc .xs.expired{background:var(--bad-bg);color:var(--bad)}
+.doc.expired{border-color:var(--bad)}.doc.soon{border-color:var(--warn)}
+.meter{height:12px;border-radius:999px;background:var(--soft);overflow:hidden;margin:8px 0 6px}
+.meter i{display:block;height:100%;border-radius:999px}
+.doc-grid.selecting .doc .row-act{visibility:hidden}

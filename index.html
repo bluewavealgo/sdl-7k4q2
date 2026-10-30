@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202610301253">
+<link rel="stylesheet" href="app.css?v=202610301319">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body>
@@ -251,6 +251,7 @@
         <div class="f wide"><span>Category</span><div class="chips" id="docCat" role="group" aria-label="Category"></div></div>
         <label class="f wide"><span>Search</span><input id="docQ" placeholder="e.g. passport, visa" autocomplete="off"></label>
       </div></div>
+      <div class="selbar" id="docSelBar"><button type="button" class="btn-sm" id="docSelToggle">Select several</button><span class="small muted" id="docSelInfo"></span><span class="sp"></span><button type="button" class="btn-sm" id="docSelAll" hidden>Select all</button><button type="button" class="btn-sm btn-primary" id="docSelShare" hidden disabled>Share</button><button type="button" class="btn-sm" id="docSelSave" hidden disabled>Save</button></div>
       <div id="docList" class="doc-grid"></div>
       <div class="card card-b small muted">Your documents are private: only you can open them, after signing in. On this device anyone who can open the app can see them, so keep your phone locked.</div>
     </section>
@@ -289,6 +290,7 @@
     <section class="view" id="v-account" data-title="Account and sync" hidden>
       <div class="vhead"><div><h1>Account &amp; sync</h1><p class="muted">Sign in to keep the same data on your phone, iPad and computer.</p></div></div>
       <div class="card card-b"><div class="acct" id="acctBox"></div></div>
+      <div class="card card-b" id="storeCard"></div>
       <div class="card card-b">
         <h2 style="margin-bottom:8px">How Sync works</h2>
         <ul class="steps small">
@@ -373,6 +375,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202610301253"></script>
+<script src="app.js?v=202610301319"></script>
 </body>
 </html>
