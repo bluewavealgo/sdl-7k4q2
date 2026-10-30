@@ -1,1154 +1,245 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="googlebot" content="noindex,nofollow"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#04121f">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="googlebot" content="noindex,nofollow">
+<title>Sea Days Ledger</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#06182a">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Sea Days Ledger</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<style>
-/* Layout: a night-watch bridge hero (flag hoist N-R-I, India-days dial) over a chart-room page:
-   notices + maritime news, contract entry, filters, FY result cards with day strips, the sea-service register, summaries. */
-:root{
-  --bg:#edf3f6; --paper:#ffffff; --ink:#0d2032; --muted:#56697a; --line:#d2dde5; --soft:#e5eef3;
-  --accent:#ff6b2c; --accent-ink:#ffffff; --sea:#0f7fa8; --sea-soft:#d3ecf5; --land:#d8c3a0; --plan:#8cc9de;
-  --ok:#14805a; --ok-bg:#dcf3e8; --warn:#a35a00; --warn-bg:#fdedcc; --bad:#c0261a; --bad-bg:#fde2df; --unk:#56697a; --unk-bg:#e3e9ee;
-  --hero-a:#04121f; --hero-b:#0a3350; --hero-c:#0d5c7a; --hero-ink:#eaf6fb; --hero-dim:#9fc3d4; --glow:#45d0ff; --gold:#ffc23d;
-  --c0:#2a78d6; --c1:#eb6834; --c2:#1baf7a; --c3:#eda100; --c4:#e87ba4; --c5:#008300; --c6:#6250d6; --c7:#e34948; --c8:#7c8a96; --c9:#9aa6b0; --c10:#5f6e7a; --cx:#a7b3bd;
-  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
-  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#07131d; --paper:#0f1f2c; --ink:#e4f0f6; --muted:#90a8b8; --line:#203749; --soft:#152a3a;
-  --accent:#ff8247; --accent-ink:#1b0a02; --sea:#3fb5e0; --sea-soft:#123447; --land:#7c6a4e; --plan:#26708c;
-  --ok:#55d69d; --ok-bg:#0f3528; --warn:#f6b85a; --warn-bg:#3a2a0e; --bad:#ff8a7c; --bad-bg:#3f1817; --unk:#90a8b8; --unk-bg:#1c3040;
-  --c0:#3987e5; --c1:#d95926; --c2:#199e70; --c3:#c98500; --c4:#d55181; --c5:#008300; --c6:#9085e9; --c7:#e66767; --c8:#8396a4; --c9:#6b7d8a; --c10:#a4b4c0; --cx:#4a5d6c;
-  color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#07131d; --paper:#0f1f2c; --ink:#e4f0f6; --muted:#90a8b8; --line:#203749; --soft:#152a3a;
-  --accent:#ff8247; --accent-ink:#1b0a02; --sea:#3fb5e0; --sea-soft:#123447; --land:#7c6a4e; --plan:#26708c;
-  --ok:#55d69d; --ok-bg:#0f3528; --warn:#f6b85a; --warn-bg:#3a2a0e; --bad:#ff8a7c; --bad-bg:#3f1817; --unk:#90a8b8; --unk-bg:#1c3040;
-  --c0:#3987e5; --c1:#d95926; --c2:#199e70; --c3:#c98500; --c4:#d55181; --c5:#008300; --c6:#9085e9; --c7:#e66767; --c8:#8396a4; --c9:#6b7d8a; --c10:#a4b4c0; --cx:#4a5d6c;
-  color-scheme:dark}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--hero-a)}
-.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-main.wrap{padding-block:22px 110px;display:flex;flex-direction:column;gap:22px}
-h1,h2,h3{font-family:var(--f-display);font-weight:600;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
-h2{font-size:1.5rem;text-transform:uppercase;letter-spacing:.03em}
-h3{font-size:1.15rem}
-.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-.eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.muted{color:var(--muted)} .small{font-size:.82rem}
-a{color:var(--sea)}
-button,.btn{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;transition:border-color .15s,transform .15s}
-button:hover,.btn:hover{border-color:var(--sea)}
-button:active{transform:translateY(1px)}
-button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 6px 18px -8px var(--accent)}
-.btn-primary:hover{border-color:var(--accent);filter:brightness(1.06)}
-.btn-ghost{background:transparent}
-.btn-danger{color:var(--bad)}
-input,select,textarea{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
-textarea{resize:vertical;min-height:70px}
-input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--accent)}
-label.f,div.f{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted);min-width:0}
-label.f>span,div.f>span{font-weight:500}
-
-/* ---------- hero ---------- */
-.hero{position:relative;overflow:hidden;color:var(--hero-ink);background:radial-gradient(1200px 500px at 85% -10%,var(--hero-c) 0%,transparent 60%),linear-gradient(160deg,var(--hero-a) 0%,var(--hero-b) 70%,var(--hero-c) 100%)}
-.hero .wrap{position:relative;z-index:2;padding-block:28px 86px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;align-items:center}
-.stars{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 12% 22%,#fff8,transparent),radial-gradient(1px 1px at 38% 12%,#fff6,transparent),radial-gradient(1.5px 1.5px at 62% 30%,#fff7,transparent),radial-gradient(1px 1px at 78% 8%,#fff5,transparent),radial-gradient(1px 1px at 90% 40%,#fff6,transparent),radial-gradient(1px 1px at 25% 45%,#fff4,transparent),radial-gradient(1px 1px at 50% 55%,#fff3,transparent);z-index:0}
-.waves{position:absolute;left:0;right:0;bottom:-2px;height:90px;z-index:1;pointer-events:none}
-.waves svg{position:absolute;bottom:0;width:200%;height:100%}
-.waves .w1{animation:drift 22s linear infinite;opacity:.35}
-.waves .w2{animation:drift 14s linear infinite reverse;opacity:.6}
-.waves .w3{opacity:1}
-@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.hoist{display:flex;gap:5px;align-items:center}
-.hoist svg{width:30px;height:21px;border-radius:2px;box-shadow:0 2px 6px #0006}
-.hoist span{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;color:var(--hero-dim);margin-left:6px}
-.hero h1{font-size:clamp(2.6rem,6vw,4.4rem);font-weight:800;text-transform:uppercase;letter-spacing:.01em;line-height:.92;margin-top:12px}
-.hero h1 em{font-style:normal;color:transparent;background:linear-gradient(90deg,var(--glow),var(--gold));-webkit-background-clip:text;background-clip:text}
-.hero p{color:var(--hero-dim);max-width:58ch;margin:12px 0 0}
-.hero .eyebrow{color:var(--hero-dim)}
-.navchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
-.navchips a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--hero-ink);border:1px solid #ffffff2e;background:#ffffff12;border-radius:999px;padding:6px 12px;font-size:.84rem;backdrop-filter:blur(4px)}
-.navchips a:hover{background:#ffffff22;border-color:var(--glow)}
-.badge[hidden]{display:none}
-.badge{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-family:var(--f-mono);font-size:.7rem;display:inline-grid;place-items:center}
-.refreshdock{position:fixed;z-index:40;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);border:0;border-radius:16px;padding:10px 16px 10px 12px;box-shadow:0 14px 34px -12px #000a;text-align:left;max-width:calc(100vw - 32px)}
-.refreshdock:hover{filter:brightness(1.12)}
-.refreshdock .ico{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);flex:none;position:relative}
-.refreshdock .ico svg{width:18px;height:18px}
-.refreshdock b{display:block;font-size:.92rem;font-weight:600;line-height:1.2}
-.refreshdock small{display:block;font-family:var(--f-mono);font-size:.7rem;opacity:.75;line-height:1.3}
-.refreshdock .upd{position:absolute;top:-2px;right:-2px;width:11px;height:11px;border-radius:50%;background:var(--ok);border:2px solid var(--ink)}
-.refreshdock.spin .ico svg{animation:spin .9s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.save-state{font-family:var(--f-mono);font-size:.74rem;color:var(--hero-dim);margin-top:14px}
-.bridge{background:linear-gradient(180deg,#ffffff14,#ffffff08);border:1px solid #ffffff24;border-radius:18px;padding:18px 20px;backdrop-filter:blur(6px);box-shadow:0 30px 60px -30px #000a;display:flex;flex-direction:column;gap:10px}
-.bridge .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
-.dial{width:100%;max-width:340px;margin:0 auto;display:block}
-.dial text{font-family:var(--f-mono)}
-.bridge .kvs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.bridge .kv{background:#00000030;border-radius:10px;padding:8px 10px}
-.bridge .kv b{display:block;font-family:var(--f-mono);font-size:1.25rem;font-weight:500}
-.bridge .kv span{font-size:.72rem;color:var(--hero-dim);line-height:1.2;display:block}
-.bridge .msg{font-size:.88rem}
-.bridge .msg b{color:var(--gold)}
-.big-status{font-family:var(--f-display);font-weight:800;font-size:2.6rem;line-height:1}
-
-.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:.74rem;font-weight:500;padding:3px 10px;border-radius:999px;letter-spacing:.04em;white-space:nowrap}
-.pill.NR{background:var(--ok-bg);color:var(--ok)}
-.pill.RNOR{background:var(--warn-bg);color:var(--warn)}
-.pill.ROR{background:var(--bad-bg);color:var(--bad)}
-.pill.UNK{background:var(--unk-bg);color:var(--unk)}
-.pill.plan{background:var(--sea-soft);color:var(--sea)}
-.tchip{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:500;padding:2px 9px;border-radius:999px;background:color-mix(in srgb,var(--tc) 14%,transparent);color:var(--tc);white-space:nowrap}
-.tchip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--tc)}
-
-.banner{border:1px dashed var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--paper));border-radius:12px;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}
-.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px}
-.panel-h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}
-.panel-b{padding:16px}
-.sec-ico{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;margin-right:10px;vertical-align:middle;color:#fff;background:var(--ic,var(--sea))}
-.sec-ico svg{width:17px;height:17px}
-.ph{display:flex;align-items:center}
-
-/* notices + news */
-.deck{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:18px;align-items:start}
-.notice-list,.news-list{display:flex;flex-direction:column}
-.notice{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;position:relative}
-.notice:last-child{border-bottom:0}
-.notice .lvl{width:4px;border-radius:2px;flex:none;background:var(--sea)}
-.notice.important .lvl{background:var(--gold)} .notice.urgent .lvl{background:var(--bad)}
-.notice .nb{min-width:0;flex:1}
-.notice .nt{font-weight:600}
-.notice .nm{white-space:pre-wrap;word-wrap:break-word;margin-top:2px}
-.notice .nd{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.newtag{font-family:var(--f-mono);font-size:.66rem;background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:0 5px}
-.composer{padding:14px 16px;border-bottom:1px solid var(--line);background:var(--soft);display:flex;flex-direction:column;gap:8px}
-.composer .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.composer .row select{width:auto}
-.topics{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
-.topics button{border-radius:999px;padding:4px 11px;font-size:.8rem}
-.topics button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.news{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
-.news:last-child{border-bottom:0}
-.news:hover{background:var(--soft)}
-.news .dt{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);text-align:center;width:44px;line-height:1.1;padding-top:2px}
-.news .dt b{display:block;font-family:var(--f-display);font-size:1.5rem;color:var(--ink);font-weight:700}
-.news .hl{font-weight:600;line-height:1.3}
-.news .gist{color:var(--muted);font-size:.84rem;margin-top:2px}
-.news .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;font-size:.74rem;color:var(--muted)}
-.scroll{max-height:520px;overflow-y:auto}
-.empty{padding:22px 16px;color:var(--muted);text-align:center}
-
-/* form */
-details.form>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px}
-details.form>summary::-webkit-details-marker{display:none}
-details.form[open]>summary{border-bottom:1px solid var(--line)}
-.fgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.fgrid .s2{grid-column:span 2}
-.fsec{display:flex;flex-direction:column;gap:10px}
-.fsec+.fsec{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line)}
-.radios{display:flex;gap:12px;align-items:center;font-size:.85rem;color:var(--ink);flex-wrap:wrap}
-.radios label{display:flex;gap:5px;align-items:center}
-.calcline{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;background:var(--sea-soft);padding:8px 12px;border-radius:8px}
-.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
-.err{color:var(--bad);font-size:.85rem}
-
-.filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:end;padding:14px 16px}
-
-/* FY cards */
-.fy-list{display:flex;flex-direction:column;gap:16px}
-.fy{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;--st:var(--unk)}
-.fy.NR{--st:var(--ok)} .fy.RNOR{--st:var(--warn)} .fy.ROR{--st:var(--bad)}
-.fy-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,color-mix(in srgb,var(--st) 16%,var(--paper)),var(--paper) 70%);border-left:5px solid var(--st)}
-.fy-h .t{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-.fy-h h3{font-size:1.6rem;font-weight:700}
-.fy-b{padding:14px 16px;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.stat{display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:var(--soft);border-radius:10px;min-width:0}
-.stat b{font-family:var(--f-mono);font-size:1.25rem;font-weight:500}
-.stat span{font-size:.72rem;color:var(--muted);line-height:1.25}
-.stat.hl{background:color-mix(in srgb,var(--st) 14%,var(--paper))} .stat.hl b{color:var(--st)}
-.strip-wrap{margin-top:12px}
-.strip{display:flex;height:18px;border-radius:5px;overflow:hidden;background:var(--land)}
-.strip i{flex:1 1 0;min-width:0}
-.strip i.o{background:var(--sea)} .strip i.p{background:var(--plan)} .strip i.u{background:var(--unk-bg)} .strip i.l{background:var(--land)}
-.strip-marks{display:grid;grid-template-columns:repeat(12,1fr);font-family:var(--f-mono);font-size:.66rem;color:var(--muted);margin-top:3px}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.72rem;color:var(--muted);margin-top:6px}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
-.meter{position:relative;height:9px;background:var(--soft);border-radius:5px;margin-top:10px}
-.meter .fill{position:absolute;inset:0 auto 0 0;border-radius:5px}
-.meter .thr{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
-.verdict{display:flex;flex-direction:column;gap:8px;font-size:.88rem}
-.verdict .vh{font-weight:600}
-.verdict ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
-.fyopts{display:flex;flex-direction:column;gap:6px;font-size:.82rem;border-top:1px dashed var(--line);padding-top:10px}
-.fyopts label{display:flex;gap:8px;align-items:flex-start}
-.warnline{font-size:.8rem;color:var(--warn)}
-
-/* tables */
-.tbl-wrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:.84rem}
-th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;white-space:nowrap}
-th{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--soft)}
-td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-td .sub{display:block;color:var(--muted);font-size:.75rem}
-tbody tr:hover td{background:color-mix(in srgb,var(--sea) 5%,transparent)}
-tfoot td{font-weight:600;background:var(--soft)}
-.row-act{display:flex;gap:6px;flex-wrap:wrap}
-.row-act button,.row-act .btn{padding:5px 9px;font-size:.78rem}
-.sum-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.bar{height:6px;background:var(--soft);border-radius:3px;margin-top:4px}
-.bar>i{display:block;height:100%;border-radius:3px;background:var(--tc,var(--sea))}
-
-.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.rules .r{padding:14px;border-radius:12px;font-size:.85rem;background:var(--soft);border-top:4px solid var(--rc)}
-.rules .r h3{margin-bottom:6px}
-.rules .r p{margin:0 0 6px}
-.foot{font-size:.8rem;color:var(--muted);max-width:90ch}
-.hist{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
-.hist label.f{width:160px}
-
-/* theme toggle */
-.herotop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.themeswitch{display:inline-flex;align-items:center;gap:8px;background:#ffffff14;border:1px solid #ffffff2e;color:var(--hero-ink);border-radius:999px;padding:4px 6px 4px 12px;font-size:.8rem}
-.themeswitch:hover{border-color:var(--glow)}
-.themeswitch .track{position:relative;width:46px;height:24px;border-radius:12px;background:linear-gradient(90deg,#ffd76a,#ff9f43);transition:background .25s}
-.themeswitch .knob{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #0006;transition:transform .25s;display:grid;place-items:center;font-size:11px;color:#c77700}
-.themeswitch[aria-checked=true] .track{background:linear-gradient(90deg,#1b2a6b,#3b4fb8)}
-.themeswitch[aria-checked=true] .knob{transform:translateX(22px);color:#3b4fb8}
-
-/* tabs */
-.tabs{display:flex;gap:4px;padding:8px 8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.tabs [role=tab]{border:0;border-bottom:3px solid transparent;border-radius:8px 8px 0 0;background:transparent;padding:10px 14px;font-family:var(--f-display);font-size:1.15rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);display:inline-flex;gap:8px;align-items:center}
-.tabs [role=tab][aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent);background:var(--soft)}
-.tabbar-extra{margin-left:auto;display:flex;align-items:center;gap:8px;padding:0 8px 8px}
-
-/* overview charts */
-.ov-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.chart-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.chart-card .ch{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
-.chart-card h3{font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em}
-.chart-body{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:16px;align-items:center}
-.chart-body svg{width:100%;height:auto;display:block}
-.chart-body svg text{font-family:var(--f-mono)}
-.lg{display:flex;flex-direction:column;gap:6px;font-size:.82rem;min-width:0}
-.lg .li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:center}
-.lg .sw{width:12px;height:12px;border-radius:3px}
-.lg .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lg .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{border:0;border-radius:0;padding:4px 10px;font-size:.78rem;background:transparent}
-.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
-.bars-wrap{overflow-x:auto}
-.bars-wrap svg{display:block;min-width:100%}
-.mark{cursor:default}
-.mark:hover{filter:brightness(1.12)}
-#tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:var(--bg);font-size:.78rem;line-height:1.35;padding:7px 10px;border-radius:8px;max-width:260px;box-shadow:0 8px 24px -8px #0008;white-space:pre-line}
-
-@media (max-width:920px){
-  .hero .wrap{grid-template-columns:1fr}
-  .ov-grid{grid-template-columns:1fr}
-  .deck,.fy-b,.rules{grid-template-columns:1fr}
-  .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (max-width:540px){
-  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .sum-grid{grid-template-columns:1fr}
-  .fgrid,.filters{grid-template-columns:1fr}
-  .fgrid .s2{grid-column:auto}
-  .bridge .kvs{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .chart-body{grid-template-columns:1fr}
-  .chart-body svg{max-width:240px;margin:0 auto}
-}
-@media (prefers-reduced-motion:reduce){.waves svg{animation:none!important}*{transition:none!important}}
-</style>
-
-<header class="hero" id="top">
-  <div class="stars" aria-hidden="true"></div>
-  <div class="wrap">
-    <div>
-      <div class="herotop">
-      <div class="hoist" aria-label="Maritime signal flags spelling N R I">
-        <svg viewBox="0 0 4 4" aria-hidden="true"><title>Signal flag N (November)</title><rect width="4" height="4" fill="#fff"/><g fill="#1d4fb8"><rect width="1" height="1"/><rect x="2" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="3" y="1" width="1" height="1"/><rect y="2" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/></g></svg>
-        <svg viewBox="0 0 30 21" aria-hidden="true"><title>Signal flag R (Romeo)</title><rect width="30" height="21" fill="#d32f2f"/><rect x="12.5" width="5" height="21" fill="#ffd21f"/><rect y="8" width="30" height="5" fill="#ffd21f"/></svg>
-        <svg viewBox="0 0 30 21" aria-hidden="true"><title>Signal flag I (India)</title><rect width="30" height="21" fill="#ffd21f"/><circle cx="15" cy="10.5" r="5.5" fill="#111"/></svg>
-        <span>Signal flags · N · R · I</span>
+<link rel="stylesheet" href="app.css?v=202610300730">
+<script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+<div class="app">
+  <aside class="rail" aria-label="Sections">
+    <div class="brand">
+      <div class="hoist" title="Signal flags N · R · I">
+        <svg viewBox="0 0 4 4" aria-hidden="true"><rect width="4" height="4" fill="#fff"/><g fill="#1d4fb8"><rect width="1" height="1"/><rect x="2" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="3" y="1" width="1" height="1"/><rect y="2" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/></g></svg>
+        <svg viewBox="0 0 30 21" aria-hidden="true"><rect width="30" height="21" fill="#d32f2f"/><rect x="12.5" width="5" height="21" fill="#ffd21f"/><rect y="8" width="30" height="5" fill="#ffd21f"/></svg>
+        <svg viewBox="0 0 30 21" aria-hidden="true"><rect width="30" height="21" fill="#ffd21f"/><circle cx="15" cy="10.5" r="5.5" fill="#111"/></svg>
       </div>
-      <button type="button" class="themeswitch" id="themeBtn" role="switch" aria-checked="false"><span id="themeLbl">Day</span><span class="track"><span class="knob" id="themeKnob">☀</span></span></button>
+      <div class="brand-name">Sea Days <em>Ledger</em></div>
+    </div>
+    <nav class="nav">
+      <a href="#dashboard" data-v="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 3v6h8V3z"/></svg><span>Dashboard</span></a>
+      <a href="#years" data-v="years"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14l2.5 2.5L16 12"/></svg><span>Year <span class="lbl-long">results</span></span></a>
+      <a href="#ships" data-v="ships"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l2 4h14l2-4z"/><path d="M6 17V9h12v8M12 9V3l5 3"/></svg><span>Sea <span class="lbl-long">service</span></span></a>
+      <a href="#upload" data-v="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg><span>Upload <span class="lbl-long">profile</span></span></a>
+      <div class="sep"></div>
+      <a href="#notices" data-v="notices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg><span>Notices</span><b class="badge" id="noticeBadge" hidden>0</b></a>
+      <a href="#news" data-v="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/></svg><span><span class="lbl-long">Maritime </span>News</span></a>
+      <div class="sep"></div>
+      <a href="#account" data-v="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Account</span></a>
+      <a href="#help" data-v="help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg><span><span class="lbl-long">How it works</span><span class="lbl-short">Help</span></span></a>
+    </nav>
+    <div class="rail-foot">
+      <button type="button" class="syncbtn" id="syncBtn"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg><span class="dot" id="syncDot" hidden></span></span><span><b id="syncLbl">Sync</b><small id="syncWhen">Not synced yet</small></span></button>
+      <div class="rail-row"><span class="net" id="netState"><i></i><span>Offline</span></span><button type="button" class="themebtn" id="themeBtn">Night</button></div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <!-- DASHBOARD -->
+    <section class="view" id="v-dashboard" data-title="Dashboard">
+      <div class="vhead"><div><h1>Dashboard</h1><p class="muted">Your NRI position this financial year and your sea time at a glance.</p></div>
+        <label class="f" style="min-width:190px"><span>Charts for</span><select id="dFY"></select></label></div>
+      <div id="exampleBanner" hidden></div>
+      <div class="hero"><div class="bridge" id="bridge"></div><div class="card nextstep" id="nextStep"></div></div>
+      <div class="grid2">
+        <div class="card chart-card"><div class="ch"><div><h2>Years at a glance</h2><div class="small muted">Each ring is a financial year, filled with days outside India. The tick marks the NRI target.</div></div></div><div class="chart-body" id="chRings"></div></div>
+        <div class="card chart-card"><div class="ch"><div><h2>Days outside India</h2><div class="small muted">Solid = done, light = planned, dashed line = days needed.</div></div></div><div class="bars-wrap" id="chBars"></div></div>
+        <div class="card chart-card"><div class="ch"><div><h2>Sea time by ship type</h2><div class="small muted dScope"></div></div></div><div class="chart-body" id="chType"></div></div>
+        <div class="card chart-card"><div class="ch"><div><h2 id="chMixTitle">Sea time by rank</h2><div class="small muted dScope"></div></div><div class="seg" id="mixSeg" role="group" aria-label="Group sea time by"><button type="button" data-mix="rank" aria-pressed="true">Rank</button><button type="button" data-mix="company" aria-pressed="false">Company</button><button type="button" data-mix="fleet" aria-pressed="false">Fleet</button><button type="button" data-mix="flag" aria-pressed="false">Flag</button></div></div><div class="chart-body" id="chMix"></div></div>
       </div>
-      <h1>Sea Days <em>Ledger</em></h1>
-      <p>For Indian seafarers on foreign-going ships. Log every contract with CDC sign-on and sign-off dates, and see your days in India, NRI / RNOR / ROR status and tax position for each financial year.</p>
-      <nav class="navchips" aria-label="Sections">
-        <a href="#overview">Overview charts</a>
-        <a href="#board" data-gotab="notices">Notices <span class="badge" id="unreadBadge" hidden>0</span></a>
-        <a href="#board" data-gotab="news">Maritime news</a>
-        <a href="#entry">Add contract</a>
-        <a href="#results">Year results</a>
-        <a href="#register">Sea-service register</a>
-      </nav>
-      <div class="save-state" id="saveState">Loading…</div>
-    </div>
-    <div class="bridge" id="bridge" aria-live="polite"></div>
-  </div>
-  <div class="waves" aria-hidden="true">
-    <svg class="w1" viewBox="0 0 2400 90" preserveAspectRatio="none"><path fill="var(--glow)" d="M0 50 Q150 20 300 50 T600 50 T900 50 T1200 50 T1500 50 T1800 50 T2100 50 T2400 50 V90 H0Z"/></svg>
-    <svg class="w2" viewBox="0 0 2400 90" preserveAspectRatio="none"><path fill="var(--hero-c)" d="M0 60 Q200 35 400 60 T800 60 T1200 60 T1600 60 T2000 60 T2400 60 V90 H0Z"/></svg>
-    <svg class="w3" viewBox="0 0 2400 90" preserveAspectRatio="none" style="width:100%"><path fill="var(--bg)" d="M0 74 Q300 58 600 74 T1200 74 T1800 74 T2400 74 V90 H0Z"/></svg>
-  </div>
-</header>
+    </section>
 
-<button type="button" class="refreshdock" id="refreshBtn" aria-describedby="lastRefreshed"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg><span class="upd" id="updDot" hidden></span></span><span><b id="refreshLbl">Refresh</b><small id="lastRefreshed">Not refreshed yet</small></span></button>
-<main class="wrap">
-  <div class="banner" id="offlineBanner" hidden style="border-color:var(--sea);background:color-mix(in srgb,var(--sea) 9%,var(--paper))">
-    <div><b>Offline app.</b> Everything you enter is saved on this device. When you have internet, tap <b>Export sync file</b> below, then open the online Sea Days Ledger and use <b>Import / merge file</b>. Entries combine; nothing is overwritten.</div>
-  </div>
-  <div class="banner" id="exampleBanner" hidden>
-    <div><b>These are example voyages</b> (ships named “Example”). Add your first contract and the examples clear automatically.</div>
-    <button id="clearExamples" class="btn-ghost">Start empty now</button>
-  </div>
-
-  <section id="overview" style="display:flex;flex-direction:column;gap:12px">
-    <div class="ph" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><div class="ph"><span class="sec-ico" style="--ic:var(--c6)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg></span><h2>Overview</h2></div><span class="small muted" id="ovNote"></span></div>
-    <div class="ov-grid">
-      <div class="chart-card"><div class="ch"><div><h3>Years at a glance</h3><div class="small muted">Each ring is a financial year. The ring fills with days outside India; the white tick is the NRI target.</div></div></div><div class="chart-body" id="chRings"></div></div>
-      <div class="chart-card"><div class="ch"><div><h3>Days outside India per year</h3><div class="small muted">Solid = done, light = planned. Dashed line = days needed for NRI.</div></div></div><div class="bars-wrap" id="chBars"></div></div>
-      <div class="chart-card"><div class="ch"><div><h3>Sea time by ship type</h3><div class="small muted ovScope"></div></div></div><div class="chart-body" id="chType"></div></div>
-      <div class="chart-card"><div class="ch"><div><h3 id="chMixTitle">Sea time by rank</h3><div class="small muted ovScope"></div></div><div class="seg" id="mixSeg" role="group" aria-label="Group sea time by"><button type="button" data-mix="rank" aria-pressed="true">Rank</button><button type="button" data-mix="company" aria-pressed="false">Company</button><button type="button" data-mix="fleet" aria-pressed="false">Fleet</button><button type="button" data-mix="flag" aria-pressed="false">Flag</button></div></div><div class="chart-body" id="chMix"></div></div>
-    </div>
-  </section>
-
-  <section class="panel" id="board">
-    <div class="tabs" role="tablist" aria-label="Notices and news">
-      <button type="button" role="tab" id="tab-notices" aria-controls="pane-notices" aria-selected="true">Notices <span class="badge" id="unreadBadge2" hidden>0</span></button>
-      <button type="button" role="tab" id="tab-news" aria-controls="pane-news" aria-selected="false">Maritime news</button>
-    </div>
-    <div role="tabpanel" id="pane-notices" aria-labelledby="tab-notices">
-      <div class="panel-h" style="border-bottom:0;padding-bottom:4px"><span class="small muted">Updates from the author of this page</span><button id="markRead" class="btn-ghost small" hidden>Mark all read</button></div>
-      <form class="composer" id="composer" hidden novalidate>
-        <div class="eyebrow">Post an update to everyone using this page</div>
-        <input id="nTitle" placeholder="Title" maxlength="120" autocomplete="off">
-        <textarea id="nBody" placeholder="Message" maxlength="2000"></textarea>
-        <div class="row">
-          <select id="nLevel" aria-label="Importance"><option value="info">Info</option><option value="important">Important</option><option value="urgent">Urgent</option></select>
-          <button type="submit" class="btn-primary">Post notice</button>
-          <span class="err" id="nErr"></span>
-        </div>
-      </form>
-      <div class="notice-list scroll" id="noticeList"><div class="empty">Loading notices…</div></div>
-    </div>
-    <div role="tabpanel" id="pane-news" aria-labelledby="tab-news" hidden>
-      <div class="panel-h" style="border-bottom:0;padding-bottom:4px"><span class="small muted" id="newsUpdated"></span><input id="newsSearch" placeholder="Search headlines" style="width:220px;max-width:100%" autocomplete="off"></div>
-      <div class="topics" id="newsTopics" role="group" aria-label="News topics"></div>
-      <div class="news-list scroll" id="newsList"><div class="empty">Loading news…</div></div>
-    </div>
-  </section>
-
-  <details class="panel form" id="entry">
-    <summary><div class="ph"><span class="sec-ico" style="--ic:var(--c3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v14M5 10h14"/><path d="M5 14a7 7 0 0 0 14 0"/></svg></span><div><h2 id="formTitle">Add contract / voyage</h2><div class="small muted">Dates from your passport stamps and CDC entries</div></div></div><span class="btn btn-primary" aria-hidden="true">+ New entry</span></summary>
-    <form id="cform" class="panel-b" novalidate>
-      <input type="hidden" id="c_id">
-      <div class="fsec">
-        <div class="eyebrow">Vessel</div>
-        <div class="fgrid">
-          <label class="f s2"><span>Name of vessel *</span><input id="c_vessel" placeholder="MT Ocean Star" autocomplete="off"></label>
-          <label class="f"><span>Type of ship *</span><select id="c_type"></select></label>
-          <label class="f"><span>IMO number</span><input id="c_imo" inputmode="numeric" autocomplete="off"></label>
-          <label class="f"><span>Ship's flag</span><input id="c_flag" list="flagList" placeholder="e.g. Marshall Islands" autocomplete="off"><datalist id="flagList"></datalist></label>
-          <label class="f"><span>Port of registry</span><input id="c_registry" list="registryList" placeholder="e.g. Majuro" autocomplete="off"><datalist id="registryList"></datalist></label>
-          <label class="f"><span>Company</span><input id="c_company" list="companyList" placeholder="e.g. Anglo-Eastern" autocomplete="off"><datalist id="companyList"></datalist></label>
-          <label class="f"><span>Fleet</span><input id="c_fleet" list="fleetList" placeholder="e.g. Tanker Fleet 2" autocomplete="off"><datalist id="fleetList"></datalist></label>
-          <label class="f"><span>Rank *</span><select id="c_rank"></select></label>
-          <label class="f" id="rankOtherWrap" hidden><span>Rank (type it)</span><input id="c_rankOther" autocomplete="off"></label>
-          <label class="f s2"><span>Notes</span><input id="c_notes" placeholder="Trading area, flag, anything useful" autocomplete="off"></label>
+    <!-- YEARS -->
+    <section class="view" id="v-years" data-title="Year results" hidden>
+      <div class="vhead"><div><h1>Year results</h1><p class="muted">NRI, RNOR or ROR for each financial year (1 April to 31 March), and what it means for tax on your sea salary.</p></div></div>
+      <div class="card card-b">
+        <div class="filters">
+          <label class="f"><span>Financial year</span><select id="yFY"></select></label>
+          <div class="f wide"><span>Status</span><div class="chips" id="yStatus" role="group" aria-label="Status"><button type="button" data-s="" aria-pressed="true">All</button><button type="button" data-s="NR" aria-pressed="false">NR</button><button type="button" data-s="RNOR" aria-pressed="false">RNOR</button><button type="button" data-s="ROR" aria-pressed="false">ROR</button></div></div>
+          <label class="f wide" style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)"><input type="checkbox" id="edgeSet"><span style="font-weight:400">Count the day you leave and the day you land as days in India (safer)</span></label>
         </div>
       </div>
-      <div class="fsec">
-        <div class="eyebrow">Ship particulars (as in your CDC / DG Shipping record)</div>
-        <div class="fgrid">
-          <label class="f"><span>Official number</span><input id="c_officialNo" autocomplete="off"></label>
-          <label class="f"><span>GT (gross tonnage)</span><input id="c_gt" type="number" min="0" inputmode="numeric"></label>
-          <label class="f"><span>Propulsion power (kW)</span><input id="c_propulsionKw" type="number" min="0" inputmode="numeric"></label>
-          <label class="f"><span>Propelling days</span><input id="c_propellingDays" type="number" min="0" inputmode="numeric"></label>
-          <label class="f"><span>Trade area</span><select id="c_tradeArea"><option value="">Select…</option><option>Foreign Going</option><option>Near Coastal Voyage (NCV)</option><option>Home Trade</option><option>Coastal</option></select></label>
-          <label class="f" style="grid-column:span 3"><span>Nature of watchkeeping</span><input id="c_watch" list="watchList" autocomplete="off"><datalist id="watchList"><option value="On regular watch - on both main engines and boilers simultaneously"><option value="On regular watch - on main engines"><option value="On regular watch - on boilers"><option value="Day work"><option value="Navigational watch"></datalist></label>
+      <div id="fyList" style="display:flex;flex-direction:column;gap:14px"></div>
+      <div class="card">
+        <div class="card-h"><h2>Earlier years</h2><span class="small muted">Only needed for the RNOR / ROR test</span></div>
+        <div class="card-b" style="display:flex;flex-direction:column;gap:10px">
+          <p class="small muted">If you become resident in a year, RNOR depends on your last 10 years (NRI in 9 of 10) or last 7 years (729 days or less in India). Enter days in India for years you haven't logged here.</p>
+          <div class="hist"><label class="f"><span>Financial year</span><select id="hFY"></select></label><label class="f"><span>Days in India</span><input id="hDays" type="number" min="0" max="366" inputmode="numeric"></label><button type="button" id="hAdd">Save year</button></div>
+          <div id="hList" class="small"></div>
         </div>
       </div>
-      <div class="fsec">
-        <div class="eyebrow">Dates</div>
-        <div class="fgrid">
-          <label class="f"><span>1 · Left India (passport exit)</span><input type="date" id="c_left"></label>
-          <label class="f"><span>3 · Sign-on (CDC) *</span><input type="date" id="c_on"></label>
-          <label class="f"><span>4 · Sign-off (CDC)</span><input type="date" id="c_off"></label>
-          <label class="f"><span>2 · Arrived India (passport entry)</span><input type="date" id="c_arr"></label>
-          <div class="f s2"><span>Sign-on port</span><div class="radios"><label><input type="radio" name="onIn" value="abroad" checked>Abroad</label><label><input type="radio" name="onIn" value="india">Indian port</label></div><input id="c_onport" placeholder="Port name" autocomplete="off"></div>
-          <div class="f s2"><span>Sign-off port</span><div class="radios"><label><input type="radio" name="offIn" value="abroad" checked>Abroad</label><label><input type="radio" name="offIn" value="india">Indian port</label></div><input id="c_offport" placeholder="Port name" autocomplete="off"></div>
-          <label class="f s2" style="flex-direction:row;align-items:flex-start;gap:8px;color:var(--ink)"><input type="checkbox" id="c_coastal"><span style="font-weight:400">Coastal run only (no foreign port). These ship days stay counted as days in India.</span></label>
+    </section>
+
+    <!-- SHIPS -->
+    <section class="view" id="v-ships" data-title="Sea service" hidden>
+      <div class="vhead"><div><h1>Sea service</h1><p class="muted">Every contract you have sailed, with CDC and passport dates.</p></div><button type="button" class="btn-primary" id="addBtn">+ Add contract</button></div>
+      <div class="card" id="formCard" hidden>
+        <div class="card-h"><h2 id="formTitle">Add contract</h2><button type="button" class="btn-ghost btn-sm" id="formClose">Close</button></div>
+        <form id="cform" class="card-b" novalidate>
+          <input type="hidden" id="c_id">
+          <div class="form-sec">
+            <div class="eyebrow">Vessel</div>
+            <div class="fgrid">
+              <label class="f s2"><span>Name of vessel *</span><input id="c_vessel" placeholder="MT Ocean Star" autocomplete="off"></label>
+              <label class="f"><span>Type of ship *</span><select id="c_type"></select></label>
+              <label class="f"><span>Rank *</span><select id="c_rank"></select></label>
+              <label class="f" id="rankOtherWrap" hidden><span>Rank (type it)</span><input id="c_rankOther" autocomplete="off"></label>
+              <label class="f"><span>IMO number</span><input id="c_imo" inputmode="numeric" autocomplete="off"></label>
+              <label class="f"><span>Company</span><input id="c_company" list="companyList" autocomplete="off"><datalist id="companyList"></datalist></label>
+              <label class="f"><span>Fleet</span><input id="c_fleet" list="fleetList" autocomplete="off"><datalist id="fleetList"></datalist></label>
+              <label class="f"><span>Ship's flag</span><input id="c_flag" list="flagList" autocomplete="off"><datalist id="flagList"></datalist></label>
+              <label class="f"><span>Port of registry</span><input id="c_registry" autocomplete="off"></label>
+            </div>
+            <details class="more"><summary>More ship details (official no., GT, kW, propelling days)</summary>
+              <div class="fgrid" style="margin-top:10px">
+                <label class="f"><span>Official number</span><input id="c_officialNo" autocomplete="off"></label>
+                <label class="f"><span>GT (gross tonnage)</span><input id="c_gt" type="number" min="0" inputmode="numeric"></label>
+                <label class="f"><span>Propulsion power (kW)</span><input id="c_propulsionKw" type="number" min="0" inputmode="numeric"></label>
+                <label class="f"><span>Propelling days</span><input id="c_propellingDays" type="number" min="0" inputmode="numeric"></label>
+                <label class="f"><span>Trade area</span><select id="c_tradeArea"><option value="">Select…</option><option>Foreign Going</option><option>Near Coastal Voyage (NCV)</option><option>Home Trade</option><option>Coastal</option></select></label>
+                <label class="f" style="grid-column:span 3"><span>Nature of watchkeeping</span><input id="c_watch" autocomplete="off"></label>
+                <label class="f s2"><span>Notes</span><input id="c_notes" autocomplete="off"></label>
+              </div>
+            </details>
+          </div>
+          <div class="form-sec">
+            <div class="eyebrow">Dates</div>
+            <div class="fgrid">
+              <label class="f"><span>Sign-on (CDC) *</span><input type="date" id="c_on"></label>
+              <label class="f"><span>Sign-off (CDC)</span><input type="date" id="c_off"></label>
+              <label class="f"><span>Left India (passport)</span><input type="date" id="c_left"></label>
+              <label class="f"><span>Arrived India (passport)</span><input type="date" id="c_arr"></label>
+              <div class="f s2"><span>Sign-on port</span><div class="radios"><label><input type="radio" name="onIn" value="abroad" checked>Abroad</label><label><input type="radio" name="onIn" value="india">Indian port</label></div><input id="c_onport" placeholder="Port name" autocomplete="off"></div>
+              <div class="f s2"><span>Sign-off port</span><div class="radios"><label><input type="radio" name="offIn" value="abroad" checked>Abroad</label><label><input type="radio" name="offIn" value="india">Indian port</label></div><input id="c_offport" placeholder="Port name" autocomplete="off"></div>
+              <label class="f s2" style="flex-direction:row;align-items:flex-start;gap:8px;color:var(--ink)"><input type="checkbox" id="c_coastal"><span style="font-weight:400">Coastal run only (no foreign port). These days stay counted as days in India.</span></label>
+            </div>
+            <p class="small muted">Leave sign-off or arrival blank while you're still onboard or abroad. Future dates count as planned. When passport dates are entered, they decide your days outside India.</p>
+            <div class="calcline" id="calcline"></div>
+          </div>
+          <div class="actions" style="margin-top:16px"><button type="submit" class="btn-primary" id="saveBtn">Save contract</button><button type="button" class="btn-ghost" id="cancelBtn">Cancel</button><span class="err" id="formErr"></span></div>
+        </form>
+      </div>
+      <div class="card card-b">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><span class="eyebrow">Filters</span><button type="button" class="btn-ghost btn-sm filtertoggle" id="sFilterToggle" aria-expanded="false">More filters</button></div>
+        <div class="filters collapsible" id="sFilters">
+          <label class="f wide always"><span>Vessel name or IMO</span><input id="fVessel" placeholder="e.g. Al Amerat or 9405851" autocomplete="off"></label>
+          <label class="f always"><span>Financial year</span><select id="fFY"></select></label>
+          <label class="f"><span>Ship type</span><select id="fType"></select></label>
+          <label class="f"><span>Rank</span><select id="fRank"></select></label>
+          <label class="f"><span>Company</span><select id="fCompany"></select></label>
+          <label class="f"><span>Fleet</span><select id="fFleet"></select></label>
+          <label class="f"><span>Flag</span><select id="fFlag"></select></label>
+          <div class="f always"><span>&nbsp;</span><button type="button" class="btn-ghost" id="fReset">Clear filters</button></div>
         </div>
-        <div class="small muted">Leave sign-off or arrival blank while you are still onboard or abroad; days run to today. Future dates count as planned.</div>
-        <div class="calcline" id="calcline"></div>
       </div>
-      <div class="actions">
-        <button type="submit" class="btn-primary" id="saveBtn">Save contract</button>
-        <button type="button" id="cancelBtn" class="btn-ghost">Cancel</button>
-        <span class="err" id="formErr"></span>
+      <div class="sumrow" id="shipTiles"></div>
+      <div class="card"><div class="tbl-wrap cards"><table class="reg" id="ctable"></table></div></div>
+      <div class="card">
+        <div class="card-h"><h2>Totals</h2><div class="seg" id="totSeg" role="group" aria-label="Totals by"><button type="button" data-k="type" aria-pressed="true">Ship type</button><button type="button" data-k="rank" aria-pressed="false">Rank</button><button type="button" data-k="company" aria-pressed="false">Company</button><button type="button" data-k="fleet" aria-pressed="false">Fleet</button><button type="button" data-k="flag" aria-pressed="false">Flag</button></div></div>
+        <div class="tbl-wrap"><table id="totTable"></table></div>
       </div>
-    </form>
-  </details>
+    </section>
 
-  <section class="panel" id="profileImport">
-    <div class="panel-h"><div class="ph"><span class="sec-ico" style="--ic:var(--c1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg></span><div><h2>Upload your seafarer profile</h2><div class="small muted">The “Seafarer Profile” PDF from the DG Shipping e-Governance portal. It is read on this device and never uploaded anywhere.</div></div></div>
-      <div class="row-act"><label class="btn btn-primary" for="profilePdf">Choose profile PDF</label><input type="file" id="profilePdf" accept="application/pdf,.pdf" hidden></div></div>
-    <div class="panel-b" id="pImpBody" hidden></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-h"><div class="ph"><span class="sec-ico" style="--ic:var(--c2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg></span><h2>Filters</h2></div><span class="small muted" id="filterNote"></span></div>
-    <div class="filters">
-      <label class="f"><span>Financial year</span><select id="fFY"></select></label>
-      <label class="f"><span>Status</span><select id="fStatus"><option value="">All</option><option>NR</option><option>RNOR</option><option>ROR</option></select></label>
-      <label class="f"><span>Ship type</span><select id="fType"></select></label>
-      <label class="f"><span>Rank</span><select id="fRank"></select></label>
-      <label class="f"><span>Company</span><select id="fCompany"></select></label>
-      <label class="f"><span>Fleet</span><select id="fFleet"></select></label>
-      <label class="f"><span>Ship's flag</span><select id="fFlag"></select></label>
-      <label class="f"><span>Vessel name or IMO</span><input id="fVessel" placeholder="e.g. Horizon or 9876543" autocomplete="off"></label>
-      <div class="f"><span>&nbsp;</span><button id="fReset" class="btn-ghost">Reset filters</button></div>
-    </div>
-  </section>
-
-  <section id="results" style="display:flex;flex-direction:column;gap:12px">
-    <div class="ph"><span class="sec-ico" style="--ic:var(--ok)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="3"/></svg></span><h2>Results by financial year</h2></div>
-    <div class="fy-list" id="fyList"></div>
-  </section>
-
-  <section class="panel" id="register">
-    <div class="panel-h"><div class="ph"><span class="sec-ico" style="--ic:var(--c6)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l2 4h14l2-4z"/><path d="M6 17V9h12v8M12 9V3l5 3"/></svg></span><h2>Sea-service register</h2></div><div class="row-act"><button id="expCsv">Export CSV</button><button id="expJson">Export sync file</button><label class="btn" for="impJson" id="impLabel">Import / merge file</label><input type="file" id="impJson" accept=".json,application/json" hidden></div></div>
-    <div class="tbl-wrap"><table id="ctable"></table></div>
-  </section>
-
-  <section class="sum-grid">
-    <div class="panel"><div class="panel-h"><h2>Time by ship type</h2><span class="small muted sumScope"></span></div><div class="tbl-wrap"><table id="byType"></table></div></div>
-    <div class="panel"><div class="panel-h"><h2>Time by rank</h2><span class="small muted sumScope"></span></div><div class="tbl-wrap"><table id="byRank"></table></div></div>
-    <div class="panel"><div class="panel-h"><h2>Time by company</h2><span class="small muted sumScope"></span></div><div class="tbl-wrap"><table id="byCompany"></table></div></div>
-    <div class="panel"><div class="panel-h"><h2>Time by fleet</h2><span class="small muted sumScope"></span></div><div class="tbl-wrap"><table id="byFleet"></table></div></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-h"><h2>Earlier years</h2><span class="small muted">Needed only for the RNOR / ROR test</span></div>
-    <div class="panel-b" style="display:flex;flex-direction:column;gap:10px">
-      <div class="small muted">If you become resident in a year, RNOR depends on your last 10 years (NR in 9 of 10) or last 7 years (729 days or less in India). Enter days in India for years you have not logged here.</div>
-      <div class="hist">
-        <label class="f"><span>Financial year</span><select id="hFY"></select></label>
-        <label class="f"><span>Days in India</span><input id="hDays" type="number" min="0" max="366"></label>
-        <button id="hAdd">Add / update year</button>
+    <!-- UPLOAD -->
+    <section class="view" id="v-upload" data-title="Upload profile" hidden>
+      <div class="vhead"><div><h1>Upload seafarer profile</h1><p class="muted">Add your sea service straight from the “Seafarer Profile” PDF you download from the DG Shipping e-Governance portal.</p></div></div>
+      <div class="banner info" id="upOnline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5v.01M2 9a15 15 0 0 1 20 0"/></svg><div><b>Works only when you're online.</b> The PDF is read on this device and is never uploaded anywhere.</div></div>
+      <div class="card card-b" style="display:flex;flex-direction:column;gap:12px">
+        <ol class="steps small">
+          <li>Download your latest Seafarer Profile PDF from the DG Shipping portal.</li>
+          <li>Choose the file below. The app reads the “Sea Going Service” records only.</li>
+          <li>Check the preview. New ships are added; ships you already have only get details that are blank. Nothing is overwritten.</li>
+        </ol>
+        <div class="actions"><label class="btn btn-primary" for="profilePdf" id="pickLbl">Choose profile PDF</label><input type="file" id="profilePdf" accept="application/pdf,.pdf" hidden><span class="small muted" id="upState"></span></div>
       </div>
-      <div id="hList" class="small"></div>
-    </div>
-  </section>
+      <div class="card card-b" id="pImpBody" hidden></div>
+    </section>
 
-  <section class="panel">
-    <div class="panel-h"><h2>How the ledger decides</h2><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="edgeSet">Count the day you leave and the day you land as days in India (safer)</label></div>
-    <div class="panel-b rules">
-      <div class="r" style="--rc:var(--sea)"><h3>Day count</h3>
-        <p>Days outside India = days between passport exit and entry, plus every day from CDC sign-on to CDC sign-off on a foreign-going voyage. For a voyage that starts or ends at an Indian port, the CDC period is excluded from your India stay under Rule 126 (FY 2025-26 and earlier) and Rule 8 of the Income-tax Rules, 2026 with s.6 of the Income-tax Act, 2025 (tax year 2026-27 onwards).</p>
-        <p>Days in India = days in the year − days outside. Keep it at 181 or fewer: at least 184 days outside in a 365-day year, 185 in a leap year.</p></div>
-      <div class="r" style="--rc:var(--warn)"><h3>Resident or not</h3>
-        <p><b>Resident</b> if in India 182 days or more. An Indian citizen working abroad or as crew gets 182 days in place of the 60-day test.</p>
-        <p>If your Indian income (excluding foreign income) is over ₹15 lakh, a stay of 120–181 days with 365+ days in the previous 4 years makes you resident (RNOR). Not applied in the year you first leave India for employment.</p>
-        <p><b>Deemed resident (RNOR)</b>: Indian citizen, Indian income over ₹15 lakh, and not liable to tax in any other country. Most seafarers are not tax resident anywhere else, so watch this one.</p></div>
-      <div class="r" style="--rc:var(--bad)"><h3>RNOR or ROR</h3>
-        <p>A resident is <b>RNOR</b> if NR in 9 of the 10 previous years, or in India 729 days or less in the 7 previous years. Otherwise <b>ROR</b>.</p>
-        <p><b>NR</b>: salary for service on a foreign-going ship is outside Indian tax, even when credited to your NRE account (CBDT Circular 13/2017). Indian income (FD interest, rent, gains) is still taxable.</p>
-        <p><b>RNOR</b>: foreign income is taxed only if received in India. <b>ROR</b>: worldwide income including sea salary is taxable.</p></div>
-    </div>
-  </section>
+    <!-- NOTICES -->
+    <section class="view" id="v-notices" data-title="Notices" hidden>
+      <div class="vhead"><div><h1>Notices</h1><p class="muted">Updates from the author of Sea Days Ledger. New notices arrive when you press Sync.</p></div></div>
+      <div class="card card-b" id="composerCard" hidden>
+        <form class="composer" id="composer" novalidate>
+          <div class="eyebrow">Post a notice to everyone using the app</div>
+          <input id="nTitle" placeholder="Title" maxlength="120" autocomplete="off">
+          <textarea id="nBody" placeholder="Message" maxlength="2000"></textarea>
+          <div class="actions"><select id="nLevel" style="width:auto" aria-label="Importance"><option value="info">Info</option><option value="important">Important</option><option value="urgent">Urgent</option></select><button type="submit" class="btn-primary">Post notice</button><span class="err" id="nErr"></span></div>
+        </form>
+      </div>
+      <div class="chips" id="nFilter" role="group" aria-label="Show"><button type="button" data-l="" aria-pressed="true">All</button><button type="button" data-l="urgent" aria-pressed="false">Urgent</button><button type="button" data-l="important" aria-pressed="false">Important</button><button type="button" data-l="info" aria-pressed="false">Info</button></div>
+      <div class="card" id="noticeList"></div>
+    </section>
 
-  <p class="foot">This ledger applies the published day-count rules to the dates you enter. Keep your CDC, passport stamps, joining letters and wage slips as proof, and confirm your status with a chartered accountant before filing. Rule 8 of the Income-tax Rules, 2026 was in draft form when this page was built. Your contracts are saved privately to your own account; other people using this page cannot see them. News headlines link to their original publishers.</p>
-</main>
+    <!-- NEWS -->
+    <section class="view" id="v-news" data-title="Maritime news" hidden>
+      <div class="vhead"><div><h1>Maritime news</h1><p class="muted" id="newsUpdated">Headlines for seafarers. New headlines arrive when you press Sync.</p></div></div>
+      <div class="card card-b"><div class="filters">
+        <label class="f wide"><span>Search headlines</span><input id="newsSearch" placeholder="e.g. tanker, DG Shipping" autocomplete="off"></label>
+        <div class="f wide" style="flex-basis:100%"><span>Topic</span><div class="chips" id="newsTopics" role="group" aria-label="Topic"></div></div>
+      </div></div>
+      <div class="card" id="newsList"></div>
+    </section>
 
+    <!-- ACCOUNT -->
+    <section class="view" id="v-account" data-title="Account and sync" hidden>
+      <div class="vhead"><div><h1>Account &amp; sync</h1><p class="muted">Sign in to keep the same data on your phone, iPad and computer.</p></div></div>
+      <div class="card card-b"><div class="acct" id="acctBox"></div></div>
+      <div class="card card-b">
+        <h2 style="margin-bottom:8px">How Sync works</h2>
+        <ul class="steps small">
+          <li>Everything you enter is saved on this device straight away, even with no internet.</li>
+          <li>Nothing changes on its own. When you press <b>Sync</b> while online, the app combines this device's data with your account, brings in new notices and news, and installs any app update.</li>
+          <li>Press Sync on your other devices to get the same data there.</li>
+          <li>If the same contract was edited on two devices, the newest edit is kept. Deleted contracts stay deleted.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- HELP -->
+    <section class="view" id="v-help" data-title="How it works" hidden>
+      <div class="vhead"><div><h1>How it works</h1><p class="muted">The rules the app uses to decide your residential status.</p></div></div>
+      <div class="rules">
+        <div class="r" style="--rc:var(--sea)"><h3>Day count</h3>
+          <p>Days outside India come from your passport dates (left India and arrived India) when you enter them. Without passport dates, the CDC sign-on to sign-off period is used.</p>
+          <p>For a voyage that starts or ends at an Indian port, the CDC period is excluded from your India stay under Rule 126 (FY 2025-26 and earlier) and Rule 8 of the Income-tax Rules, 2026 with s.6 of the Income-tax Act, 2025.</p>
+          <p>Keep India days at 181 or fewer: at least 184 days outside in a 365-day year, 185 in a leap year.</p></div>
+        <div class="r" style="--rc:var(--warn)"><h3>Resident or not</h3>
+          <p><b>Resident</b> if in India 182 days or more. An Indian citizen working abroad or as crew gets 182 days in place of the 60-day test.</p>
+          <p>If your Indian income (excluding foreign income) is over ₹15 lakh, 120–181 days in India plus 365+ days in the previous 4 years makes you resident (RNOR).</p>
+          <p><b>Deemed resident (RNOR)</b>: Indian citizen, Indian income over ₹15 lakh, and not liable to tax in any other country.</p></div>
+        <div class="r" style="--rc:var(--bad)"><h3>RNOR or ROR</h3>
+          <p>A resident is <b>RNOR</b> if NRI in 9 of the 10 previous years, or in India 729 days or less in the 7 previous years. Otherwise <b>ROR</b>.</p>
+          <p><b>NRI</b>: salary for service on a foreign-going ship is outside Indian tax, even when credited to an NRE account (CBDT Circular 13/2017).</p>
+          <p><b>RNOR</b>: foreign income is taxed only if received in India. <b>ROR</b>: worldwide income including sea salary is taxable.</p></div>
+      </div>
+      <p class="small muted" style="max-width:90ch">Sea Days Ledger applies the published day-count rules to the dates you enter. Keep your CDC, passport stamps, joining letters and wage slips as proof, and confirm your status with a chartered accountant before filing your return. Your data is private: it stays on your devices and in your own account, and no one else can see it.</p>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
 <script>
 (function(){
-"use strict";
-const TYPES=["Oil Tanker (Crude)","Oil/Chem Product Tanker","Product Tanker","Chemical Tanker","LNG Carrier","LPG Carrier","Bulk Carrier","Container Ship","General Cargo","Car Carrier (PCTC)","Offshore / Other"];
-const RANKS={"Deck":["Master / Captain","Chief Officer","2nd Officer","3rd Officer","Junior Officer (Deck)","Deck Cadet / Trainee","Bosun","AB (Able Seaman)","OS (Ordinary Seaman)","Pumpman","Deck Fitter"],
- "Engine":["Chief Engineer","2nd Engineer","3rd Engineer","4th Engineer","Junior Engineer","Engine Cadet / TME","ETO (Electro-Technical Officer)","Electrical Officer","Gas Engineer","Motorman","Oiler","Wiper","Fitter"],
- "Catering":["Chief Cook","2nd Cook","Messman / Steward"]};
-const ALLRANKS=[].concat(...Object.values(RANKS));
-const TOPICS=["All","India & Seafarers","Tankers","LNG & Gas","Safety & Security","Markets & Trade","Regulation"];
-const DAY=86400000,pad=n=>String(n).padStart(2,"0");
-function dn(s){if(!s)return null;const [y,m,d]=String(s).split("-").map(Number);if(!y||!m||!d)return null;return Math.round(Date.UTC(y,m-1,d)/DAY);}
-const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-function fmt(n){if(n==null)return "—";const d=new Date(n*DAY);return pad(d.getUTCDate())+" "+MON[d.getUTCMonth()]+" "+d.getUTCFullYear();}
-const now=new Date();const TODAY=Math.round(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())/DAY);
-function fyOf(n){const d=new Date(n*DAY);return d.getUTCMonth()>=3?d.getUTCFullYear():d.getUTCFullYear()-1;}
-const fyStart=f=>Math.round(Date.UTC(f,3,1)/DAY),fyEnd=f=>Math.round(Date.UTC(f+1,2,31)/DAY);
-const fyLabel=f=>f+"-"+String((f+1)%100).padStart(2,"0");
-function ymd(a,b){const s=new Date(a*DAY),e=new Date((b+1)*DAY);let y=e.getUTCFullYear()-s.getUTCFullYear(),m=e.getUTCMonth()-s.getUTCMonth(),d=e.getUTCDate()-s.getUTCDate();
-  if(d<0){m--;d+=new Date(Date.UTC(e.getUTCFullYear(),e.getUTCMonth(),0)).getUTCDate();}if(m<0){y--;m+=12;}return span(y,m,d);}
-function approx(days){const y=Math.floor(days/365);const r=days-y*365;const m=Math.floor(r/30);return span(y,m,r-m*30);}
-function span(y,m,d){const p=[];if(y)p.push(y+"y");if(m||y)p.push(m+"m");p.push(d+"d");return p.join(" ");}
-const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const uid=()=>Math.random().toString(36).slice(2,10);
-const typeColor=t=>{const i=TYPES.indexOf(t);return "var(--c"+(i<0?10:i)+")";};
-const $=id=>document.getElementById(id);
-function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
-function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
-
-const EXAMPLE={v:2,example:true,settings:{edge:true},fy:{},contracts:[
- {id:"ex1",vessel:"MT Example Horizon",type:"Oil/Chem Product Tanker",company:"Example Shipmanagement",fleet:"Tanker Fleet 1",rank:"2nd Officer",imo:"",left:"2025-04-12",on:"2025-04-14",onIndia:false,onPort:"Fujairah",off:"2025-09-20",offIndia:false,offPort:"Singapore",arr:"2025-09-22",coastal:false,notes:"Example entry"},
- {id:"ex2",vessel:"LNG Example Aurora",type:"LNG Carrier",company:"Example Gas Carriers",fleet:"LNG Fleet",rank:"2nd Officer",imo:"",left:"2025-12-05",on:"2025-12-06",onIndia:false,onPort:"Ras Laffan",off:"2026-05-10",offIndia:false,offPort:"Rotterdam",arr:"2026-05-12",coastal:false,notes:"Example entry"},
- {id:"ex3",vessel:"MT Example Meridian",type:"Chemical Tanker",company:"Example Shipmanagement",fleet:"Tanker Fleet 2",rank:"Chief Officer",imo:"",left:"",on:"2026-08-02",onIndia:true,onPort:"Mumbai (JNPT)",off:"2027-01-15",offIndia:false,offPort:"Houston",arr:"2027-01-17",coastal:false,notes:"Example entry · sign-off planned"}
-]};
-let S=JSON.parse(JSON.stringify(EXAMPLE));
-let ref=null,saveTimer=null,DB=null,USER=null,IS_OWNER=false,OFFLINE=false;
-let NEWS=null,NOTICES=null,newsTopic="All";
-
-/* ---------- persistence ---------- */
-const setSave=t=>{$("saveState").textContent=t;};
-function persist(){
-  if(S.example)return;clearTimeout(saveTimer);setSave("Saving…");
-  saveTimer=setTimeout(async()=>{
-    S.updatedAt=Date.now();const body=snapshot();
-    lsSet("seaDaysLedger",JSON.stringify(body));
-    if(ref){try{await ref.set(body);setSave("Saved to your account · "+new Date().toLocaleTimeString());}catch(e){setSave("Saved in this browser only (account save not allowed for this view). Use Backup to keep a copy.");}}
-    else setSave(OFFLINE?"Saved on this device · "+new Date().toLocaleTimeString()+" · "+S.contracts.length+" contract"+(S.contracts.length===1?"":"s"):"Saved in this browser only. Use Export sync file to keep a copy.");
-  },500);
-}
-function loadLocal(){try{const r=lsGet("seaDaysLedger");if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.contracts))return o;}}catch(e){}return null;}
-function adopt(o){S={v:2,example:false,settings:Object.assign({edge:true},o.settings||{}),fy:o.fy||{},contracts:(o.contracts||[]).map(c=>Object.assign({company:""},c)),deleted:Array.isArray(o.deleted)?o.deleted:[],updatedAt:+o.updatedAt||0};}
-function snapshot(){return {v:2,app:"sea-days-ledger",settings:S.settings,fy:S.fy,contracts:S.contracts,deleted:S.deleted||[],updatedAt:S.updatedAt||Date.now()};}
-/* merge another copy (offline app, other device, backup) into S: newest edit of each contract wins, deletions carry over */
-function merge(o){
-  if(S.example)leaveExample();
-  const before=JSON.stringify([S.contracts,S.fy,S.deleted]);
-  const tomb={};(S.deleted||[]).concat(Array.isArray(o.deleted)?o.deleted:[]).forEach(d=>{if(d&&d.id)tomb[d.id]=Math.max(tomb[d.id]||0,+d.u||0);});
-  const m={};S.contracts.concat((o.contracts||[]).map(c=>Object.assign({company:""},c))).forEach(c=>{if(!c||!c.id)return;const p=m[c.id];if(!p||(+c.u||0)>(+p.u||0))m[c.id]=c;});
-  S.contracts=Object.values(m).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
-  S.deleted=Object.entries(tomb).map(([id,u])=>({id,u})).slice(-500);
-  const newer=(+o.updatedAt||0)>(+S.updatedAt||0);
-  Object.entries(o.fy||{}).forEach(([k,v])=>{S.fy[k]=newer?Object.assign({},S.fy[k],v):Object.assign({},v,S.fy[k]);});
-  if(newer&&o.settings)S.settings=Object.assign({},S.settings,o.settings);
-  return before!==JSON.stringify([S.contracts,S.fy,S.deleted]);
-}
-async function initStore(){
-  const local=loadLocal();
-  if(local){adopt(local);render();setSave("Loaded from this browser");}
-  try{
-    if(!window.claude||!window.claude.use){offlineApp(local);return;}
-    const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
-    DB=db;USER=user;
-    if(user){try{IS_OWNER=await user.isOwner();}catch(e){}}
-    $("composer").hidden=!IS_OWNER||!db;
-    if(!db){noShared("Sign in to Claude to see news and notices.");if(!local)setSave("Showing examples · sign in to save to your account");return;}
-    subscribeShared(db);
-    const id=user?await user.id():null;
-    if(!id){setSave(local?"Loaded from this browser":"Showing examples · saves in this browser");return;}
-    ref=db.collection("data/users/"+id).doc("ledger");
-    const snap=await ref.get();
-    const remote=snap.exists?snap.data():null;
-    if(remote){adopt(remote);let changed=false;if(local)changed=merge(local);render();if(changed){persist();setSave("Synced entries made in this browser to your account");}else setSave("Loaded from your account");}
-    else if(local){persist();setSave("Syncing entries made in this browser to your account…");}
-    else setSave("Showing examples · your entries will save to your account");
-  }catch(e){setSave(local?"Loaded from this browser":"Showing examples");}
-}
-function offlineApp(local){
-  OFFLINE=true;document.body.classList.add("offline-app");
-  $("board").hidden=true;document.querySelectorAll("[data-gotab]").forEach(a=>a.hidden=true);
-  $("offlineBanner").hidden=false;$("impLabel").textContent="Import / merge file";
-  setSave(local?"Offline app · saved on this device":"Offline app · showing examples · saves on this device");
-}
-function noShared(msg){NEWS=NEWS||[];NOTICES=NOTICES||[];$("newsList").innerHTML=`<div class="empty">${esc(msg)}</div>`;$("noticeList").innerHTML=`<div class="empty">${esc(msg)}</div>`;}
-
-/* ---------- shared: news + notices ---------- */
-/* news and notices load when the page opens and when you press Refresh, never on their own */
-function subscribeShared(db){return loadShared(db);}
-async function loadShared(db){db=db||DB;if(!db)return;
-  try{const n=await db.collection("news").orderBy("date","desc").limit(60).get();NEWS=n.docs.map(d=>Object.assign({id:d.id},d.data()));renderNews();}catch(e){NEWS=NEWS||[];renderNews("News could not load right now.");}
-  try{const t=await db.collection("notices").orderBy("createdAt","desc").limit(40).get();NOTICES=t.docs.map(d=>Object.assign({id:d.id},d.data()));renderNotices();}catch(e){NOTICES=NOTICES||[];renderNotices("Notices could not load right now.");}
-}
-function relDate(s){const n=dn(s);if(n==null)return "";const diff=TODAY-n;return diff<=0?"Today":diff===1?"Yesterday":diff<7?diff+" days ago":fmt(n);}
-function renderNewsTopics(){
-  $("newsTopics").innerHTML=TOPICS.map(t=>`<button type="button" aria-pressed="${t===newsTopic}" data-topic="${esc(t)}">${esc(t)}</button>`).join("");
-}
-function renderNews(errMsg){
-  renderNewsTopics();
-  if(NEWS==null)return;
-  const q=$("newsSearch").value.trim().toLowerCase();
-  const items=NEWS.filter(n=>(newsTopic==="All"||n.topic===newsTopic)&&(!q||(String(n.title)+" "+String(n.summary||"")+" "+String(n.source||"")).toLowerCase().includes(q)));
-  const latest=NEWS.reduce((m,n)=>Math.max(m,+n.addedAt||0),0);
-  $("newsUpdated").textContent=latest?"Updated "+new Date(latest).toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+" · refreshed daily":"";
-  if(errMsg&&!NEWS.length){$("newsList").innerHTML=`<div class="empty">${esc(errMsg)}</div>`;return;}
-  if(!items.length){$("newsList").innerHTML=`<div class="empty">${NEWS.length?"No headlines match this topic or search.":"No headlines yet. The daily refresh adds them here."}</div>`;return;}
-  $("newsList").innerHTML=items.map(n=>{const d=dn(n.date);const dd=d!=null?new Date(d*DAY):null;
-    const safe=/^https?:\/\//i.test(String(n.url||""))?n.url:"#";
-    return `<a class="news" href="${esc(safe)}" target="_blank" rel="noopener noreferrer">
-      <div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div>
-      <div><div class="hl">${esc(n.title)}</div>${n.summary?`<div class="gist">${esc(n.summary)}</div>`:""}
-      <div class="meta"><span class="tchip" style="--tc:${topicColor(n.topic)}">${esc(n.topic||"News")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span></div></div></a>`;}).join("");
-}
-function topicColor(t){const i=TOPICS.indexOf(t);return ["var(--c0)","var(--c1)","var(--c0)","var(--c2)","var(--c4)","var(--c3)","var(--c6)"][i<0?0:i];}
-function seenAt(){return +(lsGet("sdlNoticesSeen")||0);}
-function renderNotices(errMsg){
-  if(NOTICES==null)return;
-  const seen=seenAt();const unread=NOTICES.filter(n=>(+n.createdAt||0)>seen).length;
-  ["unreadBadge","unreadBadge2"].forEach(id=>{$(id).hidden=!unread;$(id).textContent=unread;});$("markRead").hidden=!unread;
-  if(errMsg&&!NOTICES.length){$("noticeList").innerHTML=`<div class="empty">${esc(errMsg)}</div>`;return;}
-  if(!NOTICES.length){$("noticeList").innerHTML=`<div class="empty">${IS_OWNER?"No notices yet. Post one above and everyone using this page will see it here.":"No notices from the author yet."}</div>`;return;}
-  $("noticeList").innerHTML=NOTICES.map(n=>{const lv=["info","important","urgent"].includes(n.level)?n.level:"info";const isNew=(+n.createdAt||0)>seen;
-    return `<div class="notice ${lv}"><div class="lvl"></div><div class="nb"><div class="nt">${esc(n.title||"Update")}</div>${n.body?`<div class="nm">${esc(n.body)}</div>`:""}
-    <div class="nd">${isNew?'<span class="newtag">NEW</span>':""}<span>${esc(lv==="info"?"Info":lv==="important"?"Important":"Urgent")}</span><span>· ${n.createdAt?new Date(+n.createdAt).toLocaleString(undefined,{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}):""}</span>
-    ${IS_OWNER?`<button class="btn-danger" data-ndel="${esc(n.id)}" style="padding:2px 8px;font-size:.74rem">Delete</button>`:""}</div></div></div>`;}).join("");
-}
-$("composer").addEventListener("submit",async e=>{
-  e.preventDefault();const t=$("nTitle").value.trim(),b=$("nBody").value.trim();
-  if(!t&&!b){$("nErr").textContent="Write a title or message first.";return;}
-  if(!DB){$("nErr").textContent="Notices need you to be signed in.";return;}
-  $("nErr").textContent="Posting…";
-  try{await DB.collection("notices").add({title:t||"Update",body:b,level:$("nLevel").value,createdAt:Date.now()});$("nTitle").value="";$("nBody").value="";$("nErr").textContent="Posted";loadShared();lsSet("sdlNoticesSeen",String(Date.now()));setTimeout(()=>$("nErr").textContent="",2500);}
-  catch(err){$("nErr").textContent="Could not post ("+(err&&err.code||"error")+").";}
-});
-let pendingN=null;
-$("noticeList").addEventListener("click",async e=>{
-  const b=e.target.closest("[data-ndel]");if(!b||!DB)return;
-  if(pendingN!==b.dataset.ndel){pendingN=b.dataset.ndel;b.textContent="Confirm delete";setTimeout(()=>{if(pendingN===b.dataset.ndel){pendingN=null;b.textContent="Delete";}},4000);return;}
-  pendingN=null;b.textContent="Deleting…";
-  try{await DB.collection("notices").doc(b.dataset.ndel).delete();loadShared();}catch(err){b.textContent="Delete failed";}
-});
-$("markRead").addEventListener("click",()=>{lsSet("sdlNoticesSeen",String(Date.now()));renderNotices();});
-$("newsTopics").addEventListener("click",e=>{const b=e.target.closest("[data-topic]");if(!b)return;newsTopic=b.dataset.topic;renderNews();});
-$("newsSearch").addEventListener("input",()=>renderNews());
-
-/* ---------- engine ---------- */
-function ranges(c,edge){
-  const out=[],e1=edge?1:0;const on=dn(c.on),off=dn(c.off),left=dn(c.left),arr=dn(c.arr);
-  const shipEnd=on!=null?(off!=null?off:Math.max(TODAY,on)):null;
-  /* passport dates, when given, decide the stay; CDC dates still count for an Indian-port voyage (Rule 126 / Rule 8) or when no passport date is entered */
-  const hasPass=left!=null||arr!=null,eligible=!!(c.onIndia||c.offIndia);
-  if(on!=null&&!c.coastal&&(!hasPass||eligible))out.push([on,shipEnd,"ship"]);
-  if(left!=null){let e=arr!=null?arr-e1:(shipEnd!=null?shipEnd:TODAY);if(arr==null&&left<=TODAY&&e<TODAY)e=TODAY;out.push([left+e1,e,"phys"]);}
-  else if(arr!=null){out.push([on!=null?on:arr,arr-e1,"phys"]);}
-  return out.filter(r=>r[1]>=r[0]);
-}
-function shipSpan(c){const on=dn(c.on);if(on==null)return null;const off=dn(c.off);return [on,off!=null?off:Math.max(TODAY,on)];}
-function overlap(a,b,s,e){const x=Math.max(a,s),y=Math.min(b,e);return y>=x?y-x+1:0;}
-function compute(){
-  const edge=S.settings.edge!==false;let minD=Infinity,maxD=TODAY;
-  S.contracts.forEach(c=>["left","on","off","arr"].forEach(k=>{const v=dn(c[k]);if(v!=null){minD=Math.min(minD,v);maxD=Math.max(maxD,v);}}));
-  const fyset=new Set();let dataFrom=null,dataTo=null;
-  if(minD!==Infinity){dataFrom=fyOf(minD);dataTo=Math.max(fyOf(maxD),fyOf(TODAY));for(let f=dataFrom;f<=dataTo;f++)fyset.add(f);}else fyset.add(fyOf(TODAY));
-  Object.keys(S.fy).forEach(k=>{if(S.fy[k]&&S.fy[k].india!=null&&S.fy[k].india!=="")fyset.add(+k);});
-  const fys=[...fyset].sort((a,b)=>a-b);
-  const lo=Math.min(fyStart(fys[0]),minD),hi=fyEnd(fys[fys.length-1]);
-  const len=hi-lo+1,out=new Uint8Array(len),ship=new Uint8Array(len);
-  S.contracts.forEach(c=>{ranges(c,edge).forEach(([s,e])=>{for(let d=Math.max(s,lo);d<=Math.min(e,hi);d++)out[d-lo]=1;});
-    const sp=c.coastal?null:shipSpan(c);if(sp)for(let d=Math.max(sp[0],lo);d<=Math.min(sp[1],hi);d++)ship[d-lo]=1;});
-  const res={};
-  fys.forEach(f=>{
-    const s=fyStart(f),e=fyEnd(f),days=e-s+1;const inData=dataFrom!=null&&f>=dataFrom&&f<=dataTo;
-    let outside=0,outPlan=0,shipD=0,outToDate=0;const cells=[];
-    for(let d=s;d<=e;d++){const o=out[d-lo];if(o){outside++;if(d>TODAY)outPlan++;else outToDate++;}if(ship[d-lo])shipD++;cells.push(o?(d>TODAY?"p":"o"):(d>TODAY?"u":"l"));}
-    const elapsed=TODAY<s?0:Math.min(days,TODAY-s+1);
-    const ov=S.fy[f]&&S.fy[f].india!=null&&S.fy[f].india!==""?+S.fy[f].india:null;
-    res[f]={f,s,e,days,outside,outPlan,outToDate,shipD,elapsed,cells,inData,override:ov,india:ov!=null?ov:(inData?days-outside:null),indiaToDate:elapsed-outToDate,current:TODAY>=s&&TODAY<=e,future:TODAY<s};
-  });
-  const known=f=>res[f]?res[f].india:null;const order=Object.keys(res).map(Number).sort((a,b)=>a-b);const stat={};
-  order.forEach(f=>{
-    const r=res[f],o=S.fy[f]||{},D=r.india,flags=[];
-    if(D==null){r.status="UNK";r.flags=[];return;}
-    let p4=0,unk4=0;for(let k=1;k<=4;k++){const v=known(f-k);if(v==null){unk4++;p4+=365;}else p4+=v;}
-    let route="",resident=false;
-    if(D>=182){resident=true;route="182";}
-    else if(o.inc15&&!o.leftEmp&&D>=120&&p4>=365){resident=true;route="120";if(unk4)flags.push("Earlier years are missing, so the 365-day test assumed a full year in India for each.");}
-    if(resident&&route==="182"){
-      let nr=0,unk10=0;for(let k=1;k<=10;k++){const st=stat[f-k];if(st==="NR")nr++;else if(st==null||st==="UNK")unk10++;}
-      let d7=0,unk7=0;for(let k=1;k<=7;k++){const v=known(f-k);if(v==null){unk7++;d7+=365;}else d7+=v;}
-      if(nr>=9||d7<=729)r.status="RNOR";else{r.status="ROR";if(unk10||unk7)flags.push("RNOR test used incomplete history. Add earlier years below; you may qualify as RNOR.");}
-    }else if(resident)r.status="RNOR";
-    else if(o.inc15&&!o.abroadTax){r.status="RNOR";route="deemed";}
-    else r.status="NR";
-    r.route=route;r.flags=flags;stat[f]=r.status;
-  });
-  return {res,order,dataFrom};
-}
-
-/* ---------- render ---------- */
-const actLabel=f=>f>=2026?"Income-tax Act, 2025 · s.6 · Rule 8 (crew)":"Income-tax Act, 1961 · s.6 · Rule 126 (crew)";
-const statusName=s=>({NR:"Non-Resident (NRI)",RNOR:"Resident but Not Ordinarily Resident",ROR:"Resident and Ordinarily Resident",UNK:"Not enough data"}[s]);
-function taxLine(r){
-  if(r.status==="NR")return {h:"Sea salary: not taxable in India",items:["Salary for service on a foreign-going ship is outside your Indian income, even if credited to an NRE account in India (CBDT Circular 13/2017).","Indian income such as FD/NRO interest, rent and capital gains is still taxable. File an ITR if it crosses the basic exemption limit or you need a TDS refund."]};
-  if(r.status==="RNOR")return {h:r.route==="deemed"?"Deemed resident (RNOR): sea salary taxable only if received in India":"Sea salary: taxable only if received in India",items:[r.route==="deemed"?"You are below the day limit, but Indian income over ₹15 lakh with no tax residence elsewhere makes you a deemed resident.":(r.route==="120"?"Your Indian income is above ₹15 lakh and you stayed 120+ days, so you are resident (RNOR).":"You crossed 182 days, but your past NRI years keep you RNOR."),"Salary paid into an Indian bank account counts as received in India and becomes taxable. Salary received in a foreign account generally is not.","Indian income is fully taxable. Check whether your NRE account needs redesignating under FEMA."]};
-  if(r.status==="ROR")return {h:"Sea salary: taxable in India",items:["As ROR your worldwide income, including sea wages, is taxable in India.","Claim relief under a tax treaty or foreign tax credit if any country taxed the same income."]};
-  return {h:"Add dates or days in India for this year",items:["Add contracts covering this year, or enter days in India under Earlier years."]};
-}
-function fillSelect(el,opts,keep){el.innerHTML=opts.map(o=>o.group?`<optgroup label="${esc(o.group)}">${o.items.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("")}</optgroup>`:`<option value="${esc(o[0])}">${esc(o[1])}</option>`).join("");if(keep!=null&&[...el.options].some(x=>x.value==keep))el.value=keep;}
-const uniq=k=>[...new Set(S.contracts.map(c=>(c[k]||"").trim()).filter(Boolean))].sort();
-function render(){
-  const C=compute();window.__ledger=C;
-  fillSelect($("fFY"),[["","All years"]].concat(C.order.slice().reverse().map(f=>[f,"FY "+fyLabel(f)])),$("fFY").value);
-  fillSelect($("fType"),[["","All types"]].concat([...new Set(TYPES.concat(uniq("type")))].map(t=>[t,t])),$("fType").value);
-  const usedRanks=uniq("rank");
-  fillSelect($("fRank"),[["","All ranks"]].concat(usedRanks.map(t=>[t,t])),$("fRank").value);
-  fillSelect($("fCompany"),[["","All companies"]].concat(uniq("company").map(t=>[t,t])),$("fCompany").value);
-  fillSelect($("fFleet"),[["","All fleets"]].concat(uniq("fleet").map(t=>[t,t])),$("fFleet").value);
-  fillSelect($("fFlag"),[["","All flags"]].concat(uniq("flag").map(t=>[t,t])),$("fFlag").value);
-  const FLAGS=["Panama","Liberia","Marshall Islands","Singapore","Malta","Bahamas","Hong Kong","Greece","Cyprus","Isle of Man","India","Norway","Denmark","United Kingdom","Japan","Portugal","Antigua and Barbuda","Belgium","Netherlands","Saudi Arabia","Qatar","United Arab Emirates"];
-  $("flagList").innerHTML=[...new Set(uniq("flag").concat(FLAGS))].map(f=>`<option value="${esc(f)}">`).join("");
-  $("registryList").innerHTML=uniq("registry").map(f=>`<option value="${esc(f)}">`).join("");
-  $("companyList").innerHTML=uniq("company").map(f=>`<option value="${esc(f)}">`).join("");
-  $("fleetList").innerHTML=uniq("fleet").map(f=>`<option value="${esc(f)}">`).join("");
-  $("exampleBanner").hidden=!S.example;$("edgeSet").checked=S.settings.edge!==false;
-  renderBridge(C);renderCharts(C);renderFY(C);renderTable();renderSums();renderHist(C);
-}
-function arc(cx,cy,r,a0,a1){const p=a=>[cx+r*Math.cos(a),cy-r*Math.sin(a)];const [x0,y0]=p(a0),[x1,y1]=p(a1);return `M${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`;}
-function renderBridge(C){
-  const f=fyOf(TODAY),r=C.res[f];if(!r){$("bridge").innerHTML="";return;}
-  const need=r.days-181,more=Math.max(0,need-r.outside),allow=Math.max(0,181-r.indiaToDate),st=r.status||"UNK";
-  const out=r.outside,A=v=>Math.PI*(1-Math.min(v,r.days)/r.days);
-  const cx=150,cy=140,R=110;const ang=A(out);
-  const tA=A(need),tx1=cx+(R+8)*Math.cos(tA),ty1=cy-(R+8)*Math.sin(tA),tx2=cx+(R-22)*Math.cos(tA),ty2=cy-(R-22)*Math.sin(tA);
-  const safe=out>=need,valCol=safe?"#55d69d":(out>=need-20?"#ffc23d":"#ff6b5c");
-  const stCol={NR:"#55d69d",RNOR:"#ffc23d",ROR:"#ff6b5c",UNK:"#9fc3d4"}[st];
-  const msg=more>0?`Plan at least <b>${more}</b> more day${more===1?"":"s"} outside India before 31 Mar ${f+1} to reach ${need} and stay NRI.`:`Target met: <b>${out}</b> days outside, ${out-need} more than the ${need} needed.`;
-  $("bridge").innerHTML=`<div class="top"><div><div class="eyebrow">FY ${fyLabel(f)} · day ${r.elapsed} of ${r.days}</div><div class="big-status" style="color:${stCol}">${st==="UNK"?"—":st}</div><div class="small" style="color:var(--hero-dim)">${esc(statusName(st))}${r.outPlan?" · projected with planned dates":""}</div></div></div>
-  <svg class="dial" viewBox="0 0 300 160" role="img" aria-label="${out} days outside India this financial year, ${need} needed for NRI">
-    <path d="${arc(cx,cy,R,Math.PI,0)}" stroke="#ffffff1f" stroke-width="16" fill="none" stroke-linecap="round"/>
-    <path d="${arc(cx,cy,R,Math.PI,tA)}" stroke="#ff6b5c55" stroke-width="16" fill="none"/>
-    <path d="${arc(cx,cy,R,tA,0)}" stroke="#55d69d66" stroke-width="16" fill="none"/>
-    ${out>0?`<path d="${arc(cx,cy,R,Math.PI,ang)}" stroke="${valCol}" stroke-width="16" fill="none" stroke-linecap="round"/>`:""}
-    <line x1="${tx1.toFixed(1)}" y1="${ty1.toFixed(1)}" x2="${tx2.toFixed(1)}" y2="${ty2.toFixed(1)}" stroke="#ffffff" stroke-width="2.5"/>
-    <text x="${(cx+(R+21)*Math.cos(tA)).toFixed(1)}" y="${(cy-(R+21)*Math.sin(tA)).toFixed(1)}" fill="#ffffff" font-size="10" text-anchor="middle">${need}</text>
-    <circle cx="${(cx+R*Math.cos(ang)).toFixed(1)}" cy="${(cy-R*Math.sin(ang)).toFixed(1)}" r="9" fill="#ffffff" stroke="${valCol}" stroke-width="3"/>
-    <text x="${cx}" y="${cy-22}" fill="${valCol}" font-size="38" text-anchor="middle" font-weight="500">${out}</text>
-    <text x="${cx}" y="${cy-4}" fill="#9fc3d4" font-size="9" text-anchor="middle" letter-spacing="1">DAYS OUTSIDE INDIA</text>
-    <text x="${cx-R}" y="${cy+16}" fill="#9fc3d4" font-size="9" text-anchor="middle">0</text>
-    <text x="${cx+R}" y="${cy+16}" fill="#9fc3d4" font-size="9" text-anchor="middle">${r.days}</text>
-  </svg>
-  <div style="display:flex;justify-content:center;gap:14px;font-size:.72rem;color:var(--hero-dim);margin-top:-4px"><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ff6b5c;vertical-align:-1px;margin-right:4px"></i>Below ${need}: resident risk</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#55d69d;vertical-align:-1px;margin-right:4px"></i>${need}+ : NRI safe</span></div>
-  <div class="kvs"><div class="kv"><b>${need}</b><span>days outside needed this FY</span></div><div class="kv"><b>${more}</b><span>more days outside still needed</span></div><div class="kv"><b>${allow}</b><span>more India days allowed</span></div></div>
-  <div class="msg">${msg}</div>`;
-}
-function renderFY(C){
-  const fF=$("fFY").value,fS=$("fStatus").value;let list=C.order.slice().reverse();
-  if(fF)list=list.filter(f=>String(f)===fF);if(fS)list=list.filter(f=>C.res[f].status===fS);
-  if(!list.length){$("fyList").innerHTML=`<div class="panel empty">No financial year matches these filters.</div>`;return;}
-  $("fyList").innerHTML=list.map(f=>{
-    const r=C.res[f],o=S.fy[f]||{},st=r.status||"UNK";const need=r.days-181,more=Math.max(0,need-r.outside);
-    const ind=r.india,opct=Math.min(100,r.outside/r.days*100),t=taxLine(r);
-    const cells=r.inData?r.cells.map(c=>`<i class="${c}"></i>`).join(""):"";
-    const indLbl=r.override!=null?"days in India (entered)":(r.current||r.future?"days in India (projected)":"days in India");
-    return `<article class="fy ${st}" data-fy="${f}">
-    <div class="fy-h"><div class="t"><h3>FY ${fyLabel(f)}</h3><span class="small muted">${fmt(r.s)} – ${fmt(r.e)} · ${r.days} days · ${actLabel(f)}</span></div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">${r.current?'<span class="pill plan">In progress</span>':""}${r.outPlan?'<span class="pill plan">Includes planned dates</span>':""}<span class="pill ${st}">${st==="UNK"?"No data":st}</span></div></div>
-    <div class="fy-b"><div>
-      <div class="stats">
-        <div class="stat hl"><b>${r.inData?r.outside:"—"}</b><span>days outside India${r.outPlan?" (incl. planned)":""}</span></div>
-        <div class="stat"><b>${ind==null?"—":ind}</b><span>${indLbl}</span></div>
-        <div class="stat"><b>${r.inData?r.shipD:"—"}</b><span>days on ship (CDC)${r.inData?" · "+approx(r.shipD):""}</span></div>
-        <div class="stat"><b>${need}</b><span>days outside needed (India ≤ 181)</span></div>
-      </div>
-      <div class="meter" title="Days outside India against the ${need}-day NRI target"><div class="fill" style="width:${opct}%;background:var(--${r.outside>=need?"ok":(r.outside>=need-20?"warn":"bad")})"></div><div class="thr" style="left:${need/r.days*100}%"></div></div>
-      <div class="small muted" style="margin-top:4px">${!r.inData?"":(r.outside>=need?`${r.outside} of ${need} days outside needed · ${r.outside-need} day${r.outside-need===1?"":"s"} to spare`:`${r.outside} of ${need} days outside needed · ${more} more day${more===1?"":"s"} outside needed`)}${ind!=null&&r.override!=null?`${ind} days in India entered`:""}</div>
-      ${r.inData?`<div class="strip-wrap"><div class="strip" role="img" aria-label="Day by day: outside India or in India">${cells}</div><div class="strip-marks">${"AMJJASONDJFM".split("").map(m=>`<span>${m}</span>`).join("")}</div>
-      <div class="legend"><span><i style="background:var(--sea)"></i>Outside / onboard</span><span><i style="background:var(--plan)"></i>Planned outside</span><span><i style="background:var(--land)"></i>In India</span><span><i style="background:var(--unk-bg)"></i>Future, not planned</span></div></div>`:`<div class="small muted" style="margin-top:10px">${r.override!=null?"Days entered under Earlier years.":"No contracts in this year."}</div>`}
-    </div>
-    <div class="verdict"><div class="vh">${esc(t.h)}</div><ul>${t.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>
-      ${(r.flags||[]).map(x=>`<div class="warnline">${esc(x)}</div>`).join("")}
-      <div class="fyopts">
-        <label><input type="checkbox" data-o="inc15" ${o.inc15?"checked":""}><span>Indian income (excluding foreign income) above ₹15 lakh this year</span></label>
-        <label><input type="checkbox" data-o="abroadTax" ${o.abroadTax?"checked":""}><span>I am tax resident of another country this year</span></label>
-        <label><input type="checkbox" data-o="leftEmp" ${o.leftEmp?"checked":""}><span>This is the year I first left India for employment</span></label>
-      </div></div></div></article>`;
-  }).join("");
-}
-function filteredContracts(){
-  const fF=$("fFY").value,fT=$("fType").value,fR=$("fRank").value,fC=$("fCompany").value,fL=$("fFleet").value,fG=$("fFlag").value,fV=$("fVessel").value.trim().toLowerCase();
-  return S.contracts.filter(c=>{
-    if(fT&&c.type!==fT)return false;if(fR&&(c.rank||"").trim()!==fR)return false;
-    if(fC&&(c.company||"").trim()!==fC)return false;if(fL&&(c.fleet||"").trim()!==fL)return false;if(fG&&(c.flag||"").trim()!==fG)return false;
-    if(fV&&!((c.vessel||"").toLowerCase().includes(fV)||String(c.imo||"").replace(/\D/g,"").includes(fV.replace(/^imo\s*/,"").replace(/\D/g,"")||"\u0000")))return false;
-    if(fF){const sp=shipSpan(c);if(!sp||!overlap(sp[0],sp[1],fyStart(+fF),fyEnd(+fF)))return false;}
-    return true;
-  }).sort((a,b)=>(dn(b.on)||0)-(dn(a.on)||0));
-}
-const nf=n=>(n===""||n==null||isNaN(+n))?"":Number(n).toLocaleString("en-IN");
-function partLine(c){const a=[];
-  if(c.officialNo)a.push("Off. No. "+esc(c.officialNo));if(nf(c.gt))a.push("GT "+nf(c.gt));if(nf(c.propulsionKw))a.push(nf(c.propulsionKw)+" kW");if(c.tradeArea)a.push(esc(c.tradeArea));
-  return (a.length?`<span>${a.join(" · ")}</span>`:'<span class="muted">—</span>')+(c.watch?`<span class="sub">${esc(c.watch)}</span>`:"");}
-function shipDaysIn(c,f){const sp=shipSpan(c);if(!sp)return 0;return f?overlap(sp[0],sp[1],fyStart(f),fyEnd(f)):sp[1]-sp[0]+1;}
-function renderTable(){
-  const fF=$("fFY").value?+$("fFY").value:null,list=filteredContracts();
-  const n=["fFY","fType","fRank","fCompany","fFleet","fFlag"].map(id=>$(id).value).concat($("fVessel").value.trim()).filter(Boolean).length;
-  $("filterNote").textContent=n?`${list.length} of ${S.contracts.length} contracts shown`:`${S.contracts.length} contract${S.contracts.length===1?"":"s"}`;
-  if(!list.length){$("ctable").innerHTML=`<tr><td class="empty">${S.contracts.length?"No contracts match these filters.":"No contracts yet. Use “New entry” to log your first ship."}</td></tr>`;return;}
-  let tot=0,totF=0;const totP=list.reduce((a,c)=>a+(+c.propellingDays||0),0);
-  const rows=list.map(c=>{const sp=shipSpan(c),d=sp?sp[1]-sp[0]+1:0;tot+=d;const inF=fF!=null?shipDaysIn(c,fF):null;if(inF!=null)totF+=inF;
-    const planned=["left","on","off","arr"].some(k=>{const v=dn(c[k]);return v!=null&&v>TODAY;});
-    return `<tr><td><b>${esc(c.vessel)}</b>${planned?' <span class="pill plan">planned</span>':""}<span class="sub">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span>${c.flag||c.registry?`<span class="sub">${esc(c.flag||"")}${c.flag&&c.registry?" · ":""}${c.registry?"Reg. "+esc(c.registry):""}</span>`:""}</td>
-      <td><span class="tchip" style="--tc:${typeColor(c.type)}">${esc(c.type)}</span><span class="sub">${esc(c.company||"—")}${c.fleet?" · "+esc(c.fleet):""}</span></td>
-      <td class="mono">${fmt(dn(c.left))}<span class="sub">${c.left||c.arr?"Counted by passport dates":"Counted by CDC dates"}</span></td>
-      <td class="mono">${fmt(dn(c.on))}<span class="sub">${c.onIndia?"India":"Abroad"}${c.onPort?" · "+esc(c.onPort):""}</span></td>
-      <td class="mono">${c.off?fmt(dn(c.off)):'<span class="pill plan">onboard</span>'}<span class="sub">${c.off?(c.offIndia?"India":"Abroad")+(c.offPort?" · "+esc(c.offPort):""):""}</span></td>
-      <td class="mono">${fmt(dn(c.arr))}</td>
-      <td class="n">${d}<span class="sub">${sp?ymd(sp[0],sp[1]):""}</span></td>${fF!=null?`<td class="n">${inF}</td>`:""}
-      <td class="n">${c.propellingDays!==""&&c.propellingDays!=null?esc(c.propellingDays):"—"}</td>
-      <td style="white-space:normal;min-width:220px">${partLine(c)}</td>
-      <td><div class="row-act"><button data-edit="${esc(c.id)}">Edit</button><button class="btn-danger" data-del="${esc(c.id)}">Delete</button></div></td></tr>`;}).join("");
-  $("ctable").innerHTML=`<thead><tr><th>Vessel · rank</th><th>Type · company · fleet</th><th>Left India</th><th>Sign-on</th><th>Sign-off</th><th>Arrived India</th><th class="n">Days on ship</th>${fF!=null?`<th class="n">In FY ${fyLabel(fF)}</th>`:""}<th class="n">Propelling days</th><th>Ship particulars</th><th></th></tr></thead><tbody>${rows}</tbody>
-  <tfoot><tr><td colspan="6">Total sea service (shown contracts)</td><td class="n">${tot}<span class="sub">${approx(tot)}</span></td>${fF!=null?`<td class="n">${totF}<span class="sub">${approx(totF)}</span></td>`:""}<td class="n">${totP||"—"}</td><td></td><td></td></tr></tfoot>`;
-}
-function renderSums(){
-  const fF=$("fFY").value?+$("fFY").value:null,list=filteredContracts();
-  document.querySelectorAll(".sumScope").forEach(el=>el.textContent=fF?`Days in FY ${fyLabel(fF)}`:"All time");
-  const group=key=>{const m={};list.forEach(c=>{const k=(c[key]||"").trim()||"Not set";const d=shipDaysIn(c,fF);m[k]=m[k]||{d:0,n:0};m[k].d+=d;m[k].n++;});return Object.entries(m).sort((a,b)=>b[1].d-a[1].d);};
-  const tbl=(rows,label,colorFn)=>{if(!rows.length)return `<tr><td class="empty">Nothing to total.</td></tr>`;const max=Math.max(...rows.map(r=>r[1].d),1),T=rows.reduce((s,r)=>s+r[1].d,0);
-    return `<thead><tr><th>${label}</th><th class="n">Contracts</th><th class="n">Days</th><th class="n">Y M D</th></tr></thead><tbody>${rows.map(([k,v])=>`<tr><td style="white-space:normal">${esc(k)}<div class="bar"><i style="width:${v.d/max*100}%;${colorFn?"--tc:"+colorFn(k):""}"></i></div></td><td class="n">${v.n}</td><td class="n">${v.d}</td><td class="n">${approx(v.d)}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${rows.reduce((s,r)=>s+r[1].n,0)}</td><td class="n">${T}</td><td class="n">${approx(T)}</td></tr></tfoot>`;};
-  $("byType").innerHTML=tbl(group("type"),"Ship type",typeColor);
-  $("byRank").innerHTML=tbl(group("rank"),"Rank",k=>RANKS.Engine.includes(k)?"var(--c1)":RANKS.Catering.includes(k)?"var(--c5)":"var(--c0)");
-  $("byCompany").innerHTML=tbl(group("company"),"Company",()=>"var(--c2)");
-  $("byFleet").innerHTML=tbl(group("fleet"),"Fleet",()=>"var(--c3)");
-}
-function renderHist(C){
-  const cur=fyOf(TODAY),opts=[];for(let f=cur;f>=cur-15;f--)opts.push([f,"FY "+fyLabel(f)]);
-  fillSelect($("hFY"),opts,$("hFY").value||String((C.dataFrom||cur)-1));
-  const ent=Object.entries(S.fy).filter(([k,v])=>v&&v.india!=null&&v.india!=="").sort((a,b)=>b[0]-a[0]);
-  $("hList").innerHTML=ent.length?ent.map(([k,v])=>`<span class="pill UNK" style="margin:0 6px 6px 0">FY ${fyLabel(+k)}: ${v.india} days <button data-hdel="${k}" style="border:0;background:none;padding:0 0 0 4px;color:inherit;cursor:pointer" aria-label="Remove FY ${fyLabel(+k)}">✕</button></span>`).join(""):'<span class="muted">No earlier years entered.</span>';
-}
-
-/* ---------- DG Shipping seafarer profile import ---------- */
-/* shared DG Shipping profile parser (copied verbatim into the page) */
-function sdlLinesFromItems(items){
-  const rows=[];
-  items.forEach(it=>{if(!it.str||!it.str.trim())return;const y=Math.round(it.transform[5]),x=it.transform[4];
-    let row=rows.find(r=>Math.abs(r.y-y)<=2);if(!row){row={y,parts:[]};rows.push(row);}row.parts.push({x,s:it.str});});
-  rows.sort((a,b)=>b.y-a.y);
-  return rows.map(r=>r.parts.sort((a,b)=>a.x-b.x).map(p=>p.s).join(" ").replace(/\s+/g," ").trim());
-}
-const SDL_KEYS=[["vessel","Ship Name"],["flag","Flag"],["officialNo","Official No\\.?"],["registry","Port of Registry"],["imo","IMO Number"],["ptype","Ship Type"],["gt","\\bGT"],["tradeArea","Trade Area"],["rank","Rank"],["watch","Nature of watch ?keeping"],["on","Service From \\(Date\\)"],["off","Service To \\(Date\\)"],["artM","Article of Months"],["artD","Article Days"],["propulsionKw","Propulsion power ?\\(KW\\)"],["ptypeProp","Propulsion Type"],["propellingDays","Propelling days"],["remarks","Remarks"]];
-function sdlParseProfile(text){
-  const t=text.replace(/\r/g,"");
-  const keyRe=new RegExp("("+SDL_KEYS.map(k=>k[1]).join("|")+")\\s*:","gi");
-  const starts=[];const startRe=/\d+\s*\.\s*Ship Name\s*:/gi;let m;
-  while((m=startRe.exec(t)))starts.push(m.index);
-  const recs=[];
-  starts.forEach((s,i)=>{
-    let chunk=t.slice(s,i+1<starts.length?starts[i+1]:t.length);
-    chunk=chunk.replace(/^\d+\s*\.\s*/,"");
-    const cut=chunk.search(/Report generated on|Total no of record|Post Sea Training|Page \d+ of \d+/i);
-    const hits=[];let k;keyRe.lastIndex=0;
-    while((k=keyRe.exec(chunk)))hits.push({name:k[1],start:k.index,end:keyRe.lastIndex});
-    const f={};
-    hits.forEach((h,j)=>{
-      const key=SDL_KEYS.find(x=>new RegExp("^"+x[1]+"$","i").test(h.name.trim()));if(!key||f[key[0]]!=null)return;
-      let stop=j+1<hits.length?hits[j+1].start:chunk.length;
-      if(cut>h.end&&cut<stop)stop=cut;
-      f[key[0]]=chunk.slice(h.end,stop).replace(/\s+/g," ").trim();
-    });
-    if(!f.vessel||!f.on)return;
-    const iso=d=>{const mm=String(d||"").match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);return mm?`${mm[3]}-${mm[2].padStart(2,"0")}-${mm[1].padStart(2,"0")}`:"";};
-    const num=v=>{const n=parseFloat(String(v||"").replace(/,/g,""));return isNaN(n)?"":n;};
-    recs.push({vessel:f.vessel,flag:f.flag||"",officialNo:f.officialNo||"",registry:f.registry||"",imo:(String(f.imo||"").match(/\d{7}/)||[""])[0],
-      ptype:f.ptype||"",gt:num(f.gt),tradeArea:f.tradeArea||"",rank:f.rank||"",watch:f.watch||"",on:iso(f.on),off:iso(f.off),
-      propulsionKw:num(f.propulsionKw),propellingDays:num(f.propellingDays)});
-  });
-  return recs.filter(r=>r.on);
-}
-
-const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
-function loadPdfJs(){if(window.pdfjsLib)return Promise.resolve();return new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=PDFJS+"pdf.min.js";sc.onload=()=>{try{window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+"pdf.worker.min.js";res();}catch(e){rej(e);}};sc.onerror=()=>rej(new Error("load"));document.head.appendChild(sc);});}
-const titleCase=v=>String(v||"").toLowerCase().replace(/(^|[\s\-\/(])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\bOf\b/g,"of").replace(/\bAnd\b/g,"and");
-function normFlag(f){let v=titleCase(f.trim());if(/^marshall island$/i.test(v))v="Marshall Islands";if(/^isle of man$/i.test(v))v="Isle of Man";return v;}
-function mapType(t){const x=String(t||"").toLowerCase();
-  if(/lng/.test(x))return "LNG Carrier";if(/lpg|gas carrier|lpg\/|liquefied petroleum/.test(x))return "LPG Carrier";
-  if(/oil.*chem|chem.*oil/.test(x))return "Oil/Chem Product Tanker";if(/chemical/.test(x))return "Chemical Tanker";if(/product/.test(x))return "Product Tanker";
-  if(/crude|oil tanker|^tanker/.test(x))return "Oil Tanker (Crude)";if(/bulk|ore/.test(x))return "Bulk Carrier";if(/container/.test(x))return "Container Ship";
-  if(/general cargo|multi.?purpose/.test(x))return "General Cargo";if(/car carrier|pctc|pcc|ro.?ro/.test(x))return "Car Carrier (PCTC)";return "Offshore / Other";}
-function defaultRank(r){const x=String(r||"").toLowerCase();
-  if(ALLRANKS.some(a=>a.toLowerCase()===x))return ALLRANKS.find(a=>a.toLowerCase()===x);
-  const R=[[/trainee marine engineer|\btme\b/,"Junior Engineer"],[/oicew|watch ?keeping engineer/,"4th Engineer"],[/chief engineer/,"Chief Engineer"],[/(2nd|second) engineer/,"2nd Engineer"],[/(3rd|third) engineer/,"3rd Engineer"],[/(4th|fourth) engineer/,"4th Engineer"],[/junior engineer/,"Junior Engineer"],[/electro|\beto\b/,"ETO (Electro-Technical Officer)"],[/electrical officer/,"Electrical Officer"],[/gas engineer/,"Gas Engineer"],[/master|captain/,"Master / Captain"],[/chief (mate|officer)/,"Chief Officer"],[/(2nd|second) (mate|officer)/,"2nd Officer"],[/(3rd|third) (mate|officer)|oicnw|navigational watch officer|watch ?keeping (navigat|deck)/,"3rd Officer"],[/deck cadet|trainee (navigat|deck)/,"Deck Cadet / Trainee"],[/engine cadet/,"Engine Cadet / TME"],[/bosun|boatswain/,"Bosun"],[/able|\bab\b/,"AB (Able Seaman)"],[/ordinary|\bos\b/,"OS (Ordinary Seaman)"],[/pump/,"Pumpman"],[/motorman/,"Motorman"],[/oiler/,"Oiler"],[/wiper/,"Wiper"],[/fitter/,"Fitter"],[/chief cook/,"Chief Cook"],[/cook/,"2nd Cook"],[/steward|messman/,"Messman / Steward"]];
-  const hit=R.find(([re])=>re.test(x));return hit?hit[1]:r;}
-let PIMP=null;
-const normName=v=>String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"").replace(/^(MV|MT|MS|LNGC|LPGC|SS)/,"");
-function findExisting(r){const id="dgs-"+(r.imo||normName(r.vessel))+"-"+r.on;
-  return S.example?null:S.contracts.find(c=>c.id===id||(r.imo&&c.imo===r.imo&&c.on===r.on)||(normName(c.vessel)===normName(r.vessel)&&c.on===r.on));}
-function candidate(r,map){return {vessel:r.vessel,type:mapType(r.ptype),rank:map[r.rank]!=null?map[r.rank]:defaultRank(r.rank),imo:r.imo,flag:r.flag?normFlag(r.flag):"",registry:r.registry?titleCase(r.registry):"",officialNo:r.officialNo,gt:r.gt,tradeArea:r.tradeArea?titleCase(r.tradeArea):"",propulsionKw:r.propulsionKw,propellingDays:r.propellingDays,watch:r.watch,on:r.on,off:r.off};}
-const blank=v=>v===""||v==null;
-function planImport(){
-  const map=PIMP.map;return PIMP.recs.map(r=>{const cand=candidate(r,map),ex=findExisting(r);
-    if(!ex)return {r,cand,ex:null,fill:Object.keys(cand).filter(k=>!blank(cand[k])),status:"new"};
-    const fill=Object.keys(cand).filter(k=>blank(ex[k])&&!blank(cand[k]));return {r,cand,ex,fill,status:fill.length?"update":"same"};});
-}
-function renderImport(){
-  const body=$("pImpBody");if(!PIMP){body.hidden=true;return;}body.hidden=false;
-  const plan=planImport(),nNew=plan.filter(p=>p.status==="new").length,nUp=plan.filter(p=>p.status==="update").length;
-  const ranks=[...new Set(PIMP.recs.map(r=>r.rank).filter(Boolean))];
-  const opts=v=>`<option value="">(keep as written)</option>`+Object.entries(RANKS).map(([g,items])=>`<optgroup label="${g}">${items.map(i=>`<option ${i===v?"selected":""}>${esc(i)}</option>`).join("")}</optgroup>`).join("");
-  body.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
-   <div><b>${PIMP.recs.length} sea-service record${PIMP.recs.length===1?"":"s"} found</b> in ${esc(PIMP.name)}. <span class="pill NR">${nNew} new</span> <span class="pill RNOR">${nUp} with missing details to fill</span> <span class="pill UNK">${plan.length-nNew-nUp} already up to date</span></div>
-   <div class="small muted">Nothing you already entered is overwritten. Existing ships only get details that are blank in your app (for example a sign-off date that was missing).</div>
-   ${ranks.length?`<div><div class="eyebrow" style="margin-bottom:6px">Rank names in the PDF → rank in the app</div><div class="fgrid">${ranks.map((rk,i)=>`<label class="f"><span>${esc(rk)}</span><select data-rk="${i}">${opts(PIMP.map[rk]!=null?PIMP.map[rk]:(ALLRANKS.includes(defaultRank(rk))?defaultRank(rk):""))}</select></label>`).join("")}</div></div>`:""}
-   <div class="tbl-wrap"><table><thead><tr><th>Vessel</th><th>Type</th><th>Rank</th><th>Sign-on</th><th>Sign-off</th><th>Result</th></tr></thead><tbody>${plan.map(p=>`<tr><td><b>${esc(p.cand.vessel)}</b><span class="sub">${p.cand.imo?"IMO "+esc(p.cand.imo):""}</span></td><td>${esc(p.cand.type)}</td><td>${esc(p.cand.rank||"—")}</td><td class="mono">${fmt(dn(p.cand.on))}</td><td class="mono">${fmt(dn(p.cand.off))}</td><td>${p.status==="new"?'<span class="pill NR">New ship</span>':p.status==="update"?`<span class="pill RNOR">Fill ${p.fill.length} detail${p.fill.length===1?"":"s"}</span>`:'<span class="pill UNK">Up to date</span>'}</td></tr>`).join("")}</tbody></table></div>
-   <div class="actions" style="margin-top:0"><button class="btn-primary" id="pImpGo" ${nNew+nUp?"":"disabled"}>${nNew+nUp?`Add ${nNew} new ship${nNew===1?"":"s"}${nUp?` and update ${nUp}`:""}`:"Nothing new to add"}</button><button class="btn-ghost" id="pImpCancel">Close</button></div></div>`;
-  body.querySelectorAll("[data-rk]").forEach(sel=>sel.addEventListener("change",()=>{PIMP.map[ranks[+sel.dataset.rk]]=sel.value||ranks[+sel.dataset.rk];renderImport();}));
-  $("pImpCancel").onclick=()=>{PIMP=null;renderImport();};
-  $("pImpGo").onclick=()=>{
-    if(S.example)leaveExample();const now=Date.now();let added=0,updated=0;
-    planImport().forEach(p=>{
-      if(p.status==="new"){S.contracts.push(Object.assign({id:"dgs-"+(p.cand.imo||normName(p.cand.vessel))+"-"+p.cand.on,company:"",fleet:"",left:"",arr:"",onIndia:false,offIndia:false,onPort:"",offPort:"",coastal:false,notes:"From DG Shipping profile",source:"DGS profile",u:now},p.cand));added++;}
-      else if(p.status==="update"){p.fill.forEach(k=>p.ex[k]=p.cand[k]);p.ex.u=now;updated++;}
-    });
-    S.settings.rankMap=Object.assign({},S.settings.rankMap||{},PIMP.map);
-    PIMP=null;render();renderImport();persist();
-    setTimeout(()=>setSave(`Profile imported: ${added} ship${added===1?"":"s"} added, ${updated} updated`),700);
-    $("register").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
-  };
-}
-$("profilePdf").addEventListener("change",async e=>{
-  const file=e.target.files[0];e.target.value="";if(!file)return;
-  const body=$("pImpBody");body.hidden=false;body.innerHTML='<div class="muted">Reading your profile…</div>';
-  try{
-    await loadPdfJs();
-    const pdf=await window.pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;let lines=[];
-    for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const tc=await pg.getTextContent();lines=lines.concat(sdlLinesFromItems(tc.items));}
-    const recs=sdlParseProfile(lines.join("\n"));
-    if(!recs.length){body.innerHTML='<div class="err">No sea-service records were found in this PDF. Use the “Seafarer Profile” PDF downloaded from the DG Shipping e-Governance portal. Scanned or photographed copies cannot be read.</div>';return;}
-    const map={};const saved=S.settings.rankMap||{};recs.forEach(r=>{if(r.rank&&map[r.rank]==null&&saved[r.rank]!=null)map[r.rank]=saved[r.rank];});
-    PIMP={name:file.name,recs,map};renderImport();
-  }catch(err){body.innerHTML=`<div class="err">${navigator.onLine===false&&!window.pdfjsLib?"The PDF reader needs internet the first time. Connect once and try again.":"This file could not be read. Check that it is the DG Shipping Seafarer Profile PDF."}</div>`;}
-});
-
-/* ---------- charts ---------- */
-const stColor=s=>({NR:"var(--ok)",RNOR:"var(--warn)",ROR:"var(--bad)"}[s]||"var(--unk)");
-const P=(cx,cy,r,a)=>[cx+r*Math.sin(a),cy-r*Math.cos(a)];
-function arcP(cx,cy,r,a0,a1){
-  if(a1-a0>=Math.PI*2-1e-4){const m=a0+Math.PI;return arcP(cx,cy,r,a0,m)+" "+arcP(cx,cy,r,m,a0+Math.PI*2-1e-4).replace(/^M[^A]+/,"");}
-  const [x0,y0]=P(cx,cy,r,a0),[x1,y1]=P(cx,cy,r,a1);return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
-}
-function sector(cx,cy,ro,ri,a0,a1){
-  if(a1-a0>=Math.PI*2-1e-4)return `M${cx} ${cy-ro} A${ro} ${ro} 0 1 1 ${cx-0.01} ${cy-ro}Z M${cx} ${cy-ri} A${ri} ${ri} 0 1 0 ${cx-0.01} ${cy-ri}Z`;
-  const L=a1-a0>Math.PI?1:0,[x0,y0]=P(cx,cy,ro,a0),[x1,y1]=P(cx,cy,ro,a1),[x2,y2]=P(cx,cy,ri,a1),[x3,y3]=P(cx,cy,ri,a0);
-  return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${ro} ${ro} 0 ${L} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} L${x2.toFixed(2)} ${y2.toFixed(2)} A${ri} ${ri} 0 ${L} 0 ${x3.toFixed(2)} ${y3.toFixed(2)}Z`;
-}
-function renderRings(C){
-  const fys=C.order.filter(f=>C.res[f].india!=null).slice(-6).reverse();
-  if(!fys.length){$("chRings").innerHTML='<div class="empty">Add a contract to see your years.</div>';return;}
-  const cx=110,cy=110;let g="";const lg=[];
-  fys.forEach((f,i)=>{
-    const r=C.res[f],rad=98-i*15,need=r.days-181;
-    const out=r.inData?r.outside:r.days-r.india,done=r.inData?r.outside-r.outPlan:out;
-    const col=stColor(r.status);const aDone=done/r.days*Math.PI*2,aAll=out/r.days*Math.PI*2,aNeed=need/r.days*Math.PI*2;
-    const tip=`FY ${fyLabel(f)} · ${r.status}\n${out} days outside (${need} needed)${r.outPlan?`\n${r.outPlan} of them planned`:""}\n${r.india} days in India`;
-    g+=`<g class="mark" data-tip="${esc(tip)}"><circle cx="${cx}" cy="${cy}" r="${rad}" fill="none" stroke="var(--soft)" stroke-width="11"/>`;
-    if(aDone>0)g+=`<path d="${arcP(cx,cy,rad,0,aDone)}" fill="none" stroke="${col}" stroke-width="11" stroke-linecap="round"/>`;
-    if(aAll>aDone+0.001)g+=`<path d="${arcP(cx,cy,rad,aDone,aAll)}" fill="none" stroke="${col}" stroke-opacity=".4" stroke-width="11"/>`;
-    const [t0x,t0y]=P(cx,cy,rad-7,aNeed),[t1x,t1y]=P(cx,cy,rad+7,aNeed);
-    g+=`<line x1="${t0x.toFixed(1)}" y1="${t0y.toFixed(1)}" x2="${t1x.toFixed(1)}" y2="${t1y.toFixed(1)}" stroke="var(--ink)" stroke-width="2.5"/>`;
-    g+=`<circle cx="${cx}" cy="${cy}" r="${rad}" fill="none" stroke="transparent" stroke-width="15"/></g>`;
-    lg.push(`<div class="li"><span class="sw" style="background:${col}"></span><span class="nm">FY ${fyLabel(f)} <span class="pill ${r.status}" style="padding:0 6px;font-size:.66rem">${r.status}</span></span><span class="v">${out} / ${need}</span></div>`);
-  });
-  const nr=fys.filter(f=>C.res[f].status==="NR").length;
-  const inner=98-(fys.length-1)*15-12;
-  g+=inner>24?`<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="${inner>40?22:15}" fill="var(--ink)" font-weight="500">${nr}/${fys.length}</text><text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="8" fill="var(--muted)" letter-spacing="1">NRI YEARS</text>`:"";
-  $("chRings").innerHTML=`<svg viewBox="0 0 220 220" role="img" aria-label="Days outside India per financial year as rings">${g}</svg><div class="lg"><div class="small muted">Outermost ring = latest year · days outside / needed</div>${lg.join("")}</div>`;
-}
-function renderBars(C){
-  const fys=C.order.filter(f=>C.res[f].india!=null).slice(-8);
-  if(!fys.length){$("chBars").innerHTML='<div class="empty">No years to chart yet.</div>';return;}
-  const slot=72,padL=34,padB=26,padT=18,H=220,W=Math.max(520,padL+fys.length*slot+8),plotH=H-padB-padT,y=v=>padT+plotH*(1-v/366);
-  let g="";
-  [0,100,200,300].forEach(v=>{g+=`<line x1="${padL}" x2="${W-4}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${padL-6}" y="${y(v)+3}" text-anchor="end" font-size="9" fill="var(--muted)">${v}</text>`;});
-  fys.forEach((f,i)=>{
-    const r=C.res[f],need=r.days-181,out=r.inData?r.outside:r.days-r.india,done=r.inData?out-r.outPlan:out,plan=out-done;
-    const x=padL+i*slot+16,bw=slot-32,col=stColor(r.status);
-    const tip=`FY ${fyLabel(f)} · ${r.status}\n${out} days outside, ${need} needed\n${out>=need?(out-need)+" to spare":(need-out)+" short"}`;
-    g+=`<g class="mark" data-tip="${esc(tip)}"><rect x="${x-10}" y="${padT}" width="${bw+20}" height="${plotH}" fill="transparent"/>`;
-    if(done>0){const h=y(0)-y(done);g+=`<path d="M${x} ${y(0)} V${y(done)+Math.min(4,h)} Q${x} ${y(done)} ${x+4} ${y(done)} H${x+bw-4} Q${x+bw} ${y(done)} ${x+bw} ${y(done)+Math.min(4,h)} V${y(0)}Z" fill="${col}"/>`;}
-    if(plan>0){const top=y(out),bot=y(done)-2;if(bot>top)g+=`<rect x="${x}" y="${top}" width="${bw}" height="${bot-top}" rx="3" fill="${col}" fill-opacity=".4"/>`;}
-    g+=`<line x1="${x-6}" x2="${x+bw+6}" y1="${y(need)}" y2="${y(need)}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
-    g+=`<text x="${x+bw/2}" y="${y(Math.max(out,need))-6}" text-anchor="middle" font-size="10" fill="var(--ink)" font-weight="500">${out}</text>`;
-    g+=`<text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${fyLabel(f)}</text></g>`;
-  });
-  $("chBars").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" style="max-width:${Math.max(W,320)}px" role="img" aria-label="Days outside India per financial year">${g}</svg>
-  <div class="legend" style="margin-top:4px"><span><i style="background:var(--ok)"></i>NR</span><span><i style="background:var(--warn)"></i>RNOR</span><span><i style="background:var(--bad)"></i>ROR</span><span><i style="background:var(--sea);opacity:.4"></i>Planned</span><span>– – days needed</span></div>`;
-}
-function donut(el,rows,center,label){
-  const total=rows.reduce((s,r)=>s+r.v,0);
-  if(!total){el.innerHTML='<div class="empty">No sea time for these filters.</div>';return;}
-  const cx=110,cy=110,ro=96,ri=64;let a=0,g="";
-  rows.forEach(r=>{const a1=a+r.v/total*Math.PI*2;g+=`<path class="mark" d="${sector(cx,cy,ro,ri,a,a1)}" fill="${r.c}" stroke="var(--paper)" stroke-width="2" fill-rule="evenodd" data-tip="${esc(r.l+"\n"+r.v+" days · "+approx(r.v)+"\n"+Math.round(r.v/total*100)+"% of shown sea time")}"/>`;a=a1;});
-  g+=`<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="24" fill="var(--ink)" font-weight="500">${total}</text><text x="${cx}" y="${cy+18}" text-anchor="middle" font-size="9" fill="var(--muted)" letter-spacing="1">DAYS AT SEA</text><text x="${cx}" y="${cy+32}" text-anchor="middle" font-size="9" fill="var(--muted)">${approx(total)}</text>`;
-  el.innerHTML=`<svg viewBox="0 0 220 220" role="img" aria-label="${esc(label)}">${g}</svg><div class="lg">${rows.map(r=>`<div class="li"><span class="sw" style="background:${r.c}"></span><span class="nm" title="${esc(r.l)}">${esc(r.l)}</span><span class="v">${r.v}d · ${Math.round(r.v/total*100)}%</span></div>`).join("")}</div>`;
-}
-let mixKey="rank";
-function renderCharts(C){
-  renderRings(C);renderBars(C);
-  const fF=$("fFY").value?+$("fFY").value:null,list=filteredContracts();
-  document.querySelectorAll(".ovScope").forEach(e=>e.textContent=(fF?`Days in FY ${fyLabel(fF)}`:"All time")+` · ${list.length} contract${list.length===1?"":"s"}`);
-  // ship types: fixed colour per type
-  const tm={};list.forEach(c=>{const d=shipDaysIn(c,fF);if(!d)return;const i=TYPES.indexOf(c.type);const k=i>=0&&i<8?c.type:"Other types";tm[k]=(tm[k]||0)+d;});
-  donut($("chType"),Object.entries(tm).map(([l,v])=>({l,v,c:l==="Other types"?"var(--cx)":typeColor(l)})).sort((a,b)=>b.v-a.v),null,"Sea time by ship type");
-  // mix: colour follows the entity — top 7 by all-time days keep fixed slots
-  const all={};S.contracts.forEach(c=>{const k=(c[mixKey]||"").trim()||"Not set";all[k]=(all[k]||0)+shipDaysIn(c,null);});
-  const top=Object.entries(all).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,7).map(e=>e[0]);
-  const mm={};list.forEach(c=>{const d=shipDaysIn(c,fF);if(!d)return;let k=(c[mixKey]||"").trim()||"Not set";if(!top.includes(k))k="Other";mm[k]=(mm[k]||0)+d;});
-  donut($("chMix"),Object.entries(mm).map(([l,v])=>({l,v,c:l==="Other"?"var(--cx)":`var(--c${top.indexOf(l)})`})).sort((a,b)=>b.v-a.v),null,"Sea time by "+mixKey);
-  $("chMixTitle").textContent="Sea time by "+mixKey;
-  const n=["fType","fRank","fCompany","fFleet","fFlag"].map(id=>$(id).value).concat($("fVessel").value.trim()).filter(Boolean).length;
-  $("ovNote").textContent=n?"Ship charts follow your filters":"Use the filters below to narrow the ship charts";
-}
-$("mixSeg").addEventListener("click",e=>{const b=e.target.closest("[data-mix]");if(!b)return;mixKey=b.dataset.mix;$("mixSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderCharts(window.__ledger);});
-
-/* tooltip */
-const tip=document.createElement("div");tip.id="tip";tip.hidden=true;document.body.appendChild(tip);
-document.addEventListener("pointerover",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");if(!t){tip.hidden=true;return;}tip.textContent=t.getAttribute("data-tip");tip.hidden=false;});
-document.addEventListener("pointermove",e=>{if(tip.hidden)return;const w=tip.offsetWidth,h=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;tip.style.left=Math.max(8,x)+"px";tip.style.top=Math.max(8,y)+"px";});
-document.addEventListener("pointerdown",e=>{if(!(e.target.closest&&e.target.closest("[data-tip]")))tip.hidden=true;});
-
-/* tabs */
-function selectTab(name){["notices","news"].forEach(n=>{$("tab-"+n).setAttribute("aria-selected",String(n===name));$("pane-"+n).hidden=n!==name;});lsSet("sdlTab",name);}
-$("tab-notices").addEventListener("click",()=>selectTab("notices"));
-$("tab-news").addEventListener("click",()=>selectTab("news"));
-document.querySelector(".tabs").addEventListener("keydown",e=>{if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;const n=$("tab-news").getAttribute("aria-selected")==="true"?"notices":"news";selectTab(n);$("tab-"+n).focus();});
-document.querySelectorAll("[data-gotab]").forEach(a=>a.addEventListener("click",()=>selectTab(a.dataset.gotab)));
-selectTab(lsGet("sdlTab")==="news"?"news":"notices");
-
-/* day / night */
-const mq=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null;
-function applyTheme(t){if(t)document.documentElement.setAttribute("data-theme",t);const dark=t?t==="dark":!!(mq&&mq.matches);$("themeBtn").setAttribute("aria-checked",String(dark));$("themeLbl").textContent=dark?"Night":"Day";$("themeKnob").textContent=dark?"☾":"☀";$("themeBtn").setAttribute("aria-label",dark?"Switch to day mode":"Switch to night mode");}
-applyTheme(lsGet("sdlTheme"));
-$("themeBtn").addEventListener("click",()=>{const t=$("themeBtn").getAttribute("aria-checked")==="true"?"light":"dark";lsSet("sdlTheme",t);applyTheme(t);});
-if(mq&&mq.addEventListener)mq.addEventListener("change",()=>{if(!lsGet("sdlTheme"))applyTheme(null);});
-
-/* ---------- form ---------- */
-fillSelect($("c_type"),[["","Select…"]].concat(TYPES.map(t=>[t,t])));
-fillSelect($("c_rank"),[["","Select rank…"]].concat(Object.entries(RANKS).map(([g,items])=>({group:g+" department",items}))).concat([["__other","Other (type it)"]]));
-const F=$;
-const radio=n=>document.querySelector(`input[name=${n}]:checked`).value;
-const setRadio=(n,v)=>{document.querySelector(`input[name=${n}][value=${v}]`).checked=true;};
-function rankVal(){return F("c_rank").value==="__other"?F("c_rankOther").value.trim():F("c_rank").value;}
-F("c_rank").addEventListener("change",()=>{$("rankOtherWrap").hidden=F("c_rank").value!=="__other";});
-function readForm(){return {id:F("c_id").value||uid(),vessel:F("c_vessel").value.trim(),type:F("c_type").value,company:F("c_company").value.trim(),fleet:F("c_fleet").value.trim(),rank:rankVal(),imo:F("c_imo").value.trim(),flag:F("c_flag").value.trim(),registry:F("c_registry").value.trim(),officialNo:F("c_officialNo").value.trim(),gt:F("c_gt").value===""?"":+F("c_gt").value,propulsionKw:F("c_propulsionKw").value===""?"":+F("c_propulsionKw").value,propellingDays:F("c_propellingDays").value===""?"":+F("c_propellingDays").value,tradeArea:F("c_tradeArea").value,watch:F("c_watch").value.trim(),notes:F("c_notes").value.trim(),
-  left:F("c_left").value,on:F("c_on").value,off:F("c_off").value,arr:F("c_arr").value,onIndia:radio("onIn")==="india",offIndia:radio("offIn")==="india",onPort:F("c_onport").value.trim(),offPort:F("c_offport").value.trim(),coastal:F("c_coastal").checked};}
-function validate(c){
-  if(!c.vessel)return "Enter the vessel name.";if(!c.type)return "Choose the type of ship.";if(!c.rank)return "Choose your rank.";if(!c.on)return "Enter the CDC sign-on date.";
-  const L=dn(c.left),O=dn(c.on),X=dn(c.off),A=dn(c.arr);
-  if(X!=null&&X<O)return "Sign-off is before sign-on.";if(L!=null&&O<L)return "Sign-on is before the date you left India.";
-  if(A!=null&&X!=null&&A<X)return "Arrival in India is before sign-off.";if(A!=null&&L!=null&&A<L)return "Arrival in India is before leaving India.";return "";
-}
-function calcLine(){
-  const c=readForm(),O=dn(c.on);if(O==null){$("calcline").innerHTML='<span class="muted">Enter sign-on to see days onboard.</span>';return;}
-  const X=dn(c.off)!=null?dn(c.off):Math.max(TODAY,O);const parts=[`<span>On ship: <b class="mono">${X-O+1}</b> days (${ymd(O,X)})${c.off?"":" so far"}</span>`];
-  const byF={};for(let d=O;d<=X;d++){const f=fyOf(d);byF[f]=(byF[f]||0)+1;}
-  Object.entries(byF).forEach(([f,n])=>parts.push(`<span>FY ${fyLabel(+f)}: <b class="mono">${n}</b></span>`));
-  if(c.onIndia||c.offIndia)parts.push(`<span class="muted">Indian-port voyage: CDC period excluded from India stay</span>`);
-  $("calcline").innerHTML=parts.join("");
-}
-function resetForm(){$("cform").reset();F("c_id").value="";setRadio("onIn","abroad");setRadio("offIn","abroad");$("rankOtherWrap").hidden=true;$("formTitle").textContent="Add contract / voyage";$("saveBtn").textContent="Save contract";$("formErr").textContent="";calcLine();}
-function editContract(id){
-  const c=S.contracts.find(x=>x.id===id);if(!c)return;
-  ["vessel","type","company","fleet","imo","flag","registry","officialNo","gt","propulsionKw","propellingDays","tradeArea","watch","notes"].forEach(k=>F("c_"+k).value=c[k]==null?"":c[k]);
-  F("c_id").value=c.id;F("c_left").value=c.left||"";F("c_on").value=c.on||"";F("c_off").value=c.off||"";F("c_arr").value=c.arr||"";F("c_onport").value=c.onPort||"";F("c_offport").value=c.offPort||"";F("c_coastal").checked=!!c.coastal;
-  if(!c.rank)F("c_rank").value="";else if(ALLRANKS.includes(c.rank))F("c_rank").value=c.rank;else{F("c_rank").value="__other";F("c_rankOther").value=c.rank;}
-  $("rankOtherWrap").hidden=F("c_rank").value!=="__other";
-  setRadio("onIn",c.onIndia?"india":"abroad");setRadio("offIn",c.offIndia?"india":"abroad");
-  $("formTitle").textContent="Edit "+c.vessel;$("saveBtn").textContent="Update contract";$("entry").open=true;calcLine();
-  $("entry").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
-}
-function leaveExample(){if(S.example)S={v:2,example:false,settings:{edge:S.settings.edge!==false},fy:{},contracts:[],deleted:[],updatedAt:0};}
-$("cform").addEventListener("submit",e=>{
-  e.preventDefault();const c=readForm(),err=validate(c);if(err){$("formErr").textContent=err;return;}
-  if(S.example)leaveExample();
-  c.u=Date.now();if(S.contracts.some(x=>x.id===c.id))S.contracts=S.contracts.map(x=>x.id===c.id?c:x);else S.contracts.push(c);
-  resetForm();$("entry").open=false;render();persist();
-});
-$("cancelBtn").addEventListener("click",()=>{resetForm();$("entry").open=false;});
-$("cform").addEventListener("input",calcLine);$("cform").addEventListener("change",calcLine);
-$("clearExamples").addEventListener("click",()=>{leaveExample();render();persist();});
-
-let pendingDel=null;
-$("ctable").addEventListener("click",e=>{
-  const ed=e.target.closest("[data-edit]");if(ed){editContract(ed.dataset.edit);return;}
-  const del=e.target.closest("[data-del]");if(!del)return;
-  if(pendingDel===del.dataset.del){if(S.example)leaveExample();else{S.contracts=S.contracts.filter(x=>x.id!==del.dataset.del);(S.deleted=S.deleted||[]).push({id:del.dataset.del,u:Date.now()});}pendingDel=null;render();persist();}
-  else{pendingDel=del.dataset.del;del.textContent="Confirm delete";setTimeout(()=>{if(pendingDel===del.dataset.del){pendingDel=null;del.textContent="Delete";}},4000);}
-});
-$("fyList").addEventListener("change",e=>{const cb=e.target.closest("[data-o]");if(!cb)return;const f=cb.closest("[data-fy]").dataset.fy;S.fy[f]=Object.assign({},S.fy[f],{[cb.dataset.o]:cb.checked});render();persist();});
-["fFY","fType","fRank","fCompany","fFleet","fFlag","fStatus"].forEach(id=>$(id).addEventListener("change",render));
-$("fVessel").addEventListener("input",()=>{renderTable();renderSums();renderCharts(window.__ledger);});
-$("fReset").addEventListener("click",()=>{["fFY","fType","fRank","fCompany","fFleet","fFlag","fStatus"].forEach(id=>$(id).value="");$("fVessel").value="";render();});
-$("edgeSet").addEventListener("change",e=>{S.settings.edge=e.target.checked;render();persist();});
-$("hAdd").addEventListener("click",()=>{const f=$("hFY").value,v=$("hDays").value;if(v===""||+v<0||+v>366)return;if(S.example)leaveExample();S.fy[f]=Object.assign({},S.fy[f],{india:Math.round(+v)});$("hDays").value="";render();persist();});
-$("hList").addEventListener("click",e=>{const b=e.target.closest("[data-hdel]");if(!b)return;if(S.fy[b.dataset.hdel])delete S.fy[b.dataset.hdel].india;render();persist();});
-
-async function save(filename,data,label){
-  if(OFFLINE){try{const url=URL.createObjectURL(new Blob([data],{type:filename.endsWith(".csv")?"text/csv":"application/json"}));const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);setSave(label+" downloaded");}catch(e){setSave(label+" not saved");}return;}
-  try{const dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null;if(!dl){setSave("Downloads are not available in this view.");return;}await dl.save({filename,data});setSave(label+" saved");}
-  catch(e){setSave(label+" not saved");}
-}
-$("expJson").addEventListener("click",()=>{const d=new Date();save(`sea-days-ledger-${OFFLINE?"offline":"online"}-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`,JSON.stringify(snapshot(),null,2),"Backup");});
-$("expCsv").addEventListener("click",()=>{
-  const h=["Vessel","Type","Company","Fleet","Rank","IMO","Flag","Port of registry","Official No.","GT","Propulsion kW","Propelling days","Trade area","Nature of watchkeeping","Left India","Sign-on","Sign-on port","Sign-on in India","Sign-off","Sign-off port","Sign-off in India","Arrived India","Days on ship","Notes"];
-  const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
-  const rows=filteredContracts().map(c=>{const sp=shipSpan(c);return [c.vessel,c.type,c.company,c.fleet,c.rank,c.imo,c.flag,c.registry,c.officialNo,c.gt,c.propulsionKw,c.propellingDays,c.tradeArea,c.watch,c.left,c.on,c.onPort,c.onIndia?"Yes":"No",c.off,c.offPort,c.offIndia?"Yes":"No",c.arr,sp?sp[1]-sp[0]+1:"",c.notes].map(q).join(",");});
-  save("sea-service-register.csv",[h.map(q).join(",")].concat(rows).join("\n"),"CSV");
-});
-$("impJson").addEventListener("change",e=>{
-  const file=e.target.files[0];if(!file)return;const rd=new FileReader();
-  rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!o||!Array.isArray(o.contracts))throw 0;const n0=S.example?0:S.contracts.length;const changed=merge(o);render();persist();setSave(changed?`Merged: ${S.contracts.length} contracts now (${Math.max(0,S.contracts.length-n0)} added)`:"Nothing new in that file");}catch(_){setSave("That file is not a Sea Days Ledger backup.");}e.target.value="";};
-  rd.readAsText(file);
-});
-
-/* ---------- refresh (only when you press it) ---------- */
-function showRefreshed(t){if(t)lsSet("sdlRefreshed",String(t));const v=+(lsGet("sdlRefreshed")||0);$("lastRefreshed").textContent=v?"Last refreshed "+new Date(v).toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"Not refreshed yet";}
-function showUpdateReady(){const on=!!window.sdlUpdateReady;$("updDot").hidden=!on;$("refreshLbl").textContent=on?"Refresh · update ready":"Refresh";}
-document.addEventListener("sdl-update",showUpdateReady);
-async function refreshAll(){
-  const btn=$("refreshBtn");if(btn.classList.contains("spin"))return;btn.classList.add("spin");$("refreshLbl").textContent="Refreshing…";
-  try{
-    if(OFFLINE&&typeof window.sdlAppUpdate==="function"){showRefreshed(Date.now());if(await window.sdlAppUpdate())return;}
-    if(ref){
-      const snap=await ref.get();
-      if(snap.exists){const mine=S.example?null:snapshot();adopt(snap.data());let changed=false;if(mine)changed=merge(mine);render();if(changed)persist();}
-      await loadShared();
-      setSave("Up to date with your account");
-    }else{
-      const local=loadLocal();if(local){adopt(local);render();}
-      setSave(navigator.onLine===false?"Offline · showing what is saved on this device":"Showing the latest saved on this device");
-    }
-    showRefreshed(Date.now());
-  }catch(e){setSave(navigator.onLine===false?"No internet · showing what is saved on this device":"Could not refresh right now. Try again in a moment.");}
-  finally{btn.classList.remove("spin");showUpdateReady();}
-}
-$("refreshBtn").addEventListener("click",refreshAll);
-showRefreshed();showUpdateReady();
-
-window.addEventListener("online",()=>{if(!S.example)persist();});
-window.addEventListener("offline",()=>setSave("Offline · entries are kept in this browser and sync when you reconnect"));
-resetForm();render();renderNewsTopics();initStore();
-})();
-</script>
-<script>
-(function(){
-  /* the app never updates or reloads by itself: a new version is downloaded quietly and applied only when you press Refresh */
-  if(!("serviceWorker" in navigator))return;let reg=null;
+  /* the app never updates itself: a new version downloads quietly and is applied only when you press Sync */
+  if(!("serviceWorker" in navigator))return;var reg=null;
   function flag(){window.sdlUpdateReady=!!(reg&&reg.waiting&&navigator.serviceWorker.controller);document.dispatchEvent(new Event("sdl-update"));}
-  function watch(w){if(w)w.addEventListener("statechange",()=>{if(w.state==="installed")flag();});}
-  addEventListener("load",async()=>{try{reg=await navigator.serviceWorker.register("sw.js");flag();reg.addEventListener("updatefound",()=>watch(reg.installing));if(navigator.onLine)reg.update().catch(()=>{});}catch(e){}});
+  addEventListener("load",function(){navigator.serviceWorker.register("sw.js").then(function(r){reg=r;flag();r.addEventListener("updatefound",function(){var w=r.installing;if(w)w.addEventListener("statechange",function(){if(w.state==="installed")flag();});});if(navigator.onLine)r.update().catch(function(){});}).catch(function(){});});
   window.sdlAppUpdate=async function(){
     if(!reg)return false;
-    try{if(!reg.waiting&&navigator.onLine){await reg.update();const w=reg.installing;if(w)await new Promise(res=>{w.addEventListener("statechange",()=>{if(w.state!=="installing")res();});setTimeout(res,20000);});}}catch(e){}
-    if(reg.waiting&&navigator.serviceWorker.controller){navigator.serviceWorker.addEventListener("controllerchange",()=>location.reload(),{once:true});reg.waiting.postMessage("skipWaiting");return true;}
+    try{if(!reg.waiting&&navigator.onLine){await reg.update();var w=reg.installing;if(w)await new Promise(function(res){w.addEventListener("statechange",function(){if(w.state!=="installing")res();});setTimeout(res,20000);});}}catch(e){}
+    if(reg.waiting&&navigator.serviceWorker.controller){navigator.serviceWorker.addEventListener("controllerchange",function(){location.reload();},{once:true});reg.waiting.postMessage("skipWaiting");return true;}
     return false;
   };
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
-</script></body></html>
+</script>
+<script src="app.js?v=202610300730"></script>
+</body>
+</html>
