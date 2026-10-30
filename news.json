@@ -1,8 +1,288 @@
 {
- "updatedAt": 1793366087980,
+ "updatedAt": 1793386976072,
  "feedsOk": 7,
  "keepDays": 60,
  "items": [
+  {
+   "title": "Panama-flagged oil tanker targeted in Strait of Hormuz; all Indian seafarers safe, assures govt",
+   "source": "The Indian Awaaz",
+   "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNM2E2bUNrR3U1b2NVMWlYeC1mRXVIZXNiWHZnaEUyTmdqaFNSSGJweE5UM1Q4d3k5SV9uOFQ2STYweE00UDdUcnB4eDBybjZ0YnY0dWkxOXI5aUdnbmJUVGNBT3F0cS1OOVhsUjZXdENyOWhjeUs5dkJZSk84WVNSX0RpQ2VlOE13NmR4TzcxVFcyNTc0VWtIRGtGSkY1X2FkRU1uNm9BS0hEMml2SEQwREhRbmo5dHlLcm1Xd0Fn?oc=5",
+   "ts": 1793385720000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Natalia Margioli takes the helm at the Institute of Chartered Shipbrokers",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/natalia-margioli-takes-the-helm-at-the-institute-of-chartered-shipbrokers/",
+   "ts": 1793383259000,
+   "date": "2026-10-30",
+   "summary": "The Institute of Chartered Shipbrokers (ICS), the professional body for the commercial shipping industry worldwide, has officially welcomed its new senior officers at this year’s Controlling Council meeting…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Open Letter: Request for clarification on the treatment of specific fuels under the IMO Net-Zero Framework",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/open-letter-request-for-clarification-on-the-treatment-of-specific-fuels-under-the-imo-net-zero-framework/",
+   "ts": 1793383257000,
+   "date": "2026-10-30",
+   "summary": "On 27 October 2026, civil society organisations wrote to IMO Secretary-General Arsenio Dominguez. They asked for confirmation that decisions on how specific fuels are treated under the Net-Zero…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "ZIM Launches ZX3 – A New Premium Express Service Connecting Shanghai and Xiamen to Los Angeles",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/zim-launches-zx3-a-new-premium-express-service-%e2%80%a8connecting-shanghai-and-xiamen-to-los-angeles/",
+   "ts": 1793383255000,
+   "date": "2026-10-30",
+   "summary": "ZIM Integrated Shipping Services (NYSE: ZIM) announced today the launch of ZX3, a new premium expedited service connecting Shanghai and Xiamen directly with Los Angeles, further expanding ZIM’s…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "30th October International day of action: ‘Dockworkers don’t work for war’",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/30th-october-international-day-of-action-dockworkers-dont-work-for-war/",
+   "ts": 1793383253000,
+   "date": "2026-10-30",
+   "summary": "On Friday 30 October, dockworkers in 113 ports across 22 countries will take action against war in the largest coordinated port action ever held. More than 25 unions…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Gov. Kemp, Georgia Ports host Gainesville grand opening",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/gov-kemp-georgia-ports-host-gainesville-grand-opening/",
+   "ts": 1793383251000,
+   "date": "2026-10-30",
+   "summary": "Georgia Gov. Brian Kemp joined customers, Hall County dignitaries and Georgia Ports leaders to host the grand opening ceremony of the $134 million Gainesville Inland Port. “Georgia’s ports…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Increased capacity at Arken Intermodal Terminal in the Port of Gothenburg",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/increased-capacity-at-arken-intermodal-terminal-in-the-port-of-gothenburg/",
+   "ts": 1793383249000,
+   "date": "2026-10-30",
+   "summary": "By rebuilding and streamlining the layout of the railway tracks at Arken Intermodal Terminal, new space for cargo handling has been created. The result is a significant increase…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "GDP up by 0.4% in the euro area and by 0.5% in the EU",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/gdp-up-by-0-4-in-the-euro-area-and-by-0-5-in-the-eu/",
+   "ts": 1793383247000,
+   "date": "2026-10-30",
+   "summary": "Overview In the third quarter of 2026, seasonally adjusted GDP increased by 0.4% in the euro area and by 0.5% in the EU, compared with the previous quarter,…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Chicago PMI dips below forecast, signals manufacturing slowdown",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/chicago-pmi-dips-below-forecast-signals-manufacturing-slowdown/",
+   "ts": 1793383245000,
+   "date": "2026-10-30",
+   "summary": "The latest release of the Chicago Purchasing Managers’ Index (PMI) has revealed a decline, pointing to a slowdown in the manufacturing sector within the Chicago region. The Chicago…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Lion Shipbrokers Weekly Market Report, Week 44 2026",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/lion-shipbrokers-weekly-market-report-week-44-2026/",
+   "ts": 1793383241000,
+   "date": "2026-10-30",
+   "summary": "Sale & Purchase: The second-hand market was busy this week, with fifteen vessels reported sold or committed for further trading, nine dry Source: Lion Shipbrokers Limited",
+   "topic": "Markets & Trade",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "'Global South bears burden': At G20 meet, Jaishankar flags attacks on ships & Indian seafarers in Hormuz",
+   "source": "The Times of India",
+   "url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxQM0E2OUxZNUtneDZNV3A3dV93RUhhMW05M3JMMVpHeFpsTVlzNzNJdldBNk05V3hadUNrNUVXajJIdGpDaTBldWZLS0JzN2oxZGVnODFPVmlDM0FRM2w2NkZTYld2OTRPeFRjRWR5UEJNc0VxRWhuazNaQTlXTFhPWXZBZktUeEltX2pBX0p4SUhHdE1pVmp3ZnFkMi15VWQtU1hfem5ndEtUT1ZaZXhlWlB2M1kySUJLMERTdE95bFJERlVMUmtYY2U3aHhielhiNUh0NXdTaGRpYncyNDBLX2tuREd2bkl0WjZlejlfRW9OeDYyWVhXQy1n0gH_AUFVX3lxTE9SaFcwenU3VFJSY3V6bnRVdTFra0VHQXItZXdpZEhMQVNibUVxYUhPT1lJb2hzeHJLcHhXT0tXU0l5RW55cHp3VDdPN2NCSjFSQnRVam1uOXBTX3ktMEowSXpXQldBUHp2MGlwTDlFRll2aTl1a013UjZBUzU4cFlRblk4QmlJb1JUd0pqNFdYSENRRUlyZmtwUXFKN3plN2lBcGhKOERwU3l6dXd2aTBfZUg4alN5eFFpcWlPNnFRanNMNlZuSUZvVEQ4OENHUW9Ed1Z3NEhfWjA2MnpNZllLZG9KUjRLOU0tTVA1bVZ4eUowM0ZNb1AtZEw5UllNMA?oc=5",
+   "ts": 1793383080000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Designed to cripple, not sink: How limpet mines hit tanker with 27 Indians",
+   "source": "The Times of India",
+   "url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxNcVZqQnU3QlNJbDhVZnJCQlVSYUFmM1pWZWxNc2tNOHNPeVF0ZGpoTmFHOTBhU3EwV2pxUWJ3ZllYdDJBb2YzWDl6OGh4RVNUZTY0cFNBSThBd1VGSmtGNFgzZk5Ha3N3Z0FOOG5KUWp2QWxONE9rSmNibkJqeGxFSkVZei1MdERYQm1henc1XzZJeG4wYTlpa3RpLVJVSVJHazlNb3VON2dqb3FfMkFDbTd5bldxb3FnVWI1Q090UkpsTEZzc3dfVWlROTdNUVkzcnRkdE9oTGR3QnFGRjR4TTQ0bklSbUxXWjBBTNIB8gFBVV95cUxQbXFOdnQ1QUw1Q1o5bElsR0ZPbk9PMXdsQkY5TWlncW02OTRPVjFtZl9SWVpzRkNpS0o3aVAyam1HWUtsdTRqM1RsOFIwVi1teDBILWFJRjYtdm9PbTF5eE9WWlNCWGE5bEYxT3dvcEZJY0dSeFYxWXBoMFdDam90RnVRTVFzalZlc0dFSjFzV3RfU0g3bmNkMkUtYXhQNGc1b09JOHhOOVRZaUdpTEFkSHB6M2ZsSDBpVFNfYzhsWVY5eTlFZ1FHZ1RlSlozNlgxUTIzUk90cm1vRUxvMk94M01jTFFELWF6SnVYYU5Tbnltdw?oc=5",
+   "ts": 1793382960000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "How MARAD Cut Years Off Deepwater Port Reviews Without Changing Environmental Standards",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/how-marad-cut-years-off-deepwater-port-reviews-without-changing-environmental-standards/",
+   "ts": 1793381810000,
+   "date": "2026-10-30",
+   "summary": "As gCaptain reported earlier this week, the Maritime Administration (MARAD) announced its approval of the $8.2 billion Texas ST LNG export port application, a major development for U.S.…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Tanker carrying 27 Indians hit by limpet mines in Strait of Hormuz",
+   "source": "The New Indian Express",
+   "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOYWpTXzBOdUVfcW14OFlNMzV1VXhfVDFhMUR3U0h3SFNfNVpFV01vY0lfY0ozUzYxTmRxUnk3WFZnMGxaXzFOS2JPb0Fta3poZkg1SlNEOTU5NnZQdGQ2M045TWpTeFI5clhhdWoxbWlheHVwQmE2MnB2R1pVWnlfY2tRM1NnZjZSbE1hdkdwblU5ZUp0bV9pcFMyRUdfSUw0T0tlSW1CUWdMcG9DQTJXZmVNVnRhVzNo0gHGAUFVX3lxTE9Tdk9SYVlBdk50XzNoaVNsOE9Qb3VSLUE0Vkp3aVNKd1BhZWM3dS00R1lLZ3hRTjlzdTM2dmdGWGZPTW1wRDJ0eUViZGVhWmtwOFh5dll0bmYySDRoUVZkVTQ2UzNRSkdVNTV6Zy1tQ3lrcVlYbDI0UG9ZWFVyTzliUHcxdGZ2aWZVeVZtajc3T2swazVpck9mUi1fWGJScjRBa2I5anJ2YzVyREt4RFRKaDBqaFNQMzBoa3l5NklYLWhOZlNLQQ?oc=5",
+   "ts": 1793381237000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Hanwha Philly Shipyard Wins $269 Million U.S. Navy Landing Ship Contract",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/hanwha-philly-shipyard-wins-269-million-u-s-navy-landing-ship-contract/",
+   "ts": 1793378818000,
+   "date": "2026-10-30",
+   "summary": "Hanwha Philly Shipyard has secured a $269 million contract to build a Medium Landing Ship (LSM) for the U.S. Navy and Marine Corps, marking a major milestone in…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Grimaldi Warns U.S. Port Fees Could Force Ships Out of American Trades",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/grimaldi-warns-u-s-port-fees-could-force-ships-out-of-american-trades/",
+   "ts": 1793377097000,
+   "date": "2026-10-30",
+   "summary": "Italian shipping giant Grimaldi Group is warning that reinstating U.S. port fees on foreign-built vehicle carriers could force it to redeploy vessels away from American trades, potentially disrupting…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "How Marine Engineers Can Build Machinery Knowledge Before Joining a Vessel",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/how-marine-engineers-can-build-machinery-knowledge-before-joining-a-vessel/?utm_source=rss&utm_medium=rss&utm_campaign=how-marine-engineers-can-build-machinery-knowledge-before-joining-a-vessel",
+   "ts": 1793376638000,
+   "date": "2026-10-30",
+   "summary": "A marine engineer may study fuel purifiers in theory before ever seeing one in an engine room. But understanding the principle of centrifugal separation is only part of…",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Tanker with 27 Indians aboard hit by limpet mines in first such Hormuz attack",
+   "source": "India Today",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPem5XbzhkZzZGZ2dwck9YMHZZeHZNZmxwcWpwcXJXa2drbFgwQnhzVDBYcVRJMHNoN0p4TXY3ZzlFTGNSZTFIRjh6Yy1KSmlsazhOX2U1cUVtTHJUdmY3NVRrR25JQ0M0a2U0VGQ3eXp1d0JySzNhQS1PeWpUZnBkMGlJcDZoZ0FSZXV0OHJxOU5HQTl6TnlGY3Z3VnlfX19vQnBQWjBweC1rZzRYXzNxSEQ4WdIBuAFBVV95cUxPYnNmemg1RW9BWXVBbWxwcm1acTVQOUwyWUxoWWJITkFNMzBHX0gwcjVwWURZXzZCTmlfTkZSVFBBazFjYmpBbW1KZWRpTHUzNkVhc1JNeEdpcmVYYm8wajNvRHZORFdFcHNkZkpNdFhjOTB1bE1nd2t3VTNBQ0JLN3NvSlhKSTVMaTdlVnFfX3MwYTNtc2JobjhRUXBiTGlpcGoyY3pPVlhlNUJKamJwVklBOVRHc1NZ?oc=5",
+   "ts": 1793376378000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Anti-War Protests Spread Across Global Ports as Dockworkers Target Arms Trade",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/anti-war-protests-spread-across-global-ports-as-dockworkers-target-arms-trade/",
+   "ts": 1793376178000,
+   "date": "2026-10-30",
+   "summary": "Dockworkers across 113 ports in 22 countries staged coordinated strikes and protests Friday, disrupting cargo operations and ferry services as part of a global campaign opposing arms shipments…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Tanker Hit by Limpet Mines in Strait of Hormuz as New Threat to Shipping Emerges",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/tanker-hit-by-limpet-mines-in-strait-of-hormuz-as-new-threat-to-shipping-emerges/",
+   "ts": 1793373414000,
+   "date": "2026-10-30",
+   "summary": "A tanker transiting the Strait of Hormuz was attacked by a small boat that attached two explosive devices to its hull, triggering an engine room fire and temporarily…",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "South Korean Navy Training Ship Makes First-Ever Port Call At U.S. Naval Air Station In Florida",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/south-korean-navy-training-ship-makes-first-ever-port-call-at-u-s-naval-air-station-in-florida/?utm_source=rss&utm_medium=rss&utm_campaign=south-korean-navy-training-ship-makes-first-ever-port-call-at-u-s-naval-air-station-in-florida",
+   "ts": 1793367879000,
+   "date": "2026-10-30",
+   "summary": "South Korean Navy training ship ROKS Hansando makes its first-ever port call at Pensacola, bringing nearly 400 personnel for a four-month international training deployment.",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Indian Navy Set To Receive 8 Advanced Corvettes Under Mega ₹40,000 Crore Deal",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/indian-navy-set-to-receive-8-advanced-corvettes-under-mega-%e2%82%b940000-crore-deal/?utm_source=rss&utm_medium=rss&utm_campaign=indian-navy-set-to-receive-8-advanced-corvettes-under-mega-%25e2%2582%25b940000-crore-deal",
+   "ts": 1793367677000,
+   "date": "2026-10-30",
+   "summary": "The Cabinet Committee on Security (CCS) has approved a clearance worth over ₹40,000 crore to build warships for the Indian Navy.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Iran Claims Capture Of Intact U.S Drone In Strait of Hormuz During Electronic Warfare Mission",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/iran-claims-capture-of-intact-u-s-drone-in-strait-of-hormuz-during-electronic-warfare-mission/?utm_source=rss&utm_medium=rss&utm_campaign=iran-claims-capture-of-intact-u-s-drone-in-strait-of-hormuz-during-electronic-warfare-mission",
+   "ts": 1793367541000,
+   "date": "2026-10-30",
+   "summary": "Iran’s IRGC Navy claims to have captured a US MQM-170 drone intact near the Strait of Hormuz, while US Central Command has denied the report.",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "6 Indian Seafarers Stranded At Pakistan’s Karachi Port For More Than 6 Months",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/6-indian-seafarers-stranded-at-pakistans-karachi-port-for-more-than-6-months/?utm_source=rss&utm_medium=rss&utm_campaign=6-indian-seafarers-stranded-at-pakistans-karachi-port-for-more-than-6-months",
+   "ts": 1793367463000,
+   "date": "2026-10-30",
+   "summary": "Six Indian seafarers stranded at Karachi port for over six months leave families worried as they await government intervention for their safe return.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "U.S. Navy Awards $23.13 Million Contract To Strengthen Warship Cybersecurity",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/u-s-navy-awards-23-13-million-contract-to-strengthen-warship-cybersecurity/?utm_source=rss&utm_medium=rss&utm_campaign=u-s-navy-awards-23-13-million-contract-to-strengthen-warship-cybersecurity",
+   "ts": 1793366893000,
+   "date": "2026-10-30",
+   "summary": "The US Navy has awarded a $23.13 million contract to develop ways to protect warship electrical systems from cyberattacks.",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "U.S. Navy Records Highest Number Of Serious Mishaps In A Decade In FY2026",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/u-s-navy-records-highest-number-of-serious-mishaps-in-a-decade-in-fy2026/?utm_source=rss&utm_medium=rss&utm_campaign=u-s-navy-records-highest-number-of-serious-mishaps-in-a-decade-in-fy2026",
+   "ts": 1793366443000,
+   "date": "2026-10-30",
+   "summary": "The US Navy recorded 27 serious aviation and ship-related mishaps in Fiscal Year 2026, its highest combined total in at least a decade.",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Norway Detains Sanctioned Chinese Heavy-Lift Ship Linked To Russia’s Arctic LNG 2 Project",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/norway-detains-sanctioned-chinese-heavy-lift-ship-linked-to-russias-arctic-lng-2-project/?utm_source=rss&utm_medium=rss&utm_campaign=norway-detains-sanctioned-chinese-heavy-lift-ship-linked-to-russias-arctic-lng-2-project",
+   "ts": 1793365814000,
+   "date": "2026-10-30",
+   "summary": "The vessel was inspected on October 13 after seeking shelter from bad weather in Andfjorden, off Norway’s Vesterålen Islands.",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Ship Ablaze Off Oman As Iran Increases Ship Attacks, UKMTO Reports",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/ship-ablaze-off-oman-as-iran-increases-ship-attacks-ukmto-reports/?utm_source=rss&utm_medium=rss&utm_campaign=ship-ablaze-off-oman-as-iran-increases-ship-attacks-ukmto-reports",
+   "ts": 1793365357000,
+   "date": "2026-10-30",
+   "summary": "A commercial vessel was spotted on fire in the Strait of Hormuz on Thursday, the British maritime surveillance agency UKMTO reported.",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
+  },
   {
    "title": "Baltic Dry Index climbs to 2714 up 2 points",
    "source": "Hellenic Shipping News",
@@ -12,6 +292,36 @@
    "summary": "Today, Friday, October 30 2026, the Baltic Dry Index climbed 2 points, 2714 points. Baltic Dry Index is compiled by the London-based Baltic Exchange and covers prices for…",
    "topic": "General",
    "addedAt": 1793366087980
+  },
+  {
+   "title": "Indian Coast Guard Rescues 13 Seafarers After Bulk Carrier Suffers Engine Failure In Powerful Cyclone",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/indian-coast-guard-rescues-13-seafarers-after-bulk-carrier-suffers-engine-failure-in-powerful-cyclone/?utm_source=rss&utm_medium=rss&utm_campaign=indian-coast-guard-rescues-13-seafarers-after-bulk-carrier-suffers-engine-failure-in-powerful-cyclone",
+   "ts": 1793365164000,
+   "date": "2026-10-30",
+   "summary": "The Indian Coast Guard evacuated 20 crew members stranded on the Marshall Islands-flagged bulk carrier MV Sigma Pearl off the coast of Andhra Pradesh.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "Greek Ship En Route From Israel To Romania With 421 Containers Sinks After Drone Attack",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/greek-ship-en-route-from-israel-to-romania-with-421-containers-sinks-after-drone-attack/?utm_source=rss&utm_medium=rss&utm_campaign=greek-ship-en-route-from-israel-to-romania-with-421-containers-sinks-after-drone-attack",
+   "ts": 1793364941000,
+   "date": "2026-10-30",
+   "summary": "A Greek Container Ship became the latest target of a drone attack in the western Black Sea, raising concerns about the spillover of the Russia-Ukraine War across the…",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "European Shipowners Call For Inclusion Of Indian Ship Recycling Facilities Under EU Rules",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/european-shipowners-call-for-inclusion-of-indian-ship-recycling-facilities-under-eu-rules/?utm_source=rss&utm_medium=rss&utm_campaign=european-shipowners-call-for-inclusion-of-indian-ship-recycling-facilities-under-eu-rules",
+   "ts": 1793364693000,
+   "date": "2026-10-30",
+   "summary": "ECSA has urged European Parliament members to approve inclusion of two Indian ship recycling facilities on the European List of Ship Recycling Facilities.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793386976072
   },
   {
    "title": "Whistleblowers Claimed Key Oil Tanker Rate Was Manipulated",
@@ -284,6 +594,16 @@
    "addedAt": 1793366087980
   },
   {
+   "title": "Discovery of S.S. Cornwallis a reminder of great risks faced by merchant mariners, national organization says",
+   "source": "PNI Atlantic News",
+   "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxObTRYbnN5c3V1OVRrQndmb3VYaDRCbW9QSVZPMElrU2UxR19Tbm9mdEljZWNSdmUwdWFFanZsTWRRV2cyRFNzYzhLUENKZ2l5STZCUEY4WTFyZjFSYlYxXzNfVUNlNnBuVGZzb3EydWxHWk9hNlA0TklsOFF2ZTR1bldSSGFsaUluUUt1c0ZycVRoYUxUY1pLN2tmX2ZqT1JhXzF3SDR1M2JDSTdoZDFJcjJWY2s1NGtQbEJfaWJUX0s?oc=5",
+   "ts": 1793354860000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "General",
+   "addedAt": 1793386976072
+  },
+  {
    "title": "Evalend drops newcastlemax option at Dajin Heavy",
    "source": "Splash247",
    "url": "https://splash247.com/evalend-drops-newcastlemax-option-at-dajin-heavy/",
@@ -412,6 +732,26 @@
    "summary": "",
    "topic": "India & Seafarers",
    "addedAt": 1793366087980
+  },
+  {
+   "title": "Tanker Attacked by Small Boat Off the Coast of Oman: UKMTO",
+   "source": "Ship & Bunker",
+   "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPdkpQQTJOZGhTWFlnZ1RzN0lSODZZMk1XRWVxSE85Ti1qSXYtakptLXR5UlU0QWVxTkpXRVpIN3prbUdOTHpEaGRBemJaZ0psLVJWdWdtbXRZSVhlNzJ6RW5JbTN1UEZGUzRoQ3BCOGxIM05ZUFJOZGZweUpSZGVBSzdrdkNkbkVScUtJenVISkFsSmJTaFJvSzlCRzdxSHpQX3c?oc=5",
+   "ts": 1793336096000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
+  },
+  {
+   "title": "UN agency says it pauses Hormuz ship evacuation initiative after vessel attacked",
+   "source": "ET Infra",
+   "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxPeUVBdDlmd3d3TVgtdjZRdVRiOGsxVm05TlpSUnJJUmNUdmFUWUNSRll6QV82Y2Vtd3NaRm5ZSThhTjdCMU1iVHhYVmJWM0NwMVM4LXBLQkE3UzZwVGdQcHRJRVUxSk9GZlN4cV9jaWJSSWNXZDNOUjMxYWVOUkhEMlFOZUlhZExyaGk1aGJkeEc1ZS1YaVlFLUd2U3pxZGhmdnd0N0IxMFlXLTBWNTZHRWUxNWR5Uk5sMVc1eVdTSlRrY2hxb21qUkFaZWZkU2xCckZVc0lUX0MxQlUtRVd3Z2g2SC16STFZU0NoaTNzenh5UdIB7AFBVV95cUxQY1dFdDZHbVhqNmc2Z2p3M3JwTkhXT0dlaDRQYmxJSjdKZFRETzdWWFdJajFRb0UxWEltU1UzRmpYVHdjTHBTNE1iMlVjQzktalZPdXdKZk9pSE1GTEhBWGJVTklTVEtTd05QUktUcDJkbUJiLUpOSDR0U1J1SEw0VlFJazVXQ3dBX25lTFMwWkM3Mm9MbWNjYkc5TEd5YmdONVU2d0J3NEEtSmtwOFA4TUVIV3lWSUhmbzgwQmtLSGpQUFIzd2w4aldMRXlibEtWUHB3bko2ckF6bk00RnVaWEpkcE5HSjg5Q0xVcg?oc=5",
+   "ts": 1793333585000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
   },
   {
    "title": "Tanker catches fire in Hormuz after explosives attached to hull",
@@ -584,6 +924,16 @@
    "addedAt": 1793347693032
   },
   {
+   "title": "What are the Risks of an LNG Tanker Explosion?",
+   "source": "EnergyNow.com",
+   "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxPTmVfdU5scWVPY0ZEM0FMT2Fpd01KWFBhcHE1RlJoVHl3YVlBZ1NjRklZTGhUdEdLWkw5NHo3Yl9qOGpEMTRvOXpZTzlYQjhaMzAwM0RDcDE3dG9pNzVxLWJGaC1XRnF1VnludmpDcWhYbi1SaDFmb1RLNTVsYVhXSXNB?oc=5",
+   "ts": 1793311247000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
+  },
+  {
    "title": "Ballast Water: BIMCO seeks clearer guidance for ships facing challenging water quality",
    "source": "Hellenic Shipping News",
    "url": "https://www.hellenicshippingnews.com/ballast-water-bimco-seeks-clearer-guidance-for-ships-facing-challenging-water-quality/",
@@ -682,6 +1032,16 @@
    "summary": "",
    "topic": "Safety & Security",
    "addedAt": 1793347693032
+  },
+  {
+   "title": "Oil Tanker Rates Hit Record Highs Following Iran, US Shipping Attacks",
+   "source": "EnergyNow.com",
+   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNT201NUtENmNmeVh1X1lYa01nWDR5TjZzd2t1ZGQwRVRlZ0RPamdVdDBydlp6U2pVX0FBOVRfQUd2aXdtUFB3eVVFUVFyMjhXTy02blNRVDdkRERoTk96RVNEZWNhZTBnNHFSTkhLWjZoZlhKOTlZWERLXzVyNFpoVG5tZ3pTT3BwY2V2c2tKNnlSeVpGdy1SRE9VQkI2Nmlm?oc=5",
+   "ts": 1793311125000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
   },
   {
    "title": "More Than 100 Lawmakers Push to Include SHIPS for America Act in Defense Bill",
@@ -962,6 +1322,16 @@
    "summary": "The Coast Guard deployed a helicopter and vessels to reach the ship. Its Offshore Patrol Vessel was also sent towards the stranded carrier.",
    "topic": "India & Seafarers",
    "addedAt": 1793347693032
+  },
+  {
+   "title": "Russia's diesel cargo changed its destination to 'Atlantic coast', shipping data shows",
+   "source": "Reuters",
+   "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxOOF9uX1pKTjE5UkFYZ3JmaXEyRXZleG5zTWZSM1c5R29GcWNBazgzZU12TWZMUTJxaE9wY0Uxc0pzbnRubDZBSThGVTJja0VzeUFEMWY4VXdMVk5aVncxT1lTRm9XOVlnZDh1ZFpBMTRmUUZiTTZESHJHOUxwUkUwMFBVeEVodzNqcHRSd29EMVcwVGkzUWdreTNva1lLQmkyTEdvZlVDaFhZaVFraWExQS1ZemRqaFB0QnY5bml0c19HTEk1VHBEd3ZIOA?oc=5",
+   "ts": 1793278106000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "General",
+   "addedAt": 1793386976072
   },
   {
    "title": "New Alliance To Deliver First Integrated Cyber Defense & Insurance Model For Cargo Ships",
@@ -1552,6 +1922,16 @@
    "summary": "",
    "topic": "India & Seafarers",
    "addedAt": 1793366087980
+  },
+  {
+   "title": "Strait of Hormuz crisis: Nearly 500 vessels delayed amid new tanker attack and rising maritime threats",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOS1QwN2hrTUszZUY4XzJkQk16NGkzSW1tUXdDcXg1aHhvNUh2RHJhTi1peDRvX2s5Qmdnb1dqRWg5SGxoOHUwaUlfSG1WN1pXNWJSSWQ4Wkk3dGRHYVIyYU5ENld5T1BxSC03Q1NMRG9OV0xWZjNtUDZuc0tKc182UVFRQzFweEp2LUl3clB3WUo3VWtuNGt3YnlIT0tEdkRXX1JZVGYtVllacXgtMTVVNTgxRWs5Q3FrLWRzLUdjMER4UUU?oc=5",
+   "ts": 1792945361000,
+   "date": "2026-10-25",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793386976072
   },
   {
    "title": "Kerala Maritime Board’s Vizhinjam port handles first crew change since pandemic",
