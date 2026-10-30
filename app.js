@@ -519,11 +519,19 @@ async function readFeed(f){
     return {title,source,url:String(i.link||"").trim(),ts,date:d?d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()):"",summary:f.gn?"":words(plain(i.desc).replace(/The post .*? appeared first on .*$/i,"").trim(),28),topic:topicOf(title+" "+(f.gn?"":plain(i.desc)))};
   }).filter(n=>n.title&&/^https:\/\//i.test(n.url));
 }
+async function readNewsFile(){
+  /* built every few hours by a free GitHub job from the same feeds; read only when Sync is pressed */
+  for(const u of ["https://raw.githubusercontent.com/bluewavealgo/sdl-7k4q2/main/news.json","news.json"]){
+    try{const r=await timed(u+"?ts="+Date.now(),10000);if(!r.ok)continue;const j=await r.json();if(j&&Array.isArray(j.items)&&j.items.length)return j.items;}catch(e){}
+  }
+  return [];
+}
 async function fetchNews(){
-  const res=await Promise.allSettled(FEEDS.map(readFeed)),fresh=[].concat(...res.filter(r=>r.status==="fulfilled").map(r=>r.value));
+  let fresh=await readNewsFile(),res=[];
+  if(!fresh.length){res=await Promise.allSettled(FEEDS.map(readFeed));fresh=[].concat(...res.filter(r=>r.status==="fulfilled").map(r=>r.value));}
   if(!fresh.length)throw new Error("news");
   const key=n=>n.title.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,70),now=Date.now(),have=new Map((NEWS.items||[]).map(n=>[key(n),n])),urls=new Set((NEWS.items||[]).map(n=>n.url));
-  fresh.forEach(n=>{const k=key(n);if(!have.has(k)&&!urls.has(n.url)){n.addedAt=now;have.set(k,n);urls.add(n.url);}});
+  fresh.forEach(n=>{if(!n||!n.title||!/^https:\/\//i.test(String(n.url||"")))return;const k=key(n);if(!have.has(k)&&!urls.has(n.url)){n=Object.assign({},n,{addedAt:now});have.set(k,n);urls.add(n.url);}});
   const cutoff=now-14*DAY;
   NEWS={updatedAt:now,items:[...have.values()].filter(n=>(+n.ts||Date.parse(n.date)||now)>=cutoff).sort((a,b)=>(+b.ts||0)-(+a.ts||0)).slice(0,80),failed:res.filter(r=>r.status==="rejected").length};
   lsSet("sdlNews",JSON.stringify(NEWS));

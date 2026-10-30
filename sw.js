@@ -1,5 +1,5 @@
-const V="sdl-202610300756";
-const CORE=["./","index.html","app.css?v=202610300756","app.js?v=202610300756","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png",
+const V="sdl-202610300808";
+const CORE=["./","index.html","app.css?v=202610300808","app.js?v=202610300808","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png",
  "vendor/firebase-app-compat.js","vendor/firebase-auth-compat.js","vendor/firebase-firestore-compat.js","vendor/pdf.min.js","vendor/pdf.worker.min.js"];
 /* a new version installs quietly and waits; it is applied only when the user presses Sync */
 self.addEventListener("install",e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE.map(u=>new Request(u,{cache:"reload"})))));});
