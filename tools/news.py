@@ -62,7 +62,7 @@ def read(name, url, gn):
         out.append({"title": title, "source": src, "url": link, "ts": ts,
                     "date": time.strftime("%Y-%m-%d", time.gmtime(ts / 1000)) if ts else "",
                     "summary": words(desc), "topic": topic(title + " " + desc)})
-    return out[:25]
+    return out[:30]
 
 def key(n):
     return re.sub(r"[^a-z0-9]", "", n["title"].lower())[:70]
@@ -90,11 +90,19 @@ for name, url, gn in FEEDS:
             n["addedAt"] = now
             have[k] = n
             urls.add(n["url"])
-cutoff = now - 14 * 86400000
+KEEP_DAYS, KEEP_MAX, RECENT_DAYS = 60, 300, 3
+cutoff = now - KEEP_DAYS * 86400000
 items = [n for n in have.values() if (n.get("ts") or now) >= cutoff]
+for n in items:
+    n.setdefault("addedAt", now)
 items.sort(key=lambda n: n.get("ts") or 0, reverse=True)
-items = items[:80]
+items = items[:KEEP_MAX]
 if ok == 0:
     raise SystemExit("all feeds failed")
-json.dump({"updatedAt": now, "feedsOk": ok, "items": items}, open(path, "w"), indent=1, ensure_ascii=False)
+json.dump({"updatedAt": now, "feedsOk": ok, "keepDays": KEEP_DAYS, "items": items}, open(path, "w"), indent=1, ensure_ascii=False)
+# small file with only the headlines added in the last few days, so a regular Sync downloads very little
+recent = [n for n in items if n.get("addedAt", 0) >= now - RECENT_DAYS * 86400000]
+json.dump({"updatedAt": now, "recentDays": RECENT_DAYS, "items": recent},
+          open(os.path.join(os.path.dirname(__file__), "..", "news-recent.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+print(f"news-recent.json: {len(recent)} items")
 print(f"news.json: {len(items)} items from {ok} feeds")

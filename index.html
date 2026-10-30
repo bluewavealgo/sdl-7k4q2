@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202610300830">
+<link rel="stylesheet" href="app.css?v=202610300929">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body>
@@ -183,7 +183,7 @@
     <section class="view" id="v-news" data-title="Maritime news" hidden>
       <div class="vhead"><div><h1>Maritime news</h1><p class="muted">Headlines from Marine Insight, gCaptain, Splash247, SAFETY4SEA and Google News. Nothing loads by itself; press <b>Sync</b> when you want the latest.</p><p class="small muted" id="newsUpdated" style="margin-top:4px"></p></div></div>
       <div class="card card-b"><div class="filters">
-        <div class="f" style="flex:0 0 auto"><span>Show</span><button type="button" id="newsOnlyNew" aria-pressed="false" class="btn-sm" style="border-radius:999px">New since last visit</button></div>
+        <div class="f" style="flex:0 0 auto"><span>Show</span><div class="chips" id="newsShow" role="group" aria-label="Show"><button type="button" data-show="all" aria-pressed="true">All</button><button type="button" data-show="new" aria-pressed="false">New since last visit</button><button type="button" data-show="saved" aria-pressed="false">★ Saved<span id="savedCount"></span></button></div></div>
         <label class="f wide"><span>Search headlines</span><input id="newsSearch" placeholder="e.g. tanker, DG Shipping" autocomplete="off"></label>
         <div class="f wide" style="flex-basis:100%"><span>Topic</span><div class="chips" id="newsTopics" role="group" aria-label="Topic"></div></div>
       </div></div>
@@ -243,6 +243,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202610300830"></script>
+<script src="app.js?v=202610300929"></script>
 </body>
 </html>

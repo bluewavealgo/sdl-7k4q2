@@ -417,23 +417,34 @@ function renderNotices(){
 $("nFilter").addEventListener("click",e=>{const b=e.target.closest("[data-l]");if(!b)return;nLevel=b.dataset.l;$("nFilter").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderNotices();});
 
 /* ---------- news ---------- */
-let NEWS=lsJSON("sdlNews",{items:[]}),newsTopic="All",newsOnlyNew=false,newsPrevSeen=+(lsGet("sdlNewsSeen")||0);
+let NEWS=lsJSON("sdlNews",{items:[]}),newsTopic="All",newsShow="all",newsPrevSeen=+(lsGet("sdlNewsSeen")||0);
+let SAVED=lsJSON("sdlNewsSaved",{}); /* starred headlines, kept on this device even after they leave the 60-day window */
+const newsKey=n=>String(n.title||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,70);
 function newsNewCount(){const seen=+(lsGet("sdlNewsSeen")||0);return (NEWS.items||[]).filter(n=>(+n.addedAt||0)>seen).length;}
 function renderNewsBadge(){const n=newsNewCount();$("newsBadge").hidden=!n;$("newsBadge").textContent=n;}
 function relDate(s){const n=dn(s);if(n==null)return "";const d=TODAY-n;return d<=0?"Today":d===1?"Yesterday":d<7?d+" days ago":fmt(n);}
 function renderNews(){
   renderNewsBadge();
   $("newsTopics").innerHTML=TOPICS.map(t=>`<button type="button" aria-pressed="${t===newsTopic}" data-topic="${esc(t)}">${esc(t)}</button>`).join("");
-  $("newsOnlyNew").setAttribute("aria-pressed",String(newsOnlyNew));
-  $("newsUpdated").textContent=NEWS.updatedAt?`Last updated ${when(NEWS.updatedAt)}. New headlines arrive only when you press Sync.`:"Press Sync while online to load the latest headlines.";
+  const nSaved=Object.keys(SAVED).length;
+  $("newsShow").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.show===newsShow)));
+  $("savedCount").textContent=nSaved?` (${nSaved})`:"";
+  $("newsUpdated").textContent=NEWS.updatedAt?`Last updated ${when(NEWS.updatedAt)} · keeps the last 60 days (up to 300 headlines). New headlines arrive only when you press Sync.`:"Press Sync while online to load the latest headlines.";
   const q=$("newsSearch").value.trim().toLowerCase(),seen=newsPrevSeen;
-  const items=(NEWS.items||[]).filter(n=>(newsTopic==="All"||n.topic===newsTopic)&&(!newsOnlyNew||(+n.addedAt||0)>seen)&&(!q||(String(n.title)+" "+String(n.summary||"")+" "+String(n.source||"")).toLowerCase().includes(q))).sort((a,b)=>(+b.ts||0)-(+a.ts||0)||String(b.date).localeCompare(String(a.date)));
-  if(!items.length){$("newsList").innerHTML=`<div class="empty">${(NEWS.items||[]).length?(newsOnlyNew?"No new headlines since you last looked.":"No headlines match this topic or search."):"No headlines yet. Press Sync while online."}</div>`;return;}
-  $("newsList").innerHTML=items.map(n=>{const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^https:\/\//i.test(String(n.url||""))?n.url:"#",isNew=(+n.addedAt||0)>seen;
-    return `<a class="news" href="${esc(safe)}" target="_blank" rel="noopener noreferrer"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><div><div class="hl">${isNew?'<span class="newtag">NEW</span> ':""}${esc(n.title)}</div>${n.summary?`<div class="gist">${esc(n.summary)}</div>`:""}<div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||"var(--cx)"}">${esc(n.topic||"General")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span></div></div></a>`;}).join("");
+  const pool=newsShow==="saved"?Object.values(SAVED):(NEWS.items||[]);
+  const items=pool.filter(n=>(newsTopic==="All"||n.topic===newsTopic)&&(newsShow!=="new"||(+n.addedAt||0)>seen)&&(!q||(String(n.title)+" "+String(n.summary||"")+" "+String(n.source||"")).toLowerCase().includes(q))).sort((a,b)=>(+b.ts||0)-(+a.ts||0)||String(b.date).localeCompare(String(a.date)));
+  if(!items.length){$("newsList").innerHTML=`<div class="empty">${newsShow==="saved"?(nSaved?"No saved headlines match this topic or search.":"Nothing saved yet. Tap ☆ on a headline to keep it on this device."):(NEWS.items||[]).length?(newsShow==="new"?"No new headlines since you last looked.":"No headlines match this topic or search."):"No headlines yet. Press Sync while online."}</div>`;return;}
+  $("newsList").innerHTML=items.map(n=>{const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^https:\/\//i.test(String(n.url||""))?n.url:"#",isNew=newsShow!=="saved"&&(+n.addedAt||0)>seen,k=newsKey(n),st=!!SAVED[k];
+    return `<div class="news"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><a class="nlink" href="${esc(safe)}" target="_blank" rel="noopener noreferrer"><div class="hl">${isNew?'<span class="newtag">NEW</span> ':""}${esc(n.title)}</div>${n.summary?`<div class="gist">${esc(n.summary)}</div>`:""}<div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||"var(--cx)"}">${esc(n.topic||"General")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span><span class="opens">Opens the full article online ↗</span></div></a><button type="button" class="star" data-star="${esc(k)}" aria-pressed="${st}" aria-label="${st?"Remove from saved":"Save for later"}" title="${st?"Remove from saved":"Save for later"}">${st?"★":"☆"}</button></div>`;}).join("");
 }
+function toggleSave(k){
+  if(SAVED[k]){delete SAVED[k];toast("Removed from saved");}
+  else{const n=(NEWS.items||[]).find(x=>newsKey(x)===k);if(!n)return;SAVED[k]=Object.assign({},n,{savedAt:Date.now()});toast("Saved on this device");}
+  lsSet("sdlNewsSaved",JSON.stringify(SAVED));renderNews();
+}
+$("newsList").addEventListener("click",e=>{const b=e.target.closest("[data-star]");if(!b)return;e.preventDefault();toggleSave(b.dataset.star);});
 $("newsTopics").addEventListener("click",e=>{const b=e.target.closest("[data-topic]");if(!b)return;newsTopic=b.dataset.topic;renderNews();});
-$("newsOnlyNew").addEventListener("click",()=>{newsOnlyNew=!newsOnlyNew;renderNews();});
+$("newsShow").addEventListener("click",e=>{const b=e.target.closest("[data-show]");if(!b)return;newsShow=b.dataset.show;renderNews();});
 $("newsSearch").addEventListener("input",renderNews);
 
 /* ======================= Firebase (loaded only when needed, online) ======================= */
@@ -521,21 +532,32 @@ async function readFeed(f){
     return {title,source,url:String(i.link||"").trim(),ts,date:d?d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()):"",summary:f.gn?"":words(plain(i.desc).replace(/The post .*? appeared first on .*$/i,"").trim(),28),topic:topicOf(title+" "+(f.gn?"":plain(i.desc)))};
   }).filter(n=>n.title&&/^https:\/\//i.test(n.url));
 }
-async function readNewsFile(){
-  /* built every few hours by a free GitHub job from the same feeds; read only when Sync is pressed */
-  for(const u of ["https://raw.githubusercontent.com/bluewavealgo/sdl-7k4q2/main/news.json","news.json"]){
-    try{const r=await timed(u+"?ts="+Date.now(),10000);if(!r.ok)continue;const j=await r.json();if(j&&Array.isArray(j.items)&&j.items.length)return j.items;}catch(e){}
+/* built every few hours by a free GitHub job; read only when Sync is pressed.
+   If this device synced news in the last 2.5 days, only the small "recent" file (headlines added in the last 3 days) is downloaded. */
+async function getJSON(name){
+  for(const u of ["https://raw.githubusercontent.com/bluewavealgo/sdl-7k4q2/main/"+name,name]){
+    try{const r=await timed(u+"?ts="+Date.now(),10000);if(!r.ok)continue;const j=await r.json();if(j&&Array.isArray(j.items))return j;}catch(e){}
   }
-  return [];
+  return null;
+}
+async function readNewsFile(){
+  const last=+(lsGet("sdlNewsServerAt")||0),haveSome=(NEWS.items||[]).length>0;
+  let j=null;
+  if(haveSome&&last&&Date.now()-last<2.5*DAY)j=await getJSON("news-recent.json");
+  if(!j||(!j.items.length&&!haveSome))j=await getJSON("news.json");
+  if(!j)return [];
+  if(j.updatedAt)lsSet("sdlNewsServerAt",String(j.updatedAt));
+  return j.items.length?j.items:[{__empty:true}];
 }
 async function fetchNews(){
   let fresh=await readNewsFile(),res=[];
   if(!fresh.length){res=await Promise.allSettled(FEEDS.map(readFeed));fresh=[].concat(...res.filter(r=>r.status==="fulfilled").map(r=>r.value));}
   if(!fresh.length)throw new Error("news");
-  const key=n=>n.title.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,70),now=Date.now(),have=new Map((NEWS.items||[]).map(n=>[key(n),n])),urls=new Set((NEWS.items||[]).map(n=>n.url));
+  fresh=fresh.filter(n=>!n.__empty);
+  const key=newsKey,now=Date.now(),have=new Map((NEWS.items||[]).map(n=>[key(n),n])),urls=new Set((NEWS.items||[]).map(n=>n.url));
   fresh.forEach(n=>{if(!n||!n.title||!/^https:\/\//i.test(String(n.url||"")))return;const k=key(n);if(!have.has(k)&&!urls.has(n.url)){n=Object.assign({},n,{addedAt:now});have.set(k,n);urls.add(n.url);}});
-  const cutoff=now-14*DAY;
-  NEWS={updatedAt:now,items:[...have.values()].filter(n=>(+n.ts||Date.parse(n.date)||now)>=cutoff).sort((a,b)=>(+b.ts||0)-(+a.ts||0)).slice(0,80),failed:res.filter(r=>r.status==="rejected").length};
+  const cutoff=now-60*DAY;
+  NEWS={updatedAt:now,items:[...have.values()].filter(n=>(+n.ts||Date.parse(n.date)||now)>=cutoff).sort((a,b)=>(+b.ts||0)-(+a.ts||0)).slice(0,300),failed:res.filter(r=>r.status==="rejected").length};
   lsSet("sdlNews",JSON.stringify(NEWS));
 }
 
