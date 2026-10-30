@@ -1,5 +1,6 @@
 (function(){
 "use strict";
+const APP_SRC=(document.currentScript&&document.currentScript.src)||location.href;
 /* ======================= config ======================= */
 const FB_CONFIG={apiKey:"AIzaSyASOersv1lrvCSOvkk8w-BHsPcWJedCaHY",authDomain:"sea-days-ledger.firebaseapp.com",projectId:"sea-days-ledger",storageBucket:"sea-days-ledger.firebasestorage.app",messagingSenderId:"287279684615",appId:"1:287279684615:web:95ad2623d06f7d3aeedea2"};
 const ADMIN_EMAIL="bluewavealgo@gmail.com";
@@ -689,5 +690,6 @@ const local=loadLocal();if(local)adopt(local);else S=JSON.parse(JSON.stringify(E
 takeCarry();
 applyTheme();render();renderAccount();renderUploadState();
 show(location.hash.slice(1)||"dashboard");
+try{const v=new URL(APP_SRC).searchParams.get("v");if(v&&$("appVer"))$("appVer").textContent="App version "+v.slice(0,8)+"."+v.slice(8);}catch(e){}
 window.__sdl={get S(){return S;},get C(){return C;},merge,compute,syncAll};
 })();
