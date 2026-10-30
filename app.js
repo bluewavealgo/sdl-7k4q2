@@ -1,6 +1,7 @@
 (function(){
 "use strict";
 const APP_SRC=(document.currentScript&&document.currentScript.src)||location.href;
+let APP_V="";try{APP_V=new URL(APP_SRC).searchParams.get("v")||"";}catch(e){}
 /* ======================= config ======================= */
 const FB_CONFIG={apiKey:"AIzaSyASOersv1lrvCSOvkk8w-BHsPcWJedCaHY",authDomain:"sea-days-ledger.firebaseapp.com",projectId:"sea-days-ledger",storageBucket:"sea-days-ledger.firebasestorage.app",messagingSenderId:"287279684615",appId:"1:287279684615:web:95ad2623d06f7d3aeedea2"};
 const ADMIN_EMAIL="bluewavealgo@gmail.com";
@@ -570,6 +571,12 @@ async function syncAll(){
     lsSet("sdlSynced",String(Date.now()));
     render();
     if(typeof window.sdlAppUpdate==="function"&&await window.sdlAppUpdate()){return;}
+    /* safety net: if this device is still on an older version (no service worker, or a stuck one), clear the stored app files and load the new version; your data is kept */
+    try{const vr=await timed("version.json?ts="+Date.now(),8000);const vj=vr.ok?await vr.json():null;
+      if(vj&&vj.v&&APP_V&&vj.v>APP_V){toast("Installing the new version…",4000);
+        try{if(navigator.serviceWorker){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(x=>x.unregister()));}}catch(e){}
+        try{if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}
+        location.replace(location.pathname+"?v="+vj.v+"#"+VIEW);return;}}catch(e){}
     toast(notes.length?`Synced, but ${notes.join(" and ")} couldn't load. Try again shortly.`:("Up to date. "+dataMsg),5000);
   }finally{syncing=false;updateSyncUI();}
 }
@@ -690,6 +697,7 @@ const local=loadLocal();if(local)adopt(local);else S=JSON.parse(JSON.stringify(E
 takeCarry();
 applyTheme();render();renderAccount();renderUploadState();
 show(location.hash.slice(1)||"dashboard");
-try{const v=new URL(APP_SRC).searchParams.get("v");if(v&&$("appVer"))$("appVer").textContent="App version "+v.slice(0,8)+"."+v.slice(8);}catch(e){}
+if(APP_V){const t="Version "+APP_V.slice(0,8)+"."+APP_V.slice(8);if($("appVer"))$("appVer").textContent="App "+t;if($("railVer"))$("railVer").textContent=t;}
+if(/[?&]v=/.test(location.search))history.replaceState(null,"",location.pathname+location.hash);
 window.__sdl={get S(){return S;},get C(){return C;},merge,compute,syncAll};
 })();

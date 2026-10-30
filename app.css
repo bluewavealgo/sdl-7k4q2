@@ -87,6 +87,7 @@ label.f>span,div.f>span{font-weight:500}
 .net{display:inline-flex;align-items:center;gap:6px}
 .net i{width:8px;height:8px;border-radius:50%;background:var(--rail-dim)}
 .net.on i{background:#55d69d}
+.rail-ver{font-family:var(--f-mono);font-size:.62rem;color:var(--rail-dim);opacity:.8;padding:0 4px;text-align:center}
 .themebtn{background:#ffffff12;border:1px solid #ffffff22;color:var(--rail-ink);border-radius:999px;padding:4px 10px;font-size:.75rem}
 .themebtn:hover{border-color:var(--glow)}
 

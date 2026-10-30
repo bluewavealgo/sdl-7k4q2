@@ -1,5 +1,5 @@
-const V="sdl-202610300816";
-const CORE=["./","index.html","app.css?v=202610300816","app.js?v=202610300816","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png",
+const V="sdl-202610300830";
+const CORE=["./","index.html","app.css?v=202610300830","app.js?v=202610300830","manifest.webmanifest","icon-180.png","icon-192.png","icon-512.png",
  "vendor/firebase-app-compat.js","vendor/firebase-auth-compat.js","vendor/firebase-firestore-compat.js","vendor/pdf.min.js","vendor/pdf.worker.min.js"];
 /* a new version installs quietly and waits; it is applied only when the user presses Sync */
 /* the page must match this version; if GitHub's servers still hand out the previous page, the update is refused and retried on the next Sync */
