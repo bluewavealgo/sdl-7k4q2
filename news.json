@@ -1,1 +1,806 @@
-{"updatedAt":0,"items":[]}
+{
+ "updatedAt": 1793347693032,
+ "feedsOk": 7,
+ "items": [
+  {
+   "title": "Dockworkers unite across 113 ports in global anti-war protest",
+   "source": "Splash247",
+   "url": "https://splash247.com/dockworkers-unite-across-113-ports-in-global-anti-war-protest/",
+   "ts": 1793347201000,
+   "date": "2026-10-30",
+   "summary": "One of the largest coordinated port labour mobilisations in history is underway today, with more than 25 unions staging strikes and demonstrations at 113 ports across 22 countries…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Coast Guard Rescues 20 Seafarers From Stricken Vessel Off Andhra Coast",
+   "source": "OdishaBytes",
+   "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPYUFRVDRYYVFHQWVsLVNkWElCMHVpSnMzYXp5R19sZmFUZXhTMWN3N1JLRXBka1B2WUg1YUFIdEg1dzY3WEt5bkVhaFVGZ3VGcFVmcmE5VmlHZ0NXN0NtXzBGb2MyRkdEWkI0aTREVFYzSS1EdFM3aXQyclV2RkxlZVYyaFVST2VLcWcxeXJhSHZQQndwVjlfYWhYa9IBoAFBVV95cUxOX2pHRHNoMlUtc1QwMWtIZXBLdWduYWdLZ0RSMWRTb0d6Sk9lSEJYaThBTlhIdExqQkI2UmdoWVJRNVUzYkFqTDZ6cjNfZ2lYVFNzbS0zY2RRSDBJRE1GTmYwZHlpNzN5aHNWTW1xYzZTVWc2WUpJNW9XTUt1WmlpaURhYnVacEg3d19aLTJObmdlMlZMcTZIb1VRdDdFMjFD?oc=5",
+   "ts": 1793345421000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Oil majors count the cost of runaway tanker rates",
+   "source": "Splash247",
+   "url": "https://splash247.com/oil-majors-count-the-cost-of-runaway-tanker-rates/",
+   "ts": 1793345188000,
+   "date": "2026-10-30",
+   "summary": "Soaring tanker freight rates are taking an increasingly heavy toll on the world’s oil majors, with the latest quarterly results revealing billions of dollars in additional shipping-related liabilities,…",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "CVC takes majority stake in Spanish ship repair yard Cernaval",
+   "source": "Splash247",
+   "url": "https://splash247.com/cvc-takes-majority-stake-in-spanish-ship-repair-yard-cernaval/",
+   "ts": 1793344434000,
+   "date": "2026-10-30",
+   "summary": "Infrastructure investor CVC DIF has completed the acquisition of a majority stake in Spanish ship repair specialist Cernaval, giving the private equity group a foothold in one of…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Maritime CEO Forum: When to leave the party",
+   "source": "Splash247",
+   "url": "https://splash247.com/maritime-ceo-forum-when-to-leave-the-party/",
+   "ts": 1793344049000,
+   "date": "2026-10-30",
+   "summary": "Shipping investors are enjoying extraordinary returns but face increasingly difficult decisions over when to cash out, with industry leaders warning that geopolitical disruption is masking underlying market risks…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Tanker targeted with hull-mounted explosives in Hormuz",
+   "source": "Splash247",
+   "url": "https://splash247.com/tanker-targeted-with-hull-mounted-explosives-in-hormuz/",
+   "ts": 1793342988000,
+   "date": "2026-10-30",
+   "summary": "A tanker has been set ablaze in the Strait of Hormuz after attackers aboard a small boat attached explosives directly to its hull, marking a worrying new tactic…",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Institute of Chartered Shipbrokers appoints first female president",
+   "source": "Splash247",
+   "url": "https://splash247.com/institute-of-chartered-shipbrokers-appoints-first-female-president/",
+   "ts": 1793342541000,
+   "date": "2026-10-30",
+   "summary": "Greek shipping education specialist Natalia Margioli-Komninou has become the first woman to lead the Institute of Chartered Shipbrokers (ICS) in its 115-year history. Margioli-Komninou took over as president…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Three bodies found after Borr rig sinking",
+   "source": "Splash247",
+   "url": "https://splash247.com/three-bodies-found-after-borr-rig-sinking/",
+   "ts": 1793328000000,
+   "date": "2026-10-30",
+   "summary": "The bodies of three people have been located following the sinking of Borr Drilling’s Prospector 5 jackup offshore Gabon, with two others still missing as BW Energy suspends…",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Seatrium bags FPSO integration job from SBM Offshore",
+   "source": "Splash247",
+   "url": "https://splash247.com/seatrium-bags-fpso-integration-job-from-sbm-offshore/",
+   "ts": 1793327400000,
+   "date": "2026-10-30",
+   "summary": "Singapore offshore engineering group Seatrium has secured a contract worth more than S$200m ($156.5m) from Dutch floater specialist SBM Offshore to integrate an FPSO vessel destined for South…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Equinor’s US offshore wind project faces fresh schedule setback",
+   "source": "Splash247",
+   "url": "https://splash247.com/equinors-us-offshore-wind-project-faces-fresh-schedule-setback/",
+   "ts": 1793326800000,
+   "date": "2026-10-30",
+   "summary": "Norwegian energy major Equinor has pushed back first power from its $7.5bn Empire Wind offshore wind project in the US to the first half of 2027 over delays…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Tanker shares shoot higher yet again as broader stock market buckles",
+   "source": "Lloyd's List",
+   "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPdmNwc0JVaFp6WlkxbWZoUFZOdm5tcW5GWExvSXE4eHFWY2VCNEZVcHRtRzd2ZWt4V29CWHRqV2JxMHRtR3BiczU5WkJxTC01a3dtcmZCbW9kVU4wOGF0a0w0ck9EOTNQUVBsTzItX2pDUkRYZlZqUkpTNnFBazZwQ2FWaTJ2NnR2X21aeXFna2lYSG9TbHRGTHlTZ1dCdmNUN201dUxhd2k?oc=5",
+   "ts": 1793316387000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Gulf Oil Producers Build Tanker Fleet as Security Risks Mount Around Hormuz",
+   "source": "Marine News Magazine",
+   "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQRElCMklrUjVKNjdtMi1td2hRZmJZRFk1ckh6MlJQNWxjT19RZHlMREpvV3dMeGQyUGxuVG1RUFBwOW9sUl9fMUtvaXR1OGl0Vm1odjgxLUJYWDJZaDN4RnBhaDR2WHlzcTJuZmFfZENDSnk4djgtNzFaWlBuRVU0SWNB?oc=5",
+   "ts": 1793314756000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Gulf Congestion Rises, Fujairah Takes 28%",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/gulf-congestion-rises-fujairah-takes-28/",
+   "ts": 1793311259000,
+   "date": "2026-10-29",
+   "summary": "Fujairah records the largest concentration of waiting bulk vessels. More than six months into the Middle East shipping crisis, vessel waiting remains elevated across the Arabian Gulf and…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Ship Recycling Market: Steady as She Goes",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/ship-recycling-market-steady-as-she-goes/",
+   "ts": 1793311259000,
+   "date": "2026-10-29",
+   "summary": "The ship recycling market has remained broadly stable over the past few days. In its latest weekly report, Best Oasis (www.best-oasis.com), a leading cash buyer of ships said…",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Dry Bulk Shipping: Escalating attacks on ships heighten uncertainty",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/dry-bulk-shipping-escalating-attacks-on-ships-heighten-uncertainty/",
+   "ts": 1793311258000,
+   "date": "2026-10-29",
+   "summary": "“Geopolitical disruptions continue to cloud the dry bulk market outlook. The effective closure of the Strait of Hormuz remains the largest source of uncertainty, while attacks on ships…",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Shifts in cement trade help support the Supramax market",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/shifts-in-cement-trade-help-support-the-supramax-market/",
+   "ts": 1793311257000,
+   "date": "2026-10-29",
+   "summary": "China’s property slump has turned Asia’s cement trade inside out. The cargo has not grown much, but it now travels much further, and Supramaxes are doing most of…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Same Trade Lane, Different Footprint: Carrier Emissions Intensity Differs by Up to 35% on Major Container Routes",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/same-trade-lane-different-footprint-carrier-emissions-intensity-differs-by-up-to-35-on-major-container-routes/",
+   "ts": 1793311257000,
+   "date": "2026-10-29",
+   "summary": "On the same trade, the choice of carrier can change a voyage’s Well-to-Wake (WtW) emissions intensity by as much as 35%, according to Decoding Maritime Emissions, Q3 2026:…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Baltic Dry Index at Over 2-Week High",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/baltic-dry-index-at-over-2-week-high/",
+   "ts": 1793311255000,
+   "date": "2026-10-29",
+   "summary": "The Baltic Exchange’s dry bulk freight index, which tracks rates for ships carrying dry bulk commodities, was up for a second session on Thursday, rising by 2.3% to…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "VHBS New ConTex Container Ship Time Charter Assessment Index Week 44",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/vhbs-new-contex-container-ship-time-charter-assessment-index-week-44-3/",
+   "ts": 1793311254000,
+   "date": "2026-10-29",
+   "summary": "The container charter market once more continued to edge more sideways than higher, with the New ConTex gaining 8 points to 1,682, Source: Verband Hamburger und Bremer Schiffsmakler…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Crude Freight: Past the Peak, But the Floor Should Hold",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/crude-freight-past-the-peak-but-the-floor-should-hold/",
+   "ts": 1793311253000,
+   "date": "2026-10-29",
+   "summary": "VLCC rates from the US Gulf and West Africa have fallen from historical peaks by 27% and 32% respectively over the past two weeks, with smaller tankers following.…",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "European Shipowners call on MEPs to back Commission proposal to include two Indian yards in the EU ship recycling list",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/european-shipowners-call-on-meps-to-back-commission-proposal-to-include-two-indian-yards-in-the-eu-ship-recycling-list/",
+   "ts": 1793311251000,
+   "date": "2026-10-29",
+   "summary": "The Environment Committee of the European Parliament votes on 4 November on a motion for resolution objecting to the Commission’s proposal to add two Indian ship recycling yards…",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "IMO: Study Identifies A Phased Pathway For India To Develop A Competitive Regional Alternative Marine Fuel Hub",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/imo-study-identifies-a-phased-pathway-for-india-to-develop-a-competitive-regional-alternative-marine-fuel-hub/",
+   "ts": 1793311249000,
+   "date": "2026-10-29",
+   "summary": "India has the potential to become a competitive regional hub for alternative marine fuels, according to the Study on Potential Demand and Pricing of Alternative Marine Fuels in…",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "ENGINE: Americas Bunker Fuel Availability Outlook",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/engine-americas-bunker-fuel-availability-outlook-124/",
+   "ts": 1793311247000,
+   "date": "2026-10-29",
+   "summary": "North America Bunker demand is strong at the US Gulf port of Houston, where prompt availability of all three conventional grades is tight this week. Recommended lead times…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Ballast Water: BIMCO seeks clearer guidance for ships facing challenging water quality",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/ballast-water-bimco-seeks-clearer-guidance-for-ships-facing-challenging-water-quality/",
+   "ts": 1793311245000,
+   "date": "2026-10-29",
+   "summary": "We have co-sponsored a submission to MEPC 85 making the case for revising the IMO guidance related to ballast water management for ships operating in challenging water quality…",
+   "topic": "Regulation",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "FUJAIRAH DATA: Oil product stockpiles climb to five-week high, led by light distillates",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/fujairah-data-oil-product-stockpiles-climb-to-five-week-high-led-by-light-distillates/",
+   "ts": 1793311243000,
+   "date": "2026-10-29",
+   "summary": "Oil product stockpiles at the UAE’s Fujairah rose 23% in the week to Oct. 26, led by a 49% increase in light distillates such as gasoline and naphtha,…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "DNV Assessment Advances Aker Bp And Höegh Evi’s Ship-Based CO₂ Transport And Offshore Injection Concept",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/dnv-assessment-advances-aker-bp-and-hoegh-evis-ship-based-co%e2%82%82-transport-and-offshore-injection-concept/",
+   "ts": 1793311241000,
+   "date": "2026-10-29",
+   "summary": "DNV, the independent energy expert and assurance provider, has issued a Statement of Feasibility for Aker BP’s and Höegh Evi’s concept to inject CO₂ directly from shuttle carriers…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "NORDEN delivered a net profit of USD 54 million (DKK ~350 million) in the third quarter of 2026, supported by strong markets and solid underlying operating performance across Dry cargo and Tankers",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/norden-delivered-a-net-profit-of-usd-54-million-dkk-350-million-in-the-third-quarter-of-2026-supported-by-strong-markets-and-solid-underlying-operating-performance-across-dry-cargo-and-tankers/",
+   "ts": 1793311239000,
+   "date": "2026-10-29",
+   "summary": "NORDEN CEO, Jan Rindbo, comments: “We delivered a strong third quarter, with good performance across Dry cargo and Tankers. We continue to leverage the flexibility of our business…",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "HD Korea Shipbuilding Q3 2026 slides: engine margin hits record despite FX headwinds",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/hd-korea-shipbuilding-q3-2026-slides-engine-margin-hits-record-despite-fx-headwinds/",
+   "ts": 1793311237000,
+   "date": "2026-10-29",
+   "summary": "HD Korea Shipbuilding & Offshore Engineering (KRX:009540) presented mixed third-quarter 2026 results on October 28, showing strong year-over-year profitability growth tempered by sequential headwinds from foreign exchange volatility…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Boluda Shipping signs agreement to acquire Samskip and jointly build Europe’s leading short-sea network",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/boluda-shipping-signs-agreement-to-acquire-samskip-and-jointly-build-europes-leading-short-sea-network/",
+   "ts": 1793311235000,
+   "date": "2026-10-29",
+   "summary": "Boluda Shipping and Samskip have signed an agreement under which Boluda Shipping will acquire Samskip. The acquisition will pave the way for Europe’s most comprehensive short-sea shipping network,…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "NatPower Marine and ZEBOX partner to accelerate the deployment of maritime energy infrastructure",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/natpower-marine-and-zebox-partner-to-accelerate-the-deployment-of-maritime-energy-infrastructure/",
+   "ts": 1793311233000,
+   "date": "2026-10-29",
+   "summary": "ZEBOX and NatPower Marine announce a strategic partnership to accelerate the development and deployment of energy infrastructure supporting the decarbonization and electrification of ports and maritime transport. NatPower…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "FuelTech launches next-generation Gas Valve Train Mk V for LNG propulsion",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/fueltech-launches-next-generation-gas-valve-train-mk-v-for-lng-propulsion/",
+   "ts": 1793311231000,
+   "date": "2026-10-29",
+   "summary": "Developed for Everllence’s ME-GI 10.7 engine platform, the new Gas Valve Train Mk V builds on more than a decade of commercial GVT experience, introducing higher pressure capability…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "COSCO SHIPPING Ports Announces 2026 Third Quarter Results",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/cosco-shipping-ports-announces-2026-third-quarter-results/",
+   "ts": 1793311229000,
+   "date": "2026-10-29",
+   "summary": "COSCO SHIPPING Ports Limited, the world’s leading ports logistics service provider, today announced the results of the Company and its subsidiaries (the ‘Group’) for the 3 months and…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Tanker ‘mostly submerged’ and ‘on fire’ in US-protected Hormuz route off Oman",
+   "source": "TradeWinds News",
+   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOOVd6cUFjazJhSXdDaUlzMFNNbnBrNVBwd0NsSXFYZXFEUk13T1l3M21ob3RyaDgzUHM1MFBIUEtMT08zVElrSFFDZWtCOTQzcFlIdnA4ZTBVVUFqaFg3dTczRGxibTRhbUZFQV84QUFnbXhjcE9YSDlFNlFSTG1RM2lhb3JlOUxsSTB6cHZzTzJsdnpRUFdTWVhoeFhVSC14bjh2Q1BfVUUwMFJVeXYzYTcwZFFPcmtEWHE4?oc=5",
+   "ts": 1793311173000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "More Than 100 Lawmakers Push to Include SHIPS for America Act in Defense Bill",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/more-than-100-lawmakers-push-to-include-ships-for-america-act-in-defense-bill/",
+   "ts": 1793304645000,
+   "date": "2026-10-29",
+   "summary": "A bipartisan group of 119 lawmakers is urging congressional leaders to preserve and expand provisions of the SHIPS for America Act in the final fiscal year 2027 National…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "The morning after: what December’s IMO vote means for a fixture",
+   "source": "Splash247",
+   "url": "https://splash247.com/the-morning-after-what-decembers-imo-vote-means-for-a-fixture/",
+   "ts": 1793303220000,
+   "date": "2026-10-29",
+   "summary": "Whatever the IMO decides in December, a broker will price a dry bulk trip the next morning. The vote changes which line of that fixture carries the carbon,…",
+   "topic": "Regulation",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "‘Absolutely unacceptable’: EAM Jaishankar discusses attacks on Indian seafarers with Ukraine Foreign Minister",
+   "source": "DD News",
+   "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxNS0NIMlNrazBsSXdlbld2VnIwMEZSekpTd3llRERnYmFFUDVCTWNDOUVoTko0cTlOZ3k5VHgwZTVVOVVkWENUMHBnTkxhY0FtTEJWVlZfa3V3aHp0elVWeEFXRVppbl9ZQVVnNHhDMFhBZlBGTkFDTzBRT3hJNXYzU3F6cy16ekVSVkpZNkNnMnZnSVJobFB5TF84a0h3eERFdS0tLXNIb19FOXdmS3Bwenc2T1NZUS1ndkRDUFRhWGZWTldFN0pmSUVMX0Y?oc=5",
+   "ts": 1793303150000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "14 Filipino seafarers reached Varna safely. The ship they left behind has sunk",
+   "source": "astig.ph",
+   "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNTUdIUl9WR3JFbFlpUTNORVprUXVkQWg1R3NTTzZVanlQMUYxUWd0MzJjYVY3SGZHbWxwbFBWd1dfcFNYY3MxeHdOQ0dwQ2ZwblJFcDJfa0RkMl8temlZLXJ2RFFsci1uenEtdzRmcThkMG5FY0x1cG8zZmotME1icVBySUN6QQ?oc=5",
+   "ts": 1793302627000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Greek Containership Sunk by Naval Drones Off Bulgaria as Black Sea Attacks Escalate",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/greek-containership-sunk-by-naval-drones-off-bulgaria-as-black-sea-attacks-escalate/",
+   "ts": 1793300290000,
+   "date": "2026-10-29",
+   "summary": "A Greek container ship has sunk after being hit by naval drones off Bulgaria on Wednesday, the Bulgarian government said, in the latest of a series of strikes…",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Oil giants pay high price for shipping turmoil as tanker lease costs explode",
+   "source": "Baird Maritime",
+   "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQcnBhYVNobkFIc2FKOHZOWVJiNmtzQjRzc2JNUkJVVi0ycWs0VUstVUhqU0s3ZDJvNnVnRzM1VWs4VHVhVE0zY1Rad19KNzQwNElueWR4UzZram52VVBrWTVBNnIzUlRuN2hueEZaaVBYVkVaQUczTEhjU3pOQ0tPMGFEXzJaYU9QSmlDTFNFNS1GVjl3RThzRlBXS1IwWUhtY1ZFS3ByZFRGN0dlWkZpZlU2ZUs2WkJDa29UemwxTGPSAc4BQVVfeXFMTUtlMTlfR05YekpTaHAyYTltTURKZnctUWRDcFdJeVctVFplS3ZaS2VCMVN6VjlCZjByZnY0NnBfTTY2dEhEZENOdlZUb0VUdHV1OWRSUEVsM25EX0FfeU0yTlJ2WC1IQ2pVOE40alp0ZERVV1pFNzBYeEtOUlFKZ1lBSDNXQ0YteUxEcXNuWUJhOTdfUmNyc0t2UUZqdlhGMXhjTk5HYXBNNDI0SGlEamxNOS1lXzRWTFI1Ul9XNl92bHhhVXFBVENfeTdRd3c?oc=5",
+   "ts": 1793299527000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Wallenius Wilhelmsen Orders Up to 12 LNG-Powered Car Carriers in $1.5 Billion Fleet Expansion",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/wallenius-wilhelmsen-orders-up-to-12-lng-powered-car-carriers-in-1-5-billion-fleet-expansion/",
+   "ts": 1793299385000,
+   "date": "2026-10-29",
+   "summary": "Wallenius Wilhelmsen is expanding its fleet renewal program with an order for four new dual-fuel car carriers and options for eight more, potentially adding 12 vessels in a…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "QatarEnergy Continues LNG Buying Spree to Hedge Future Hormuz Disruptions",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/qatarenergy-continues-lng-buying-spree-to-hedge-future-hormuz-disruptions/",
+   "ts": 1793298353000,
+   "date": "2026-10-29",
+   "summary": "QatarEnergy is buying long-term supplies of liquefied natural gas from the US and other producers as part of a trading strategy designed to generate revenue if exports through…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "The age of pirates isn't over: Modern-day Somali raiders are hijacking oil tankers, holding sailors hostag",
+   "source": "The Economic Times",
+   "url": "https://news.google.com/rss/articles/CBMiwwJBVV95cUxNRzM4blhZOC1IWXFqZWV3NXZPMkFFVUYwcHBoeVRZTDI2UlE5MHZaQTlXSHpTU19IY0JJamswOTZfQ0xCckduY2FDX1ZKLVliSU0waTBad2RlYW1aeUxLaW5JeTd4Tzh3RGFwQlpSbmVhV1RKR0VEUmE3WG5NYzBjN2VfVENEMVFJSzNVNm1zV0NJS1U2Z2I3Y1pmeDRYVHgzY0lMWW9CZmo4YWhRMzhybE5xRmFHSzE2NU5JNWctSDBiQms2bkxmYS03d0E4ZGI5d3RLT29GS0ZrM1N0NDRPb0NmaE1WWU1VRDN6NGxIMFJvQ1BzV2I2Si1sMzdjZVZCakNfTWNKRzdtT0RWVUxHWlU3UmVqSnBXZGwxdmJWVXJQVnhuRjNRUVhFSkJJVTBjLTJrcVFKb3c5cEFQajdLR1ZSRdIByAJBVV95cUxNRE1IOVFHcGNyWDJ2WUQ3cFg4cUt5bWkyQkd2YkZ0ZHMtYmpGWFFEWlZtNlBtOGl1R1FGcmg4dkVZZVo5blpyOFhENTB2djdENENySXlyN1hBMWRVTnUtREZfMXdQVGY1RWZhX2JsT1M2ZTlITDYySDQ0V1BjVy1kT1BVT1VlSlgxNFNZcnA3RXZmZF9Bb2RqRk9kUzVjYk1IUlZzY2lMZ0FucDBJaUd5UV84REs4ZVNramNDVlFtTlUzTk03UUdnX0NXN1JUdFYwX1BDQ2c3M185SFRrMHg3UTEyeWY3VjdDRHEwX1BoVjV0VGN6b2s5QTZINlBFMEVmREZmY3pubHVGM3h5bkN5QTlXUkJMTFNSc1JPLUJaTUdoekNZZlc0SVdCNEJRTFd2aGxKc1JyaUNJYWVVSWxzSm80cEUzT0JF?oc=5",
+   "ts": 1793293959000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Maritime Unions Sound Alarm Over Jones Act Waiver Compliance, Foreign Crews and National Security",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/maritime-unions-sound-alarm-over-jones-act-waiver-compliance-foreign-crews-and-national-security/",
+   "ts": 1793293307000,
+   "date": "2026-10-29",
+   "summary": "Nine maritime labor organizations say the Trump administration’s prolonged Jones Act waiver raises serious questions about compliance with federal law, including reporting requirements, immigration restrictions and the use…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Shell and Total Post Highest Quarterly Profit Since 2022",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/shell-and-total-post-highest-quarterly-profit-since-2022/",
+   "ts": 1793292323000,
+   "date": "2026-10-29",
+   "summary": "Shell and TotalEnergies reported on Thursday sharply higher third-quarter profits and raised share buybacks, as war-driven energy prices and record refining margins helped both beat expectations.",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "U.S. Shipbuilding Delays Push Empire Wind’s First Power Into 2027",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/u-s-shipbuilding-delays-push-empire-winds-first-power-into-2027/",
+   "ts": 1793291982000,
+   "date": "2026-10-29",
+   "summary": "Delays involving U.S.-built support vessels have pushed back turbine installation at Equinor’s Empire Wind offshore wind project off New York, with first power now expected in the first…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "COSCO Profit Jumps Most in Two Years as Turmoil Supports Rates",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/cosco-profit-jumps-most-in-two-years-as-turmoil-supports-rates/",
+   "ts": 1793291504000,
+   "date": "2026-10-29",
+   "summary": "(Bloomberg) — Cosco Shipping Holdings Co. earnings jumped the most in two years as persistent geopolitical disruptions rerouted trade routes, tying up more of its vessels for longer…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Lawmakers Vow to Block Use of Training Ship Golden Bear for Deportations",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/lawmakers-vow-to-block-use-of-training-ship-golden-bear-for-deportations/",
+   "ts": 1793290894000,
+   "date": "2026-10-29",
+   "summary": "Two California lawmakers are demanding that the Trump administration abandon reported plans to use ships for mass deportations, including the former Cal Poly Maritime Academy training vessel Golden…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "6 Indian seafarers stranded at Karachi port are safe: Govt source",
+   "source": "Rediff",
+   "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNRV95eXA3R0xDNzIydktFTDk3eUVTRnAtWERCTnVYcHQ5R3R0VzJsRU13ZWcwQzRDRkVaa01QblFjcUx3OHdid3JweU5FNU9tRnI1VGwtcjB0cUU1MG1UR255RUc0WmFlbU5vNjVCb1Z5TnFVaXNUZHdVRXB5RnNkbl9yWDZzVkFQbFNVT2htdlNoQ3lwczM5c2FHbFBTWmc2b3FocF9wQ2pqeElQcVJCRWF3Vm5DUFMwb2lhYjAtM29sM1haUjVSX251cUtwbXg1N0dXLW92MjY2TWhtUUd3dTJR?oc=5",
+   "ts": 1793286899000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Cheniere LNG Shipments Surge as Iran War Reshapes Global Gas Trade",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/cheniere-lng-shipments-surge-as-iran-war-reshapes-global-gas-trade/",
+   "ts": 1793286475000,
+   "date": "2026-10-29",
+   "summary": "U.S. LNG giant raises full-year earnings outlook as Middle East supply disruptions boost demand for American exports Cheniere Energy, the largest U.S. exporter of liquefied natural gas (LNG),…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Six Indian seafarers stranded at Karachi port are safe: Govt source",
+   "source": "Mathrubhumi English",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPazlDei1zVVJmSkRPRk16SWFlb2pxZGZnWjB2aWFsTUN2WHpEXzVhZ3lTUV9LT1VYTXpkbVJKM2V3QV9DU3lwY29oQUVaUjlxazkySVpUTFdEVl9TcWJWZzFLcGx0NWhMc0xfbHZDZHdPN29ZY1hvZHN1TEdLUnZHdWwwMjFWQ2hSTzgtaERkdXVnS1F3OXRnS1FvbTdZX1Zqd1k0SGRJWWpjNUFYV3JwcGx5b9IBswFBVV95cUxPazlDei1zVVJmSkRPRk16SWFlb2pxZGZnWjB2aWFsTUN2WHpEXzVhZ3lTUV9LT1VYTXpkbVJKM2V3QV9DU3lwY29oQUVaUjlxazkySVpUTFdEVl9TcWJWZzFLcGx0NWhMc0xfbHZDZHdPN29ZY1hvZHN1TEdLUnZHdWwwMjFWQ2hSTzgtaERkdXVnS1F3OXRnS1FvbTdZX1Zqd1k0SGRJWWpjNUFYV3JwcGx5bw?oc=5",
+   "ts": 1793285284000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Russia Reopens Sea Of Azov Passage For Grain Ships For First Time Since July",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/russia-reopens-sea-of-azov-passage-for-grain-ships-for-first-time-since-july/?utm_source=rss&utm_medium=rss&utm_campaign=russia-reopens-sea-of-azov-passage-for-grain-ships-for-first-time-since-july",
+   "ts": 1793282243000,
+   "date": "2026-10-29",
+   "summary": "Permission to depart was granted on October 26 to vessels operating from the Russian commercial ports of Temryuk and Kavkaz.",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Japan Considers India For Testing Type-25 Anti-Ship Missile With 1,000-Km Range",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/japan-considers-india-for-testing-type-25-anti-ship-missile-with-1000-km-range/?utm_source=rss&utm_medium=rss&utm_campaign=japan-considers-india-for-testing-type-25-anti-ship-missile-with-1000-km-range",
+   "ts": 1793281946000,
+   "date": "2026-10-29",
+   "summary": "Japanese defence officials visited India in mid-May to inspect testing facilities and live-firing ranges.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Bulgarian Navy Rescues 18 Seafarers After Drone Attack On Cargo Ship In Black Sea",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/bulgarian-navy-rescues-18-seafarers-after-drone-attack-on-cargo-ship-in-black-sea/?utm_source=rss&utm_medium=rss&utm_campaign=bulgarian-navy-rescues-18-seafarers-after-drone-attack-on-cargo-ship-in-black-sea",
+   "ts": 1793281473000,
+   "date": "2026-10-29",
+   "summary": "Three naval drones struck the Liberian-flagged container ship Contship Jet off Bulgaria’s Black Sea coast, sinking the vessel.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "22 Indian Nationals, Including 14 Seafarers, Killed In US-Iran War, Confirms External Ministry",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/22-indian-nationals-including-14-seafarers-killed-in-us-iran-war-confirms-external-ministry/?utm_source=rss&utm_medium=rss&utm_campaign=22-indian-nationals-including-14-seafarers-killed-in-us-iran-war-confirms-external-ministry",
+   "ts": 1793281403000,
+   "date": "2026-10-29",
+   "summary": "India’s Ministry of External Affairs has confirmed 22 Indian nationals have died amid the West Asia conflict, including 14 seafarers.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "India Approves Rs 10,000 Crore Scheme To Boost Domestic Shipping Container Manufacturing",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/india-approves-rs-10000-crore-scheme-to-boost-domestic-shipping-container-manufacturing/?utm_source=rss&utm_medium=rss&utm_campaign=india-approves-rs-10000-crore-scheme-to-boost-domestic-shipping-container-manufacturing",
+   "ts": 1793281314000,
+   "date": "2026-10-29",
+   "summary": "India’s Union Cabinet has approved the ₹10,000 crore Container Manufacturing Promotion Scheme to boost domestic container production, reduce import dependence and strengthen maritime supply chains, targeting an annual…",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "China Develops Uncrewed Trimaran Submarine Designed To Carry Up To 18 Missiles",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/china-develops-uncrewed-trimaran-submarine-designed-to-carry-up-to-18-missiles/?utm_source=rss&utm_medium=rss&utm_campaign=china-develops-uncrewed-trimaran-submarine-designed-to-carry-up-to-18-missiles",
+   "ts": 1793281165000,
+   "date": "2026-10-29",
+   "summary": "China is testing a new semi-submersible warship designed to carry multiple missiles and potentially operate without a crew.",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Indian Coast Guard Launches Rescue Operation For 6 Crew On Stranded Bulk Carrier",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/indian-coast-guard-launches-rescue-operation-for-6-crew-on-stranded-bulk-carrier/?utm_source=rss&utm_medium=rss&utm_campaign=indian-coast-guard-launches-rescue-operation-for-6-crew-on-stranded-bulk-carrier",
+   "ts": 1793280554000,
+   "date": "2026-10-29",
+   "summary": "The Coast Guard deployed a helicopter and vessels to reach the ship. Its Offshore Patrol Vessel was also sent towards the stranded carrier.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "New Alliance To Deliver First Integrated Cyber Defense & Insurance Model For Cargo Ships",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/new-alliance-to-deliver-first-integrated-cyber-defense-insurance-model-for-cargo-ships/?utm_source=rss&utm_medium=rss&utm_campaign=new-alliance-to-deliver-first-integrated-cyber-defense-insurance-model-for-cargo-ships",
+   "ts": 1793275997000,
+   "date": "2026-10-29",
+   "summary": "Hanwha General Insurance and CYTUR have partnered to develop maritime cyber insurance solutions, combining vessel cybersecurity assessments, risk monitoring and incident investigation services.",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "U.S. Approves $8.2 Billion Texas Offshore Deepwater LNG Port To Boost Export Capacity By 9%",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/u-s-approves-8-2-billion-texas-offshore-deepwater-lng-port-to-boost-export-capacity-by-9/?utm_source=rss&utm_medium=rss&utm_campaign=u-s-approves-8-2-billion-texas-offshore-deepwater-lng-port-to-boost-export-capacity-by-9",
+   "ts": 1793275863000,
+   "date": "2026-10-29",
+   "summary": "The U.S. Maritime Administration has approved an $8.2 billion deepwater LNG port project off Matagorda, Texas, expected to create thousands of jobs and boost U.S. LNG export capacity…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Shipping Industry Launches 2 Common Data Formats To Streamline Fleet Emissions Reporting",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/shipping-industry-launches-2-common-data-formats-to-streamline-fleet-emissions-reporting/?utm_source=rss&utm_medium=rss&utm_campaign=shipping-industry-launches-2-common-data-formats-to-streamline-fleet-emissions-reporting",
+   "ts": 1793275709000,
+   "date": "2026-10-29",
+   "summary": "BIMCO-led JIWG has released version 1.0 of the OVD and VER frameworks to standardise vessel data exchange, reduce duplicate emissions reporting and improve data consistency across the maritime…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Taiwan Flags ‘Obvious’ Threat From 50 Chinese Vessels in Wide Sweep of Waters",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/taiwan-flags-obvious-threat-from-50-chinese-vessels-in-wide-sweep-of-waters/",
+   "ts": 1793272772000,
+   "date": "2026-10-29",
+   "summary": "China has more than 50 navy and other official vessels operating in a wide swath of sea stretching from southern Japan down to Taiwan and off the Philippines,…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Qatar to Buy LNG From Woodside as It Scours for US Supply",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/qatar-to-buy-lng-from-woodside-as-it-scours-for-us-supply/",
+   "ts": 1793272635000,
+   "date": "2026-10-29",
+   "summary": "QatarEnergy agreed to purchase US liquefied natural gas from Woodside Energy Group Ltd. for two decades, saying it’s now the top buyer of the American fuel as it…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "North Korea’s Largest Ever Warship Is A 5,000-ton Destroyer With 64 Missile Launchers",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/north-koreas-largest-ever-warship-is-a-5000-ton-destroyer-with-64-missile-launchers/?utm_source=rss&utm_medium=rss&utm_campaign=north-koreas-largest-ever-warship-is-a-5000-ton-destroyer-with-64-missile-launchers",
+   "ts": 1793272517000,
+   "date": "2026-10-29",
+   "summary": "North Korea launched its first large warship, the 5000-ton Choe Hyon, at the port city of Nampho, calling the nuclear arming of the fleet a ‘strategic course’ to…",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Fratelli Cosulich Adds Third Methanol-Ready Bunker Tanker to Singapore Fleet",
+   "source": "ChemAnalyst",
+   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOclM4NGFISnZXeXJ1bFNhUGRxZHNOUDF5N005OEx0Vk9QMWZoNWZPNERuZU5vMWExWHRkLThSYnEtMmRHdWZWQWlmWFUyLTFMdUdvWUVWdkhES3d2M2UzNkF4ai11NEVHWHNUVDBLdzFGNnFuNklfUzZoa2NLLWJxVXFYMWMxNVo1TTdwbXloZW1sR3NJMElJNmJUeWdCWldxQUlsRzZiNlJ2bkVCbGJfcFJsS3FBZkE?oc=5",
+   "ts": 1793269834000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Fratelli Cosulich Takes Delivery of Third Methanol-Ready Bunker Tanker",
+   "source": "Ship & Bunker",
+   "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPdl94V2hIMzVRYmlXTXEzZ2NGXzZDS0VvbU9wanVmMUlON3gxWE1ac0NOLTEyNUFpLVNfRHdZN3dUUTNXclZLZFoxUDRhREtoeGdIX3Q1a3l4Z3FmNl96cE9EY01OQ3FIbHpWbEFmb0NVTWU2ZWdfZ2RQaHNOY1ktYWJweDFzTUNSUi0xUjZ1WmJOQ1VKQzFtR2lIU181eVNmYXduRHg4TVZVaFFxU2ptN0puRkg?oc=5",
+   "ts": 1793267920000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "EAM Jaishankar raises safety of Indian seafarers with Russian FM Lavrov after MV Golden Leo attack",
+   "source": "DD News",
+   "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPeS1fbzZqNXpkWnNVdFQ5RVdaN2hSdmkweloyTjdmaHNGdUticXR5Q09VNDFfUFhucUZSZTVmMDU1blZJYlNWOEI1cEZQcVlUZEtOaEhzZElVY08wYVhBM1d5eDdLdGM0ZG8yWEVLa2lKT01oTXhoeVllcnpVcnZwOVJHNVNlVmdYek5oM2F2SHI1VWo1R2xtVDRWbVZBSDRuT1JadXVRYkdKakstdXBGUklqTWRUOFBsNDNHN01QakRLQQ?oc=5",
+   "ts": 1793267498000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "1 Ship, 6 Indians, 6 Months: Long Wait For Seafarers Stranded At Karachi Port",
+   "source": "NDTV",
+   "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPX25EdjVtdDIwNm92VDBxeDNlYXZsczZXdXpIM2N6OE42VFBMZXRILWhpZTFrMmQxZktaQnRNb3M2ZlUtMDdqSnZSYUJoRUlFdmJHd0l4R0JsTDYzaFY3QkZUUU5XT09lYkFxT3NKRmM3VWUtWk4zWnJhZ1M5TUlpa1pmNXk3S3k2SDlIWFV3VUJKUTNmdHA5YXdKYk4tX0JIZVRHbWlGU243QURmZWZSY2YwRVlLSWxCU1hldUFvZHdRRjFyazYxUVFaQ1JiRzIxZnZN0gHbAUFVX3lxTE8wRjNsRW9ja0I4Y1NSRnYwdWVmTUs0SUtJOFpXcE1GMXB4SXd2T2JIa3VGRnlsZlB1bkNsdzNzMHQ5c0NjT1RrUW1IWHUtdHNOX0U0em1yS1VzYkIxQkNwTXBoUXNLcV9BWHFBb2Raa29mWU9Ibk9PR2FzWWl1WVJiLWxvNl80MTNKNVJrTFB3dUt2c0lxdExjamtaQzU3bXZXTnBXTVFPNEV4VHNhNW5CMDUxRW5NcE9lb1ZhbzBYUFE5TGVKdjZNQVF3YlNrd0tqdmcxSXVkTkhGdw?oc=5",
+   "ts": 1793265816000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "LPG carrier market to 'remain strong' in 2027 then soften, Clarksons predicts",
+   "source": "TradeWinds News",
+   "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNUEp4RXRnWlQxeEVmVXc2SDVfYU1kaW1VMWNtZlU1VkYzdW1sZ0tFOFlrd1lDZHIxZDFVb2RTOVZFSkd6ZnB2ZkRMMlZYSzRvcDBtN2lkaWVNMDFOenJlTjdiaURvTVI3TUZlRDNrWG9RZVgzZ1Q0N2syZXNlaVZMY205b2otS2hlUDdUVDhJcGdZczN2bmpiV1ZKZWVKT1dBSmdlWENXLWsxSkJBX3BOa09ldGstSlczMGxrOU93?oc=5",
+   "ts": 1793264886000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Tanker on fire and largely submerged in Hormuz",
+   "source": "Seatrade Maritime News",
+   "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNXy13a3VjWmMtbXh3engzTWtJd3JyaEtGRTE3QjRLQzI2UkI1T2c2YTRiLWFqdjUzSm9xYXdBdXlnUWI1WWxvbjlyVUphVnViZW9Bb0QtOHgtUVBVelZ2aTh0VGZkZ201dUFMNW9XTmtfaUxZWkZJOXhYeXF5M0MzQzdMaHhDcHNULU95ZFk4YmdSams?oc=5",
+   "ts": 1793263029000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Turkey’s 60,000-ton Largest Warship Might Also Be The First Carrier To Combine Unmanned Systems",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/turkeys-60000-ton-largest-warship-might-also-be-the-first-carrier-to-combine-unmanned-systems/?utm_source=rss&utm_medium=rss&utm_campaign=turkeys-60000-ton-largest-warship-might-also-be-the-first-carrier-to-combine-unmanned-systems",
+   "ts": 1793261910000,
+   "date": "2026-10-29",
+   "summary": "Naval Forces Commander Adm. Ercument Tatlioglu said it would be the first carrier to combine unmanned systems and tackle aerial, surface, and underwater threats.",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "‘If you don’t stop, they’ll kill all of us’: Somali pirates are back with a vengeance",
+   "source": "CNN",
+   "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE4zUjBkaDVZYkExYjk0Ri1VUm4wQmFjS25hT2hvUkVTSFZvNzl4cXJwdTFfM0M5M0RPcHpJT0xqSl94RFRFU2xJaFhSUEw3ZWRhUHRGTGNhbzcwOEdkT3hzRFo0QXhqNW16Wm1qT1J0UnVYQ1dlR3ZvVVZPZ0oyUQ?oc=5",
+   "ts": 1793260815000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "SS United States Ocean Liner Is Set To Become The World’s Largest Artificial Reef Off Florida",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/ss-united-states-ocean-liner-is-set-to-become-the-worlds-largest-artificial-reef-off-florida/?utm_source=rss&utm_medium=rss&utm_campaign=ss-united-states-ocean-liner-is-set-to-become-the-worlds-largest-artificial-reef-off-florida",
+   "ts": 1793259975000,
+   "date": "2026-10-29",
+   "summary": "The SS United States ocean liner will become the world’s largest artificial reef after it will be sunk in the Gulf of Mexico off Florida in mid November.",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "121 Attacks, 24 Seafarers Killed as Iran War Escalates Maritime Threat",
+   "source": "Ships & Ports",
+   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOaGpidF9pVlJiak5JMHN2U091M0JhOE5Ka2FycFVaQWdvWTBxdlZoTHVOS1o0UC1paE1DLUlhRy05SnlVb0lURXBOSEN4QmlpOWkxb1NxRUJ5cTBlYjRXX0JwTzFPaUgwTXFBdzJnY2JucXBOczdLR3dOYXplZVhqQzdSUEVKWnpwaVB2czN5aXRjTjV0NW85ZTNZSmd5Ym5w?oc=5",
+   "ts": 1793252808000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "UK maritime security agency warns of possible piracy in Gulf of Aden",
+   "source": "The Eastleigh Voice",
+   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxORmlSNFRoT1hnczRSRVpkWG5PRTRZY2RZRmxkeWJOVUI3UHR5TXVpU1l2N0JHSUtIY3JZeUNjeTFLQktFWjZ0UkE3TkQ1U015WUdDS3BnLV9DRWF0X2lvMmFUYUFvSzZSVWpELVlYaTRiVjZWTmthdVZMaFhoaERyN1k3cHA4dW1ZSS0xMTNkQXlnX1VIRHV6Z0NHSDNiTzZBZGV3LUZLV295eUtXQlBqZ2VMb0UzVXdwNlFJ?oc=5",
+   "ts": 1793246694000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Indian Seafarer Deaths Reach 14 as West Asia Conflict Claims 22 Indian Lives",
+   "source": "Maritime Gateway",
+   "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQNU9WSGdhYUFiZkxreTFENWFGdFB1U0NoS0VqbHd0TzQ3RERUdTNxVlpibWJZWVl3S2g2NEIxdlpIclMzbW5oNWVhNDFIZi1VR3hXa0hEUHZzRElNQUtjR2lfb0F4VzFHUW1IV0dPeHNlSEpTN1VXeXhhb1UwcExpaUp6czFxeFEyN180SWN4bUdmTHpsM18tdGVRX3pEWG5iUmxETjR4aHg5UzJtUEE?oc=5",
+   "ts": 1793241831000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "News Content Hub - LNG carrier fleet surplus projected despite rising demand from US exports",
+   "source": "Riviera Maritime Media",
+   "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPNGxUOWR6VmdxRXM4ODNGVDdLQVhNNTVOTzJXRUFqTUZrTXhDaTlnMUxFamJuc2xfdVZZWXlaYVAtMllxOTNkS3d6SjhiUEhtejVWUm4yampHd2VheGxLc0ViOXZ3ajlmMzZHenJieHpVX0l6c2N0cTRLb3BKRzVGaGlsRk5vRFMxeHNSck1mZVJWWVRyV09XN3RJQUV4YnZsVXAxYkVxWE5SRnVuSG5MRWpBazlGSnoxRHhacjRlaw?oc=5",
+   "ts": 1793232195000,
+   "date": "2026-10-29",
+   "summary": "",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Robin Energy (Panagiotidis) clinches LPG carrier acquisition",
+   "source": "Shipping Telegraph",
+   "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxOTzFsampSWG1oaG03SC1PbVBDcEVvS3YwN0prS1VJbEx2N1dwYUJVaUNvR29wOU5XUTdlMGJfUkNGclgwckdKdm41R2ZLWW9WTzlHZjFlR01FMG9zTF9pTkI2OVJJTWFka1Mwb0NIOGszMGFPY2dhczZ0UUJVU2VGNENqWmRva05WRTZIeXg3dVVCckZKWEx6al81dlViRFZMWHdpMnFJanNTaVJYMmc5Tnln?oc=5",
+   "ts": 1793228090000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "LNG & Gas",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Keeping afloat: The world’s next generation of sailors are getting in ship shape at Philippine Transmarine Carriers",
+   "source": "Monocle",
+   "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFA2YmN2aUF6RG1JNkY1QjJ1SEs1V1dBYmFVNkNDYk9MUTVLaGpDcElKSTlFd3FxVTdaeGx5V2VlanQxVlFDT3N3RG9zbXFZaWhUUURrc1k5UGJKREdPMFZR?oc=5",
+   "ts": 1793219649000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "General",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Shipping companies make the most of rising freight rates, posting record profits",
+   "source": "EL PAÍS English",
+   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxNYVJ5alB0M3NIalB4MkFGMUFjZ0xaSkdqZHZiMlhTYndtX181SEgxaElhX2FVUXJmSlgtWlh4T25QNWd6NVVHLUF4U1A3M3huUV9UVXoycWYzeUJjNGl4a0ZGa2FtUW1TUUcwa2p2ZFBaS0lEZkNpNkp4TU9Kbms3MkZnQUZUQ1dYa3Z4UVpMdDk0R2FHdWxmYV83Yzdta0pUZjR0VU1xRllfbFF3emlTUW8tSFZUU1ROOTF1aDFxTEtTODM4V1pvTHVnRUFWbm1BYUJqWGVYbFB0UFHSAe8BQVVfeXFMT3lVVjQzSV9mV2tGUFNPT0pWLU83UlFDSzV6UTJBV1IzTjhzc211OWxJSFhicXJFTjRmSU9ZVDViVmxrZWxVeDNSVUV2c1VZNUFJeVpDSEVsTUM1RkZPcVp4WG5vRUIyVUNMa0NrTmRaQ2R2SEJsbFVJb1ZSWnBmQzZpYXREeFEtMXJFcktFRUdxQmZQbk5UdVdNNHR0a0lpU3BlaUs3NlN5MG45WWo5V2VzaDNHWnBtX1VRYXZrZWZ1U0pHS0RyVGNiZkNLUVVDeUFpSGV2YTF5SmQ1SDlSMlRiZVlYWFFHNVI2ZTVEbHM?oc=5",
+   "ts": 1793194905000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "Markets & Trade",
+   "addedAt": 1793347693032
+  },
+  {
+   "title": "Bahri tanker chartering boom helps fuel near tenfold profit surge",
+   "source": "Quantum Commodity Intelligence",
+   "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOTldqRGRWc3pTemZzQXZMNDBTRUFkblFZRVNETkZycjVNVlY1MUFpallwQXlYYi01NVFDTGduWnJlb0VrWnQ3YWhpTWNscERhdUFCVEV0OHc5aDVpcVZwT1d6QlMyOFVZekY0RTBUQmlneElXWGVTN2dOb2pKemdrRzhwa0QzLW1XQ2dzN1I4SExDWmNZdGlCaEZfT1RkeUNvcUxMTndab3JJWE8w?oc=5",
+   "ts": 1793193764000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793347693032
+  }
+ ]
+}
