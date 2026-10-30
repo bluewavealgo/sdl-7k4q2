@@ -1,8 +1,308 @@
 {
- "updatedAt": 1793352595421,
+ "updatedAt": 1793366087980,
  "feedsOk": 7,
  "keepDays": 60,
  "items": [
+  {
+   "title": "Baltic Dry Index climbs to 2714 up 2 points",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/baltic-dry-index-climbs-to-2714-up-2-points/",
+   "ts": 1793365219000,
+   "date": "2026-10-30",
+   "summary": "Today, Friday, October 30 2026, the Baltic Dry Index climbed 2 points, 2714 points. Baltic Dry Index is compiled by the London-based Baltic Exchange and covers prices for…",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Whistleblowers Claimed Key Oil Tanker Rate Was Manipulated",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/whistleblowers-claimed-key-oil-tanker-rate-was-manipulated/",
+   "ts": 1793363917000,
+   "date": "2026-10-30",
+   "summary": "The Baltic Exchange has received two whistleblowing claims of attempted manipulation of the world’s benchmark tanker rate since the beginning of the war in Iran, according to documents…",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Tanker in Strait of Hormuz Hit by Limpet Mines, Security Sources Say",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/tanker-in-strait-of-hormuz-hit-by-limpet-mines-security-sources-say/",
+   "ts": 1793363764000,
+   "date": "2026-10-30",
+   "summary": "A small boat attached two limpet mines to the hull of a tanker in the Strait of Hormuz causing a fire in its engine room and temporarily disabling…",
+   "topic": "Safety & Security",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Iran hits Hormuz tanker with limpet mines in apparent tactical shift",
+   "source": "Financial Times",
+   "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxOdlhMalhPNXJQMlROUmlua3ZEaEZUZGplWTdKWjdud010OWFwRTJhQU55bDA0U0VodGtpTUJ6aWYxZFRsYWtlRVp0dUt0UXRHamhoaW5mQUVaemRNNDhsUG9SaHRtaTJrSl9HTkhZTVBBYXlDNjhBcy10cmxYVmdJSVp2TUY?oc=5",
+   "ts": 1793361665000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "IMO DCS 2025: Is shipping’s decarbonisation progress fast enough?",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/imo-dcs-2025-is-shippings-decarbonisation-progress-fast-enough/",
+   "ts": 1793358059000,
+   "date": "2026-10-30",
+   "summary": "Each year, the Marine Environment Protection Committee (MEPC) reviews a summary report that the IMO Secretariat prepares from verified data submitted by shipowners for the previous reporting year.…",
+   "topic": "Regulation",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "How a New “Arab Dark Fleet” Keeps Hormuz Oil Flowing",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/how-a-new-arab-dark-fleet-keeps-hormuz-oil-flowing/",
+   "ts": 1793358057000,
+   "date": "2026-10-30",
+   "summary": "Gulf oil producers have gained control of a fleet of nearly 230 tankers that have defied Iran to ship oil through the Strait of Hormuz and keep the…",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Tanker Freight Surge Hits Oil Majors' Quarterly Results - News and Statistics",
+   "source": "IndexBox",
+   "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQNmxqM09OakpRVVM0OEtmOUMyanRUU2lqcmxBOEh1RzZWTjJvaTVldXVyNlVoc0t1cUt5MU4zWkptVEtPY2xHb2hKay03Nk8wUDh2RnZXbU1HWWxLVjhoUmdHUEVaTzUxVXlacUVlTUlnUEpBTDhWVy0tVnBPamVxeEk5UlpzanZ2SzJuMllFQ2tYQ2s?oc=5",
+   "ts": 1793358056000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "ZERO44 launches free calculator showing what switching to biofuel really costs",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/zero44-launches-free-calculator-showing-what-switching-to-biofuel-really-costs/",
+   "ts": 1793358055000,
+   "date": "2026-10-30",
+   "summary": "ZERO44, provider of software for maritime emissions compliance, has released a free, interactive fuel cost calculator on its website. The tool shows ship operators how the economics of…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "MOL Signs Long-Term Charter Contract with Deutsche ReGas for Energie-Terminal “Deutsche Ostsee” in Germany",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/mol-signs-long-term-charter-contract-with-deutsche-regas-for-energie-terminal-deutsche-ostsee-in-germany/",
+   "ts": 1793358053000,
+   "date": "2026-10-30",
+   "summary": "Mitsui O.S.K. Lines, Ltd. and Deutsche ReGas announced that they have entered into a long-term Time Charter Contract with Deutsche ReGas for the deployment of one FSRU at…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "GeoMarineHub Lets Ship Crews Email A Requisition As It Is, And Gives Verified Suppliers A Public Badge",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/geomarinehub-lets-ship-crews-email-a-requisition-as-it-is-and-gives-verified-suppliers-a-public-badge/",
+   "ts": 1793358051000,
+   "date": "2026-10-30",
+   "summary": "GeoMarineHub, the Dubai-based ship-supply marketplace, today opened two changes to how vessels buy stores and how buyers check suppliers. Email the requisition as it is. Masters, chief engineers…",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "IMO launches Blue Solutions to support maritime decarbonization in Southeast Asia",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/imo-launches-blue-solutions-to-support-maritime-decarbonization-in-southeast-asia/",
+   "ts": 1793358049000,
+   "date": "2026-10-30",
+   "summary": "IMO has launched Blue Solutions, a new project intended to support maritime decarbonization in Southeast Asia. The announcement was made at the 51st ASEAN Maritime Transport Working Group…",
+   "topic": "Regulation",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Research Council will fund Norwegian maritime nuclear energy and propulsion project",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/research-council-will-fund-norwegian-maritime-nuclear-energy-and-propulsion-project/",
+   "ts": 1793358047000,
+   "date": "2026-10-30",
+   "summary": "The Marine Nuclear Propulsion System (MarNuPS) Pilot project has secured NOK 20 million (USD 2m) in initial funding from the Research Council of Norway as partners prepare to…",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Bangladesh: Shipbuilding industry awaits govt impetus for export boost",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/bangladesh-shipbuilding-industry-awaits-govt-impetus-for-export-boost/",
+   "ts": 1793358045000,
+   "date": "2026-10-30",
+   "summary": "A government plan is afoot to nudge shipbuilding industry through up-scaling design capabilities, upgrading infrastructure and ensuring compliance with international standards so entrepreneurs can tap into European and…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Port of Santos starts ethanol bunkering for ships",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/port-of-santos-starts-ethanol-bunkering-for-ships/",
+   "ts": 1793358043000,
+   "date": "2026-10-30",
+   "summary": "The operation marks the transition from a trial to a regular ethanol supply model, the Santos port authority said. The first operation took place on 19 October, when…",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Kalmar updates its strategy and sets new performance targets for 2030 including a renewed framework for the capital allocation",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/kalmar-updates-its-strategy-and-sets-new-performance-targets-for-2030-including-a-renewed-framework-for-the-capital-allocation/",
+   "ts": 1793358041000,
+   "date": "2026-10-30",
+   "summary": "The Board of Directors of Kalmar Corporation has approved an updated strategy and performance targets for the strategy period until 2030. The updated strategy shifts Kalmar’s focus towards…",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Hapag-Lloyd strengthens its position in Italian ports",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/hapag-lloyd-strengthens-its-position-in-italian-ports/",
+   "ts": 1793358039000,
+   "date": "2026-10-30",
+   "summary": "Italian export volumes of Hapag-Lloyd continue its upward trend, with a further relevant growth expected in 2026 compared with 2025, bringing cumulative growth since 2021 to over 20%…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Iron Ore Slips on Weak Fundamentals",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/iron-ore-slips-on-weak-fundamentals-2/",
+   "ts": 1793358037000,
+   "date": "2026-10-30",
+   "summary": "Iron ore futures fell below CNY 680 per ton, sliding toward four-year lows as rising port inventories, subdued steel mill profitability and sluggish demand continued to pressure prices.…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "India’s steel consumption rises 8% in September; first-half imports climb 23.8%",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/indias-steel-consumption-rises-8-in-september-first-half-imports-climb-23-8/",
+   "ts": 1793358035000,
+   "date": "2026-10-30",
+   "summary": "India’s finished steel consumption rose 8% year-on-year to 14.4 million tonnes in September 2026, outpacing production growth and keeping the country a net importer of finished steel, according…",
+   "topic": "India & Seafarers",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Copper Extends Fall on Tech Selloff",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/copper-extends-fall-on-tech-selloff/",
+   "ts": 1793358033000,
+   "date": "2026-10-30",
+   "summary": "Copper futures fell toward $6.5 per pound on Friday, sliding for the second straight session as disappointing earnings updates triggered another selloff in tech and AI stocks. The…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Oil rises near 6-mth high as Trump weighs military options against Iran",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/oil-rises-near-6-mth-high-as-trump-weighs-military-options-against-iran/",
+   "ts": 1793358031000,
+   "date": "2026-10-30",
+   "summary": "Oil prices rose near six-month highs on Friday as the prospect of renewed U.S. military action against Iran clouded hopes for a diplomatic breakthrough, reviving concerns over supply…",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Low Rhine strains Swiss diesel supply as importers turn to compulsory stocks",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/low-rhine-strains-swiss-diesel-supply-as-importers-turn-to-compulsory-stocks/",
+   "ts": 1793358029000,
+   "date": "2026-10-30",
+   "summary": "Extremely low Rhine water levels have tightened refined product supplies into Switzerland, forcing importers to increasingly rely on alternative transport routes and compulsory diesel stocks as barge movements…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "US fuel production holds steady in October",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/us-fuel-production-holds-steady-in-october/",
+   "ts": 1793358027000,
+   "date": "2026-10-30",
+   "summary": "The US has supplied 11% more fuel oil per day on average in October so far than in September, according to the Energy Information Administration (EIA). Changes in…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Commission launches High-Level Dialogue with the European refining sector",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/commission-launches-high-level-dialogue-with-the-european-refining-sector/",
+   "ts": 1793358025000,
+   "date": "2026-10-30",
+   "summary": "The European Commission launched this week the first High-Level Dialogue with the European refining industry to discuss how to strengthen Europe’s energy security, defence readiness and industrial competitiveness…",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Natural Gas Storage Levels Rise, Surpassing Forecasts",
+   "source": "Hellenic Shipping News",
+   "url": "https://www.hellenicshippingnews.com/natural-gas-storage-levels-rise-surpassing-forecasts/",
+   "ts": 1793358023000,
+   "date": "2026-10-30",
+   "summary": "The latest data from the Energy Information Administration (EIA) reveals a notable increase in natural gas storage levels, as the U.S. reported an addition of 80 billion cubic…",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "CMA CGM Launches 100% Electric Barge In Vietnam To Support Nike’s Decarbonisation Efforts",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/cma-cgm-launches-100-electric-barge-in-vietnam-to-support-nikes-decarbonisation-efforts/?utm_source=rss&utm_medium=rss&utm_campaign=cma-cgm-launches-100-electric-barge-in-vietnam-to-support-nikes-decarbonisation-efforts",
+   "ts": 1793357314000,
+   "date": "2026-10-30",
+   "summary": "CMA CGM, Nike and Gemadept launch a fully electric barge in Vietnam, designed to cut inland transport emissions by 778 tonnes of CO₂ annually.",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "WHO Instructs Shipping Lines To Carry Dual Documentation Following September 2025 Regulations",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/who-instructs-shipping-lines-to-carry-dual-documentation-following-september-2025-regulations/?utm_source=rss&utm_medium=rss&utm_campaign=who-instructs-shipping-lines-to-carry-dual-documentation-following-september-2025-regulations",
+   "ts": 1793357153000,
+   "date": "2026-10-30",
+   "summary": "WHO urges States to maintain both digital and paper-based ship health documents, ensuring accessibility, authenticity and smooth maritime operations amid the transition to digitalization.",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "IMO & Partners Launch 5-Day Action Plan To Prevent Ship Groundings In Latin American Waters",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/imo-partners-launch-5-day-action-plan-to-prevent-ship-groundings-in-latin-american-waters/?utm_source=rss&utm_medium=rss&utm_campaign=imo-partners-launch-5-day-action-plan-to-prevent-ship-groundings-in-latin-american-waters",
+   "ts": 1793357086000,
+   "date": "2026-10-30",
+   "summary": "A regional IMO workshop in Peru focuses on strengthening ships’ routeing and reporting systems to improve maritime safety, prevent collisions and protect the marine environment.",
+   "topic": "Safety & Security",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Swedish owner Veritas books up to six chemical tankers in China",
+   "source": "Splash247",
+   "url": "https://splash247.com/swedish-owner-veritas-books-up-to-six-chemical-tankers-in-china/",
+   "ts": 1793356200000,
+   "date": "2026-10-30",
+   "summary": "Swedish shipowner Veritas Tankers has placed an order for up to six 13,000 dwt stainless steel chemical tankers at China’s Nantong Rainbow Offshore & Engineering Equipment, in a…",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Evalend drops newcastlemax option at Dajin Heavy",
+   "source": "Splash247",
+   "url": "https://splash247.com/evalend-drops-newcastlemax-option-at-dajin-heavy/",
+   "ts": 1793354400000,
+   "date": "2026-10-30",
+   "summary": "Greek shipowner Evalend Shipping has been linked to the decision not to exercise an option for a fourth 211,000 dwt newcastlemax bulker at China’s Dajin Heavy Industry, removing…",
+   "topic": "General",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "China Merchants tanker arm targets Yangtze fleet renewal",
+   "source": "Splash247",
+   "url": "https://splash247.com/china-merchants-tanker-arm-targets-yangtze-fleet-renewal/",
+   "ts": 1793352600000,
+   "date": "2026-10-30",
+   "summary": "China Merchants-controlled Nanjing Tanker is planning to invest up to RMB191.72m ($28.7m) in ten 4,000 dwt crude oil barges as it moves to upgrade its fleet serving refineries…",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
+  },
   {
    "title": "Splash Wrap: New networks, old faultlines",
    "source": "Splash247",
@@ -22,6 +322,16 @@
    "summary": "One of the largest coordinated port labour mobilisations in history is underway today, with more than 25 unions staging strikes and demonstrations at 113 ports across 22 countries…",
    "topic": "General",
    "addedAt": 1793347693032
+  },
+  {
+   "title": "Ships remain docked at seven ports as seafarers strike",
+   "source": "eKathimerini.com",
+   "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQYXpaOGdObk5ySUloMWRmWktPU3YyUmtMeHEwaV9rWXJ2ZFhicWswRjdqMU9RVmxCYkV3U0VXY1BEaThoMjFwcVpnTUhxaWcyNUl0ZTNhMUt5Z3l2VnhNNWlkYVZ5X0tsUHFYZGVuY203YVFVXzFTWTlLaC16ODN4TFZCS3FUOEM4MzJ5QnYtckdVTFo4Vldjc0hUU0JXbE51OXc?oc=5",
+   "ts": 1793346347000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793366087980
   },
   {
    "title": "Coast Guard Rescues 20 Seafarers From Stricken Vessel Off Andhra Coast",
@@ -92,6 +402,26 @@
    "summary": "Greek shipping education specialist Natalia Margioli-Komninou has become the first woman to lead the Institute of Chartered Shipbrokers (ICS) in its 115-year history. Margioli-Komninou took over as president…",
    "topic": "General",
    "addedAt": 1793347693032
+  },
+  {
+   "title": "India Condemns Attacks On Commercial Ships At UN Warns Of Threats To Global Trade, Seafarers",
+   "source": "ABP Live English",
+   "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxNUjJiWWk0R2ZHMHBUZk5pd2M0bUhJQjlodDB4ekx2Y1JidHdTUkhqcGhWQVNteWp1SUJFYVNXd0F2Ql8wWElraGpPbGd1WklSSmF6SGpoWmJBTnVaczhTNldnZEdST1NGeTM1RzN0UFJibW00NGE2Wm4xMXpZOWlDSVFlZHp1S3JVS0xkUEZJTi1Dd2RSZWNsVDZ2OWZjeEc1R000SHdJaHg2blBmaGVPTHhGVk44OW9qWGhETGNDOHdxNllfRFdyblF3OS1ENTk10gHWAUFVX3lxTE9WRDVuRTdnVHJ1SDJmM1F2RWYtVTNOTGVTOFVEUGdpSTVsSlRJUWF3a0NuQ0k4UlBwbnlLTllTQkJORlVRZG9ZdllBZ0FJeFdIUnpuam1haWZMd1RQaDI1U2hjYTRSbWozNUpnMXZ2cGVCYVF3dkk4eS1NSGJhT1RBOGlSeVRJMjMxSThZOGIwX0VSekQ2Uk95T3hzQlV5TVhFczQ3cGNXVjlnYWZuR25EeG1GeV9YZS04VWVKX1dxR3F1c2tsUVg0RElYTFdpZWgzQzM1YkE?oc=5",
+   "ts": 1793342259000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793366087980
+  },
+  {
+   "title": "Tanker catches fire in Hormuz after explosives attached to hull",
+   "source": "Seatrade Maritime News",
+   "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOMXhIQW9waEJhRVVzUlIyOUFLbjUwTXJ4QmNvNkU2ZFBJUUtLdzNFN2xzRU5RTVMtLTlIRElDTjFVSWthcDZ2dG1Rd2RCaXBDX2JoSm45ajl2dkZOYWRqakllTXRMQ3hKLTJka2U3Z0U1YjBYOXE2cDVYUTkxcDZseXZzUG40dWJZYUQ4WHlTRFFMVDF6T1lka1J6V1prcmNJd1J4SGNiVGx4Zw?oc=5",
+   "ts": 1793333169000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793366087980
   },
   {
    "title": "Three bodies found after Borr rig sinking",
@@ -864,6 +1194,16 @@
    "addedAt": 1793347693032
   },
   {
+   "title": "The Purple People Eater – Tight Tanker Supply Sends Shipping Costs to Frightening Heights",
+   "source": "RBN Energy",
+   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxObk9aT0djU0xlWjRIRFBFNmx0X2JJamRwWTgyZEFnZzRZLXE4cDFjOUc3T1owakFvcjQxYnlPUnROeUs5UDBCRFV4RmktZmgwZFhUcHFBbGdTczBnZ2t2dW04LXFQMkFOZHJpZ012RHc0cW1FdUpyN0VJbk5ReFJXOEduc3dQMUJKcHN5OV9mYjdGUlFqWTZWN2ZMSEJ2d1lt?oc=5",
+   "ts": 1793214922000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
+  },
+  {
    "title": "Shipping companies make the most of rising freight rates, posting record profits",
    "source": "EL PAÍS English",
    "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxNYVJ5alB0M3NIalB4MkFGMUFjZ0xaSkdqZHZiMlhTYndtX181SEgxaElhX2FVUXJmSlgtWlh4T25QNWd6NVVHLUF4U1A3M3huUV9UVXoycWYzeUJjNGl4a0ZGa2FtUW1TUUcwa2p2ZFBaS0lEZkNpNkp4TU9Kbms3MkZnQUZUQ1dYa3Z4UVpMdDk0R2FHdWxmYV83Yzdta0pUZjR0VU1xRllfbFF3emlTUW8tSFZUU1ROOTF1aDFxTEtTODM4V1pvTHVnRUFWbm1BYUJqWGVYbFB0UFHSAe8BQVVfeXFMT3lVVjQzSV9mV2tGUFNPT0pWLU83UlFDSzV6UTJBV1IzTjhzc211OWxJSFhicXJFTjRmSU9ZVDViVmxrZWxVeDNSVUV2c1VZNUFJeVpDSEVsTUM1RkZPcVp4WG5vRUIyVUNMa0NrTmRaQ2R2SEJsbFVJb1ZSWnBmQzZpYXREeFEtMXJFcktFRUdxQmZQbk5UdVdNNHR0a0lpU3BlaUs3NlN5MG45WWo5V2VzaDNHWnBtX1VRYXZrZWZ1U0pHS0RyVGNiZkNLUVVDeUFpSGV2YTF5SmQ1SDlSMlRiZVlYWFFHNVI2ZTVEbHM?oc=5",
@@ -882,6 +1222,16 @@
    "summary": "",
    "topic": "Tankers",
    "addedAt": 1793347693032
+  },
+  {
+   "title": "Piracy Concerns Rise After Nine-Person Boat Spotted Near Ships in Gulf of Aden",
+   "source": "Arab Times Kuwait News",
+   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPbDhSd2sxZnlaR0lPdmdWSHdabUtvN1lCa2FUNS1SSjVqa2NnODA0ZGpPLXRma3B1U2FHWDdSdFd5ZEd4SnhsMVVRLTU3MTIyOTRqVUhsLXJYeWVCZlE4N294WkFZRGY3OEtab0RCb3VhME9mNGg4SHY4TmtjQU83X1o1MXdkQVFEMU55Z3NzVlkzRXZTWW0tUHptYkNhUlQ5VWotSWJxcVpNRUFfMXVSMWJOS1kxazA?oc=5",
+   "ts": 1793193462000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793366087980
   },
   {
    "title": "Houthis Claim Missile Strike On Saudi Arabia’s Major Oil Export Hub",
@@ -952,6 +1302,16 @@
    "summary": "",
    "topic": "India & Seafarers",
    "addedAt": 1793352595421
+  },
+  {
+   "title": "GSI Delivers MR Tanker to NJTC Ahead of Contractual Delivery Date",
+   "source": "iMarine",
+   "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE84T1ZOTlhfZ1g1TE5aRWFhYmJIS3E4c1lCUWdROEVHcFdETy04RERfVmV2bzBYbFowS0ZIdXJLbFdmRkxuOWl1TlRaTFFUWmc?oc=5",
+   "ts": 1793170800000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793366087980
   },
   {
    "title": "Utkilen takes delivery of second 7,500DWT chemical tanker in series",
@@ -1042,6 +1402,16 @@
    "summary": "",
    "topic": "Safety & Security",
    "addedAt": 1793352595421
+  },
+  {
+   "title": "NIMASA, ITF Seal Landmark Deal to Boost Seafarers’ Mental Health",
+   "source": "Ships & Ports",
+   "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNd2hZRWtxSWpETlBidTZ1RzJ0MnBsdXNHR29iempYY0tuOXptc2cyUklDOTF4VkRiYi1jRm9KTXczZEkwaEtDX1BEN0hCWlMzdEh4aC1JdERoNHNuSWNwdDJic3ZOazJTZXRDaWxoYUl1Y2ozSjF1ekFBQTM3M0RUN3lxNTNGNWpoOTRvRDduX0NMWkVZYWhN?oc=5",
+   "ts": 1793074425000,
+   "date": "2026-10-27",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793366087980
   },
   {
    "title": "News Content Hub - Does using a solid-oxide fuel cell on an LNG carrier make sense? MOL intends to find out",
@@ -1172,6 +1542,16 @@
    "summary": "",
    "topic": "India & Seafarers",
    "addedAt": 1793352595421
+  },
+  {
+   "title": "113 ships attacked, 24 seafarers dead as Hormuz crisis deepens",
+   "source": "The Sun Nigeria",
+   "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQRnJrSkg4eWhBWXRIeGlMY0dQaVNTekc5Ym4tWEctWGg5R0ZiSHplS3VPUUVaREd3WjVxR0o5S0hlb09ZVU40eDdtUVVmVmtKbjdEZDJta1Y0Q1A2Z3VtamItMkc5Tnd1STJ0eFlyeG9menBFVXJpV0wwVm5hd1ZvUGtkWDlaazA?oc=5",
+   "ts": 1792974156000,
+   "date": "2026-10-26",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793366087980
   },
   {
    "title": "Kerala Maritime Board’s Vizhinjam port handles first crew change since pandemic",
