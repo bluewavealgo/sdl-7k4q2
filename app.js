@@ -346,7 +346,7 @@ function renderYears(){
       <div class="legend" style="margin-top:6px"><span><i style="background:var(--sea)"></i>Outside India</span><span><i style="background:var(--plan)"></i>Planned</span><span><i style="background:var(--land)"></i>In India</span></div>`:`<p class="small muted" style="margin-top:10px">${r.override!=null?"Days entered under Earlier years.":"No contracts in this year."}</p>`}
     </div>
     <div class="verdict">${passNote(f)}<b>${esc(t.h)}</b><ul>${t.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>${(r.flags||[]).map(x=>`<div class="warnline">${esc(x)}</div>`).join("")}
-      <div><button type="button" class="btn-sm" data-report="${f}">Report for your CA (PDF)</button></div>
+      <div class="row-act"><button type="button" class="btn-sm" data-report="${f}">Report for your CA (PDF)</button>${fyDocs(f).length?`<button type="button" class="btn-sm" data-fydocs="${f}">Share this year's documents (${fyDocs(f).length} + report)</button>`:""}</div>
       <div class="fyopts">
         <label><input type="checkbox" data-o="inc15" ${o.inc15?"checked":""}><span>Indian income (excluding foreign income) above ₹15 lakh</span></label>
         <label><input type="checkbox" data-o="abroadTax" ${o.abroadTax?"checked":""}><span>Tax resident of another country this year</span></label>
@@ -382,7 +382,7 @@ function renderShips(){
   if(!list.length){$("ctable").innerHTML=`<tbody><tr><td class="empty">${S.contracts.length?"No contracts match these filters.":"No contracts yet. Upload your seafarer profile or add a contract."}</td></tr></tbody>`;}
   else{
     const rows=list.map(c=>{const sp=shipSpan(c),d=sp?sp[1]-sp[0]+1:0,planned=["left","on","off","arr"].some(k=>{const v=dn(c[k]);return v!=null&&v>TODAY;}),pass=c.left||c.arr;
-      return `<tr><td data-l="Vessel"><b>${esc(c.vessel)}</b>${planned?' <span class="pill plan">planned</span>':""}<span class="sub">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span>${c.flag||c.registry?`<span class="sub">${esc(c.flag||"")}${c.flag&&c.registry?" · ":""}${c.registry?"Reg. "+esc(c.registry):""}</span>`:""}<div class="row-act" style="margin-top:6px"><button type="button" class="btn-sm" data-edit="${esc(c.id)}">Edit</button><button type="button" class="btn-sm btn-danger" data-del="${esc(c.id)}">Delete</button></div></td>
+      return `<tr><td data-l="Vessel"><b>${esc(c.vessel)}</b>${planned?' <span class="pill plan">planned</span>':""}<span class="sub">${esc(c.rank||"")}${c.imo?" · IMO "+esc(c.imo):""}</span>${c.flag||c.registry?`<span class="sub">${esc(c.flag||"")}${c.flag&&c.registry?" · ":""}${c.registry?"Reg. "+esc(c.registry):""}</span>`:""}<div class="row-act" style="margin-top:6px"><button type="button" class="btn-sm" data-edit="${esc(c.id)}">Edit</button><button type="button" class="btn-sm" data-sdocs="${esc(c.id)}" aria-expanded="${SHIPOPEN.has(c.id)}">📎 Documents${shipDocs(c).length?` (${shipDocs(c).length})`:""}</button><button type="button" class="btn-sm btn-danger" data-del="${esc(c.id)}">Delete</button></div>${shipDocs(c).length?`<span class="dcount">${shipDocSummary(c)}</span>`:""}</td>
       <td data-l="Type · company"><span class="tchip" style="--tc:${typeColor(c.type)}">${esc(c.type)}</span><span class="sub">${esc(c.company||"—")}${c.fleet?" · "+esc(c.fleet):""}</span></td>
       <td data-l="Sign-on" class="mono">${fmt(dn(c.on))}<span class="sub">${chainOf(c).prev?PROMO:(c.onIndia?"Indian port":"Abroad")+(c.onPort?" · "+esc(c.onPort):"")}</span></td>
       <td data-l="Sign-off" class="mono">${c.off?fmt(dn(c.off)):'<span class="pill plan">onboard</span>'}<span class="sub">${c.off?(chainOf(c).next?PROMO:(c.offIndia?"Indian port":"Abroad")+(c.offPort?" · "+esc(c.offPort):"")):""}</span></td>
@@ -390,7 +390,7 @@ function renderShips(){
       <td data-l="Days on ship" class="n">${d}<span class="sub">${yrs(d)} yrs</span><span class="sub">${sp?ymd(sp[0],sp[1]):""}</span></td>
       ${fF!=null?`<td data-l="In FY ${fyLabel(fF)}" class="n">${shipDaysIn(c,fF)}<span class="sub">${yrs(shipDaysIn(c,fF))} yrs</span></td>`:""}
       <td data-l="Ship particulars" class="wrap">${partLine(c)}${c.propellingDays!==""&&c.propellingDays!=null?`<span class="sub">${esc(c.propellingDays)} propelling days</span>`:""}</td>
-</tr>`;}).join("");
+</tr>${SHIPOPEN.has(c.id)?`<tr class="docpanel" data-for="${esc(c.id)}"><td colspan="${fF!=null?8:7}">${shipDocsHtml(c)}</td></tr>`:""}`;}).join("");
     $("ctable").innerHTML=`<thead><tr><th>Vessel</th><th>Type · company</th><th>Sign-on</th><th>Sign-off</th><th>Passport</th><th class="n">Days on ship</th>${fF!=null?`<th class="n">In FY ${fyLabel(fF)}</th>`:""}<th>Ship particulars</th></tr></thead><tbody>${rows}</tbody>`;
   }
   const m={};list.forEach(c=>{const k=(c[totKey]||"").trim()||"Not set";m[k]=m[k]||{d:0,n:0,p:0};m[k].d+=shipDaysIn(c,fF);m[k].n++;m[k].p+=(+c.propellingDays||0);});
@@ -577,9 +577,20 @@ function renderNews(){
   const pool=newsShow==="saved"?Object.values(SAVED):(NEWS.items||[]);
   const items=pool.filter(n=>(newsTopic==="All"||n.topic===newsTopic)&&(newsShow!=="new"||(+n.addedAt||0)>seen)&&(!q||(String(n.title)+" "+String(n.summary||"")+" "+String(n.source||"")).toLowerCase().includes(q))).sort((a,b)=>(+b.ts||0)-(+a.ts||0)||String(b.date).localeCompare(String(a.date)));
   if(!items.length){$("newsList").innerHTML=`<div class="empty">${newsShow==="saved"?(nSaved?"No saved headlines match this topic or search.":"Nothing saved yet. Tap ☆ on a headline to keep it on this device."):(NEWS.items||[]).length?(newsShow==="new"?"No new headlines since you last looked.":"No headlines match this topic or search."):"No headlines yet. Press Sync while online."}</div>`;return;}
-  $("newsList").innerHTML=items.map(n=>{const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^https:\/\//i.test(String(n.url||""))?n.url:"#",isNew=newsShow!=="saved"&&(+n.addedAt||0)>seen,k=newsKey(n),st=!!SAVED[k];
-    return `<div class="news"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><a class="nlink" href="${esc(safe)}" target="_blank" rel="noopener noreferrer"><div class="hl">${isNew?'<span class="newtag">NEW</span> ':""}${esc(n.title)}</div>${n.summary?`<div class="gist">${esc(n.summary)}</div>`:""}<div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||"var(--cx)"}">${esc(n.topic||"General")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span><span class="opens">Opens the full article online ↗</span></div></a><button type="button" class="star" data-star="${esc(k)}" aria-pressed="${st}" aria-label="${st?"Remove from saved":"Save for later"}" title="${st?"Remove from saved":"Save for later"}">${st?"★":"☆"}</button></div>`;}).join("");
+  const card=n=>{const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^https:\/\//i.test(String(n.url||""))?n.url:"#",isNew=newsShow!=="saved"&&(+n.addedAt||0)>seen,k=newsKey(n),st=!!SAVED[k];
+    return `<div class="news"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><a class="nlink" href="${esc(safe)}" target="_blank" rel="noopener noreferrer"><div class="hl">${isNew?'<span class="newtag">NEW</span> ':""}${esc(n.title)}</div>${n.summary?`<div class="gist">${esc(n.summary)}</div>`:""}<div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||"var(--cx)"}">${esc(n.topic||"General")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span><span class="opens">Opens the full article online ↗</span></div></a><button type="button" class="star" data-star="${esc(k)}" aria-pressed="${st}" aria-label="${st?"Remove from saved":"Save for later"}" title="${st?"Remove from saved":"Save for later"}">${st?"★":"☆"}</button></div>`;};
+  /* month folders, each with day folders; the newest month and day are open */
+  const months=[],byM={};items.forEach(n=>{const k=String(n.date||"").slice(0,7)||"Undated";if(!byM[k]){byM[k]=[];months.push(k);}byM[k].push(n);});
+  const searching=!!q,openM=k=>searching||NOPEN.has(k)||(!NOPEN.size&&k===months[0]),isNewN=n=>newsShow!=="saved"&&(+n.addedAt||0)>seen;
+  $("newsList").innerHTML=months.map(k=>{const list=byM[k],days=[],byD={};list.forEach(n=>{const dk=String(n.date||"").slice(0,10)||"Undated";if(!byD[dk]){byD[dk]=[];days.push(dk);}byD[dk].push(n);});
+    const nn=list.filter(isNewN).length,ml=/^\d{4}-\d{2}$/.test(k)?monthLbl(k).replace(/^(\w+)/,m=>({Jan:"January",Feb:"February",Mar:"March",Apr:"April",May:"May",Jun:"June",Jul:"July",Aug:"August",Sep:"September",Oct:"October",Nov:"November",Dec:"December"})[m]||m):k;
+    return `<details class="nmonth" data-m="${esc(k)}" ${openM(k)?"open":""}><summary><span>📁 ${esc(ml)}</span>${nn?`<span class="nnew">${nn} new</span>`:""}<span class="cnt">${list.length} headline${list.length===1?"":"s"}</span></summary>
+      ${days.map((dk,i)=>{const dd=dn(dk),lbl=dd!=null?(TODAY-dd===0?"Today":TODAY-dd===1?"Yesterday":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(dd*DAY).getUTCDay()]+" "+fmt(dd)):dk,dOpen=searching||DOPEN.has(dk)||(i===0&&!DCLOSED.has(dk));
+        return `<details class="nday" data-d="${esc(dk)}" ${dOpen?"open":""}><summary><b>${esc(lbl)}</b> · ${byD[dk].length}</summary>${byD[dk].map(card).join("")}</details>`;}).join("")}</details>`;}).join("");
 }
+const NOPEN=new Set(),DOPEN=new Set(),DCLOSED=new Set();
+$("newsList").addEventListener("toggle",e=>{const el=e.target;if(el.classList.contains("nmonth")){if(!NOPEN.size){const first=$("newsList").querySelector(".nmonth");if(first&&first!==el&&first.open)NOPEN.add(first.dataset.m);}el.open?NOPEN.add(el.dataset.m):NOPEN.delete(el.dataset.m);if(!NOPEN.size&&!el.open)NOPEN.add("__none");}
+  if(el.classList.contains("nday")){const k=el.dataset.d;if(el.open){DOPEN.add(k);DCLOSED.delete(k);}else{DOPEN.delete(k);DCLOSED.add(k);}}},true);
 function toggleSave(k){
   if(SAVED[k]){delete SAVED[k];toast("Removed from saved");}
   else{const n=(NEWS.items||[]).find(x=>newsKey(x)===k);if(!n)return;SAVED[k]=Object.assign({},n,{savedAt:Date.now()});toast("Saved on this device");}
@@ -843,22 +854,27 @@ function planImport(){return PIMP.recs.map(r=>{const cand=candidate(r),ex=findEx
 function renderUploadState(){const on=navigator.onLine;$("upOnline").className="banner "+(on?"info":"warn");$("profilePdf").disabled=!on;$("pickLbl").style.opacity=on?"":"0.5";$("pickLbl").style.pointerEvents=on?"":"none";$("upState").textContent=on?"":"You're offline. Connect to the internet to upload your profile.";}
 function renderImport(){
   const body=$("pImpBody");if(!PIMP){body.hidden=true;return;}body.hidden=false;
-  const plan=planImport(),nNew=plan.filter(p=>p.status==="new").length,nUp=plan.filter(p=>p.status==="update").length,ranks=[...new Set(PIMP.recs.map(r=>r.rank).filter(Boolean))];
+  const plan=planImport(),nCert=(PIMP.certs||[]).filter(x=>!(S.certs||[]).some(y=>y.id===certId(x))).length,nNew=plan.filter(p=>p.status==="new").length,nUp=plan.filter(p=>p.status==="update").length,ranks=[...new Set(PIMP.recs.map(r=>r.rank).filter(Boolean))];
   const opts=v=>`<option value="">(keep as written)</option>`+Object.entries(RANKS).map(([g,items])=>`<optgroup label="${g}">${items.map(i=>`<option ${i===v?"selected":""}>${esc(i)}</option>`).join("")}</optgroup>`).join("");
   body.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
     <div><b>${PIMP.recs.length} sea-service record${PIMP.recs.length===1?"":"s"} found</b> in ${esc(PIMP.name)}.</div>
     <div class="chips"><span class="pill NR">${nNew} new</span><span class="pill RNOR">${nUp} to fill in</span><span class="pill UNK">${plan.length-nNew-nUp} already up to date</span></div>
     ${ranks.length?`<div><div class="eyebrow" style="margin-bottom:6px">Rank in the PDF → rank in the app</div><div class="fgrid">${ranks.map((rk,i)=>`<label class="f"><span>${esc(rk)}</span><select data-rk="${i}">${opts(PIMP.map[rk]!=null?PIMP.map[rk]:(ALLRANKS.includes(defaultRank(rk))?defaultRank(rk):""))}</select></label>`).join("")}</div></div>`:""}
     <div class="tbl-wrap"><table><thead><tr><th>Vessel</th><th>Type</th><th>Rank</th><th>Sign-on</th><th>Sign-off</th><th>Result</th></tr></thead><tbody>${plan.map(p=>`<tr><td><b>${esc(p.cand.vessel)}</b><span class="sub">${p.cand.imo?"IMO "+esc(p.cand.imo):""}</span></td><td>${esc(p.cand.type)}</td><td>${esc(p.cand.rank||"—")}</td><td class="mono">${fmt(dn(p.cand.on))}</td><td class="mono">${fmt(dn(p.cand.off))}</td><td>${p.status==="new"?'<span class="pill NR">New ship</span>':p.status==="update"?`<span class="pill RNOR">Fill ${p.fill.length} detail${p.fill.length===1?"":"s"}</span>`:'<span class="pill UNK">Up to date</span>'}</td></tr>`).join("")}</tbody></table></div>
-    <div class="actions"><button type="button" class="btn-primary" id="pImpGo" ${nNew+nUp?"":"disabled"}>${nNew+nUp?`Add ${nNew} new ship${nNew===1?"":"s"}${nUp?` and update ${nUp}`:""}`:"Nothing new to add"}</button><button type="button" class="btn-ghost" id="pImpCancel">Close</button></div></div>`;
+    ${nCert?`<div><b>${nCert} new certificate${nCert===1?"":"s"}</b> found too. They'll be added to the Certificates tab.</div>`:`<div class="small muted">Certificates: all ${(PIMP.certs||[]).length} are already in the Certificates tab.</div>`}
+    <label class="chk"><input type="checkbox" id="pKeep" checked> <span>Also keep this profile PDF in My documents (category "Seafarer profile")</span></label>
+    <div class="actions"><button type="button" class="btn-primary" id="pImpGo">${nNew+nUp+nCert?[nNew?`Add ${nNew} new ship${nNew===1?"":"s"}`:"",nUp?`update ${nUp}`:"",nCert?`add ${nCert} certificate${nCert===1?"":"s"}`:""].filter(Boolean).join(", ").replace(/^./,m=>m.toUpperCase()):"Save the PDF only"}</button><button type="button" class="btn-ghost" id="pImpCancel">Close</button></div></div>`;
   body.querySelectorAll("[data-rk]").forEach(sel=>sel.addEventListener("change",()=>{PIMP.map[ranks[+sel.dataset.rk]]=sel.value||ranks[+sel.dataset.rk];renderImport();}));
   $("pImpCancel").onclick=()=>{PIMP=null;renderImport();};
-  $("pImpGo").onclick=()=>{if(S.example)leaveExample();const now=Date.now();let added=0,updated=0;
+  $("pImpGo").onclick=async()=>{if(S.example)leaveExample();const now=Date.now();let added=0,updated=0;const keep=$("pKeep").checked&&PIMP.file,pf=PIMP.file;
     planImport().forEach(p=>{if(p.status==="new"){S.contracts.push(Object.assign({id:"dgs-"+(p.cand.imo||normName(p.cand.vessel))+"-"+p.cand.on,company:"",fleet:"",left:"",arr:"",onIndia:false,offIndia:false,onPort:"",offPort:"",coastal:false,notes:"From DG Shipping profile",source:"DGS profile",u:now},p.cand));added++;}
       else if(p.status==="update"){p.fill.forEach(k=>p.ex[k]=p.cand[k]);p.ex.u=now;updated++;}});
     S.certs=S.certs||[];let certAdded=0;(PIMP.certs||[]).forEach(x=>{const id=certId(x);if(S.certs.some(y=>y.id===id))return;S.certs.push(Object.assign({id,source:"DGS profile",u:now},x));certAdded++;});
     if(certAdded)toast(`${certAdded} certificate${certAdded===1?"":"s"} added too.`,3000);
-    S.settings.rankMap=Object.assign({},S.settings.rankMap||{},PIMP.map);PIMP=null;saveLocal();render();renderImport();
+    S.settings.rankMap=Object.assign({},S.settings.rankMap||{},PIMP.map);PIMP=null;
+    if(keep){try{const c=await compressPdf(pf);const d={id:"doc-"+uid(),name:"Seafarer profile – "+fmt(TODAY),cat:"Seafarer profile",type:"application/pdf",size:c.blob.size,pages:c.pages,added:new Date().toISOString().slice(0,10),u:Date.now(),chunks:0,enc:1,cz:1,cert:"",ship:"",notes:""};
+      await blobPut(d.id,c.blob);S.docs=S.docs||[];S.docs.push(d);LOCAL.add(d.id);}catch(e){toast("Couldn't keep the PDF copy, but your ships and certificates were added.",5000);}}
+    saveLocal();render();renderImport();
     const todo=S.contracts.filter(c=>!cdState(c).done).length;
     toast(`${added} ship${added===1?"":"s"} added, ${updated} updated.${todo?` ${todo} have pending details: fill them in here.`:""} Press Sync to save to your account.`,7000);location.hash=todo?"complete":"ships";};
 }
@@ -873,7 +889,7 @@ $("profilePdf").addEventListener("change",async e=>{
     const recs=sdlParseProfile(lines.join("\n")),certs=sdlParseCerts(lines.join("\n"));
     if(!recs.length&&!certs.length){body.innerHTML='<div class="err">No sea-service records were found. Use the “Seafarer Profile” PDF from the DG Shipping e-Governance portal; scanned or photographed copies can\'t be read.</div>';return;}
     const map={},saved=S.settings.rankMap||{};recs.forEach(r=>{if(r.rank&&map[r.rank]==null&&saved[r.rank]!=null)map[r.rank]=saved[r.rank];});
-    PIMP={name:file.name,recs,map,certs};renderImport();
+    PIMP={name:file.name,recs,map,certs,file};renderImport();
   }catch(err){body.innerHTML='<div class="err">This file couldn\'t be read. Check that it is the DG Shipping Seafarer Profile PDF and that you\'re online.</div>';}
 });
 
@@ -1009,8 +1025,9 @@ $("certQ").addEventListener("input",renderCerts);
 /* ======================= my documents (scans) ======================= */
 /* files live in IndexedDB on the device; metadata travels with the ledger; the file itself is stored in the
    user's private Firestore area in pieces of up to 700 KB (users/{uid}/files/{docId}_{n}) when Sync is pressed */
-const DOC_CATS=["Passport","CDC","CoC","Endorsement","STCW course","Medical","Visa","Contract / letter","Other"];
-const CHUNK=700000,PDF_MAX=8*1024*1024;
+const DOC_CATS=["Passport","CDC","CoC","Endorsement","STCW course","Medical","Visa","Contract letter","Salary slip","Seafarer profile","Other"];
+const SHIPCATS=["Contract letter","Salary slip"];
+const CHUNK=700000,PDF_MAX=8*1024*1024,PDF_IN_MAX=40*1024*1024;
 let idbP=null;
 function idb(){if(!idbP)idbP=new Promise((res,rej)=>{const q=indexedDB.open("sdl-docs",1);q.onupgradeneeded=()=>q.result.createObjectStore("files");q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});return idbP;}
 async function idbDo(mode,fn){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction("files",mode),st=tx.objectStore("files");const q=fn(st);tx.oncomplete=()=>res(q&&q.result);tx.onerror=()=>rej(tx.error);});}
@@ -1028,13 +1045,35 @@ async function migrateDocs(){if(!MK)return 0;let n=0;const now=Date.now();
 let LOCAL=new Set();async function refreshLocal(){try{LOCAL=new Set(await blobKeys());}catch(e){LOCAL=new Set();}}
 const mb=n=>!n?"0 KB":n>=1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
 function renderDocBadge(){const n=S.example?0:(S.docs||[]).filter(d=>!d.chunks).length;$("docBadge").hidden=!n||!savedUser();$("docBadge").textContent=n;$("docBadge").title="Waiting to sync";}
+/* ---------- compression: every file is made as small as possible while staying sharp ---------- */
+const IMG_MAX=2400,IMG_TARGET=850000,PDF_DPI=200;
 async function imgToJpeg(file,max){
   const url=URL.createObjectURL(file);try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
-    const k=Math.min(1,(max||2000)/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k);
-    const cv=document.createElement("canvas");cv.width=w;cv.height=h;const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,w,h);cx.drawImage(im,0,0,w,h);
-    let q=.82,b;do{b=await new Promise(r=>cv.toBlob(r,"image/jpeg",q));q-=.12;}while(b&&b.size>650000&&q>.4);return {blob:b,w,h};}
+    let side=Math.min(max||IMG_MAX,Math.max(im.naturalWidth,im.naturalHeight)),b,w,h;
+    for(let pass=0;pass<4;pass++){const k=side/Math.max(im.naturalWidth,im.naturalHeight);w=Math.round(im.naturalWidth*k);h=Math.round(im.naturalHeight*k);
+      const cv=document.createElement("canvas");cv.width=w;cv.height=h;const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,w,h);cx.imageSmoothingQuality="high";cx.drawImage(im,0,0,w,h);
+      let q=.86;do{b=await new Promise(r=>cv.toBlob(r,"image/jpeg",q));q-=.06;}while(b&&b.size>IMG_TARGET&&q>.66);cv.width=cv.height=0;
+      if(b.size<=IMG_TARGET*1.4)break;side=Math.round(side*.85);}
+    if(file.type==="image/jpeg"&&file.size<=b.size)return {blob:file,w,h,kept:true}; /* already smaller than we could make it */
+    return {blob:b,w,h};}
   finally{URL.revokeObjectURL(url);}
 }
+async function pdfLib(){if(!window.pdfjsLib){await loadScript("vendor/pdf.min.js");window.pdfjsLib.GlobalWorkerOptions.workerSrc="vendor/pdf.worker.min.js";}if(!window.jspdf)await loadScript("vendor/jspdf.umd.min.js");}
+/* a scanned PDF is rebuilt page by page at print quality; if that isn't clearly smaller (text PDFs usually are small already) the original is kept */
+async function compressPdf(file,onp){
+  await pdfLib();const pdf=await window.pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;const {jsPDF}=window.jspdf;let out=null;
+  try{for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i),v1=pg.getViewport({scale:1}),k=Math.min(PDF_DPI/72,IMG_MAX/Math.max(v1.width,v1.height)),vp=pg.getViewport({scale:k});
+      const cv=document.createElement("canvas");cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,cv.width,cv.height);
+      await pg.render({canvasContext:cx,viewport:vp}).promise;const jpg=await new Promise(r=>cv.toBlob(r,"image/jpeg",.8));cv.width=cv.height=0;
+      const o=v1.width>v1.height?"l":"p";if(!out)out=new jsPDF({unit:"pt",format:[v1.width,v1.height],orientation:o,compress:true});else out.addPage([v1.width,v1.height],o);
+      out.addImage(new Uint8Array(await jpg.arrayBuffer()),"JPEG",0,0,v1.width,v1.height,undefined,"NONE");pg.cleanup();if(onp)onp(i,pdf.numPages);}
+    const pages=pdf.numPages,b=out.output("blob");return b.size<file.size*.9?{blob:b,pages}:{blob:file,pages,kept:true};}
+  finally{try{pdf.destroy();}catch(e){}}
+}
+async function photosToPdf(files,onp){await pdfLib();const {jsPDF}=window.jspdf;let pdf=null,i=0;
+  for(const f of files){const {blob,w,h}=await imgToJpeg(f,2000);const o=w>h?"l":"p",W=w*.75,H=h*.75; /* 96 dpi px → pt */
+    if(!pdf)pdf=new jsPDF({unit:"pt",format:[W,H],orientation:o,compress:true});else pdf.addPage([W,H],o);pdf.addImage(new Uint8Array(await blob.arrayBuffer()),"JPEG",0,0,W,H,undefined,"NONE");if(onp)onp(++i,files.length);}
+  return pdf.output("blob");}
 let PEND=[];
 /* ---------- which certificate does a document belong to? ---------- */
 const CABBR=[["pst",/personal survival/i],["fpff",/fire prevention/i],["aff",/advanced (training in )?fire|advanced fire/i],["mfa",/medical first aid/i],["mc",/medical care/i],["pscrb",/survival craft|proficiency in survival/i],["pssr",/personal safety/i],["efa",/elementary first aid/i],["stsdsd",/security duties|security awareness/i],["erm",/engine ?room resource/i],["hv",/high voltage/i],["bst",/basic safety/i],["tasco",/tanker|oil.*chemical|chemical tanker|oil tanker/i],["gmdss",/gmdss/i]];
@@ -1056,66 +1095,75 @@ function suggestCert(name,cat){
   return null;
 }
 function catForCert(c){if(!c)return "Other";if(c.kind==="document")return /passport/i.test(c.name)?"Passport":/cdc|discharge/i.test(c.name)?"CDC":"Other";return {coc:"CoC",endorsement:"Endorsement",course:"STCW course",medical:"Medical"}[c.kind]||"Other";}
-let certTouched=false;
+let certTouched=false,nameAuto=false;
+function shipOpts(sel){return `<option value="">— none —</option>`+S.contracts.slice().sort((a,b)=>(dn(b.on)||0)-(dn(a.on)||0)).map(c=>`<option value="${esc(c.id)}" ${c.id===sel?"selected":""}>${esc(c.vessel)} · ${fmt(dn(c.on))}</option>`).join("");}
+const monthLbl=m=>{if(!/^\d{4}-\d{2}$/.test(m||""))return "";const [y,mo]=m.split("-").map(Number);return MON[mo-1]+" "+y;};
+function slipName(){const c=S.contracts.find(x=>x.id===$("dc_ship").value),m=monthLbl($("dc_month").value);return "Salary slip"+(m?" "+m:"")+(c?" – "+c.vessel:"");}
+function syncFormBits(){const slip=$("dc_cat").value==="Salary slip";$("dcMonthRow").hidden=!slip;
+  if(nameAuto||!$("dc_name").value.trim()){if(slip){$("dc_name").value=slipName();nameAuto=true;}else if($("dc_cat").value==="Contract letter"){const c=S.contracts.find(x=>x.id===$("dc_ship").value);if(c){$("dc_name").value="Contract letter – "+c.vessel;nameAuto=true;}}}}
+$("dc_cat").addEventListener("change",syncFormBits);$("dc_ship").addEventListener("change",syncFormBits);$("dc_month").addEventListener("change",syncFormBits);
+$("dc_name").addEventListener("input",()=>{nameAuto=false;});
 function suggestInForm(){if(certTouched||$("dc_id").value)return;const c=suggestCert($("dc_name").value,$("dc_cat").value);$("dc_cert").innerHTML=docCertOpts(c?c.id:"");$("dcHint").textContent=c?"Suggested from the name. Change it if it's not right.":"";}
 $("dc_name").addEventListener("input",suggestInForm);$("dc_cat").addEventListener("change",suggestInForm);
 $("dc_cert").addEventListener("change",()=>{certTouched=true;$("dcHint").textContent="";});
 /* attach a scan straight from a certificate: the add form opens inside the Certificates tab, already linked */
-let ATTACH=null;const formHome=$("docFormCard").parentNode,formNext=$("docFormCard").nextSibling;
-function formBackHome(){if($("docFormCard").parentNode!==formHome)formHome.insertBefore($("docFormCard"),formNext);ATTACH=null;}
+let ATTACH=null,SHIPATTACH=null;const formHome=$("docFormCard").parentNode,formNext=$("docFormCard").nextSibling;
+function formBackHome(){if($("docFormCard").parentNode!==formHome)formHome.insertBefore($("docFormCard"),formNext);ATTACH=null;SHIPATTACH=null;}
 $("certFile").addEventListener("change",()=>{const files=[...$("certFile").files];$("certFile").value="";if(!files.length||!ATTACH)return;
   const c=ATTACH,row=$("certList").querySelector(`.cert[data-id="${CSS.escape(c.id)}"]`);(row||$("certList")).after($("docFormCard"));
   startDocAdd(files,{name:c.name,cat:catForCert(c),cert:c.id});});
 
 const docCertOpts=sel=>{const cs=(S.certs||[]).filter(c=>!c.hidden),cur=cs.filter(c=>certStatus(c)!=="replaced"),old=cs.filter(c=>certStatus(c)==="replaced"),o=c=>`<option value="${esc(c.id)}" ${c.id===sel?"selected":""}>${esc(c.name)}${c.expires?" · exp "+fmt(dn(c.expires)):""}</option>`,srt=l=>l.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
   return `<option value="">— none —</option><optgroup label="Current">${srt(cur).map(o).join("")}</optgroup>${old.length?`<optgroup label="Older (replaced)">${srt(old).map(o).join("")}</optgroup>`:""}`;};
-function guessCat(n){n=n.toLowerCase();return /passport/.test(n)?"Passport":/cdc|discharge/.test(n)?"CDC":/coc|competency/.test(n)?"CoC":/endorse/.test(n)?"Endorsement":/medical|fitness/.test(n)?"Medical":/visa/.test(n)?"Visa":/stcw|course|fire|survival|first aid/.test(n)?"STCW course":"Other";}
+function normCat(c){return c==="Contract / letter"?"Contract letter":DOC_CATS.includes(c)?c:"Other";}
+function guessCat(n){n=n.toLowerCase();if(/salary|pay ?slip|wage/.test(n))return "Salary slip";if(/contract|appointment|offer letter/.test(n))return "Contract letter";if(/seafarer.?profile|dgs/.test(n))return "Seafarer profile";return /passport/.test(n)?"Passport":/cdc|discharge/.test(n)?"CDC":/coc|competency/.test(n)?"CoC":/endorse/.test(n)?"Endorsement":/medical|fitness/.test(n)?"Medical":/visa/.test(n)?"Visa":/stcw|course|fire|survival|first aid/.test(n)?"STCW course":"Other";}
 $("docAddLbl").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("docFile").click();}});
 $("docFile").addEventListener("change",()=>{const files=[...$("docFile").files];$("docFile").value="";if(files.length){formBackHome();startDocAdd(files);}});
 function startDocAdd(files,preset){
   const bad=files.filter(f=>!(/^image\//.test(f.type)||f.type==="application/pdf"));if(bad.length){toast("Only photos and PDF files can be added.");return;}
-  const big=files.find(f=>f.type==="application/pdf"&&f.size>PDF_MAX);if(big){toast(`${big.name} is larger than 8 MB. Please use a smaller PDF.`,5000);return;}
+  const big=files.find(f=>f.type==="application/pdf"&&f.size>PDF_IN_MAX);if(big){toast(`${big.name} is larger than 40 MB. Please use a smaller PDF.`,5000);return;}
   PEND=files;$("docForm").reset();$("dc_id").value="";$("dcErr").textContent="";$("docFormTitle").textContent=files.length>1?`Add ${files.length} files`:"Add document";
   const imgs=files.filter(f=>/^image\//.test(f.type));$("dcCombineRow").hidden=!(imgs.length>1&&imgs.length===files.length);
-  const base=files[0].name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim();certTouched=false;$("dcHint").textContent="";
-  if(preset){$("dc_name").value=preset.name;$("dc_cat").value=preset.cat;$("dc_cert").innerHTML=docCertOpts(preset.cert);certTouched=true;$("docFormTitle").textContent="Attach scan";$("dcHint").textContent="Linked to this certificate.";}
+  const base=files[0].name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim();certTouched=false;nameAuto=false;$("dcHint").textContent="";$("dc_ship").innerHTML=shipOpts(preset&&preset.ship||"");$("dc_month").value=preset&&preset.month||"";
+  if(preset&&preset.ship){$("dc_cat").value=preset.cat;$("dc_cert").innerHTML=docCertOpts("");certTouched=true;$("dc_name").value=preset.name||"";nameAuto=true;$("docFormTitle").textContent="Add "+preset.cat.toLowerCase();syncFormBits();}
+  else if(preset){$("dc_name").value=preset.name;$("dc_cat").value=preset.cat;$("dc_cert").innerHTML=docCertOpts(preset.cert);certTouched=true;$("docFormTitle").textContent="Attach scan";$("dcHint").textContent="Linked to this certificate.";}
   else{$("dc_name").value=files.length>1&&$("dcCombineRow").hidden?"":base;$("dc_cat").value=guessCat(base);suggestInForm();}
+  if(!(preset&&preset.ship))syncFormBits();
   $("docPrev").innerHTML=files.map((f,i)=>`<div class="pv" data-i="${i}">${/^image\//.test(f.type)?"":"PDF<br>"+esc(f.name.slice(0,24))}</div>`).join("");
   files.forEach((f,i)=>{if(/^image\//.test(f.type)){const u=URL.createObjectURL(f),im=new Image();im.onload=()=>setTimeout(()=>URL.revokeObjectURL(u),1000);im.src=u;$("docPrev").querySelector(`[data-i="${i}"]`).appendChild(im);}});
   $("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});
 }
 function openDocForm(d){formBackHome();PEND=[];$("dcHint").textContent="";certTouched=true;$("docForm").reset();$("dcErr").textContent="";$("dc_id").value=d.id;$("docFormTitle").textContent="Edit document";$("dcCombineRow").hidden=true;$("docPrev").innerHTML="";
-  $("dc_name").value=d.name;$("dc_cat").value=d.cat||"Other";$("dc_cert").innerHTML=docCertOpts(d.cert||"");$("dc_notes").value=d.notes||"";$("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});}
+  $("dc_name").value=d.name;$("dc_cat").value=normCat(d.cat);$("dc_ship").innerHTML=shipOpts(d.ship||"");$("dc_month").value=d.month||"";nameAuto=false;$("dcMonthRow").hidden=$("dc_cat").value!=="Salary slip";$("dc_cert").innerHTML=docCertOpts(d.cert||"");$("dc_notes").value=d.notes||"";$("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});}
 const closeDocForm=()=>{$("docFormCard").hidden=true;PEND=[];formBackHome();};
 $("docFormClose").addEventListener("click",closeDocForm);$("dcCancel").addEventListener("click",closeDocForm);
 $("docForm").addEventListener("submit",async e=>{e.preventDefault();
-  const name=$("dc_name").value.trim(),meta={cat:$("dc_cat").value,cert:$("dc_cert").value,notes:$("dc_notes").value.trim()};
+  const name=$("dc_name").value.trim(),meta={cat:$("dc_cat").value,cert:$("dc_cert").value,ship:$("dc_ship").value,month:$("dc_cat").value==="Salary slip"?$("dc_month").value:"",notes:$("dc_notes").value.trim()};
   if(!name&&!(PEND.length>1&&$("dcCombineRow").hidden)){$("dcErr").textContent="Enter a name for the document.";return;}
   const id=$("dc_id").value;
   if(id){const d=S.docs.find(x=>x.id===id);if(d){Object.assign(d,meta,{name,u:Date.now()});saveLocal();render();renderDocs();}closeDocForm();toast("Document updated");return;}
   const addSize=PEND.reduce((a,f)=>a+(/^image\//.test(f.type)?500000:f.size),0);
   if(storageInfo().used+addSize*4/3>docLimit()){$("dcErr").textContent=`This would go over the ${mb(docLimit())} document space for your account. Delete old or replaced documents first.`;return;}
-  $("dcSave").disabled=true;$("dcSave").textContent="Saving…";
+  $("dcSave").disabled=true;$("dcSave").textContent="Compressing…";const prog=m=>$("dcProg").textContent=m;
   try{
     if(S.example)leaveExample();S.docs=S.docs||[];
     let items=[];
     if(PEND.length>1&&!$("dcCombineRow").hidden&&$("dc_combine").checked){
-      if(!window.jspdf)await loadScript("vendor/jspdf.umd.min.js");
-      const {jsPDF}=window.jspdf;let pdf=null;
-      for(const f of PEND){const {blob,w,h}=await imgToJpeg(f,1700);const data=new Uint8Array(await blob.arrayBuffer());const o=w>h?"l":"p";
-        if(!pdf)pdf=new jsPDF({unit:"px",format:[w,h],orientation:o,hotfixes:["px_scaling"]});else pdf.addPage([w,h],o);pdf.addImage(data,"JPEG",0,0,w,h);}
-      items.push({name,blob:pdf.output("blob"),type:"application/pdf",pages:PEND.length});
+      const before=PEND.reduce((a,f)=>a+f.size,0),blob=await photosToPdf(PEND,(i,n)=>prog(`Compressing photo ${i} of ${n}…`));
+      items.push({name,blob,type:"application/pdf",pages:PEND.length,before});
     }else{
       for(let i=0;i<PEND.length;i++){const f=PEND[i];const nm=name?(PEND.length>1?`${name} (${i+1})`:name):f.name.replace(/\.[^.]+$/,"");
-        if(/^image\//.test(f.type)){const {blob}=await imgToJpeg(f,2000);items.push({name:nm,blob,type:"image/jpeg"});}
-        else items.push({name:nm,blob:f,type:"application/pdf"});}
+        prog(PEND.length>1?`Compressing file ${i+1} of ${PEND.length}…`:"Compressing…");
+        if(/^image\//.test(f.type)){const {blob}=await imgToJpeg(f,IMG_MAX);items.push({name:nm,blob,type:"image/jpeg",before:f.size});}
+        else{const c=await compressPdf(f,(p,n)=>prog(`Compressing page ${p} of ${n}…`));if(c.blob.size>PDF_MAX)throw Object.assign(new Error("big"),{code:"big",nm:f.name});items.push({name:nm,blob:c.blob,type:"application/pdf",pages:c.pages,before:f.size});}}
     }
-    for(const it of items){const d=Object.assign({id:"doc-"+uid(),name:it.name,type:it.type,size:it.blob.size,added:new Date().toISOString().slice(0,10),u:Date.now(),chunks:0,enc:1},meta);if(it.pages)d.pages=it.pages;
+    for(const it of items){const d=Object.assign({id:"doc-"+uid(),name:it.name,type:it.type,size:it.blob.size,added:new Date().toISOString().slice(0,10),u:Date.now(),chunks:0,enc:1,cz:1},meta);if(it.pages)d.pages=it.pages;
       await blobPut(d.id,it.blob);LOCAL.add(d.id);S.docs.push(d);}
-    const fromCert=!!ATTACH;saveLocal();closeDocForm();render();renderDocs();if(fromCert)renderCerts();
-    toast(items.length===1?"Document saved on this device."+(savedUser()?" Press Sync to keep it in your account.":""):`${items.length} documents saved.`,4000);
-  }catch(err){$("dcErr").textContent="Couldn't save this file. "+(err&&err.name==="QuotaExceededError"?"This device is out of storage.":"Please try again.");}
-  finally{$("dcSave").disabled=false;$("dcSave").textContent="Save";}
+    const fromCert=!!ATTACH,fromShip=!!SHIPATTACH;saveLocal();closeDocForm();render();renderDocs();if(fromCert)renderCerts();
+    const b0=items.reduce((a,it)=>a+(it.before||it.blob.size),0),b1=items.reduce((a,it)=>a+it.blob.size,0),saved=b0>b1?` Compressed ${mb(b0)} → ${mb(b1)}.`:"";
+    toast((items.length===1?"Document saved.":`${items.length} documents saved.`)+saved+(savedUser()?" Press Sync to keep it in your account.":""),6000);
+  }catch(err){$("dcErr").textContent=err&&err.code==="big"?`${err.nm} is still larger than 8 MB after compressing. Split it into smaller PDFs.`:"Couldn't save this file. "+(err&&err.name==="QuotaExceededError"?"This device is out of storage.":"Please try again.");}
+  finally{$("dcSave").disabled=false;$("dcSave").textContent="Save";$("dcProg").textContent="";}
 });
 let docCat="",THUMBS={};
 async function thumbFor(d){
@@ -1130,25 +1178,27 @@ async function renderDocs(){
   await refreshLocal();
   const all=S.example?[]:(S.docs||[]),total=all.reduce((a,d)=>a+(d.size||0),0),waiting=all.filter(d=>!d.chunks).length,away=all.filter(d=>!LOCAL.has(d.id)).length;
   $("docTiles").innerHTML=`<div class="tile"><b>${all.length}</b><span>documents</span></div><div class="tile"><b>${mb(storageInfo().used)}</b><span>of ${mb(docLimit())} cloud space used</span></div><div class="tile"><b style="color:${waiting?"var(--warn)":"var(--ok)"}">${savedUser()?waiting:"—"}</b><span>${savedUser()?"waiting to sync":"sign in to back up"}</span></div>${away?`<div class="tile"><b>${away}</b><span>in your account, not on this device yet</span></div>`:""}`;
+  all.forEach(d=>{if(d.cat==="Contract / letter")d.cat="Contract letter";});
   const cats=DOC_CATS.filter(c=>all.some(d=>d.cat===c));if(docCat&&!cats.includes(docCat))docCat="";
   $("docCat").innerHTML=`<button type="button" data-c="" aria-pressed="${!docCat}">All</button>`+cats.map(c=>`<button type="button" data-c="${esc(c)}" aria-pressed="${docCat===c}">${esc(c)}</button>`).join("");
   const q=$("docQ").value.trim().toLowerCase();
-  const list=all.filter(d=>(!docCat||d.cat===docCat)&&(!q||(d.name+" "+d.cat+" "+(d.notes||"")).toLowerCase().includes(q))).sort((a,b)=>DOC_CATS.indexOf(a.cat)-DOC_CATS.indexOf(b.cat)||String(a.name).localeCompare(String(b.name)));
+  const shipName=d=>{const c=d.ship&&S.contracts.find(x=>x.id===d.ship);return c?c.vessel:"";};
+  const list=all.filter(d=>(!docCat||d.cat===docCat)&&(!q||(d.name+" "+d.cat+" "+(d.notes||"")+" "+shipName(d)).toLowerCase().includes(q))).sort((a,b)=>DOC_CATS.indexOf(a.cat)-DOC_CATS.indexOf(b.cat)||String(a.name).localeCompare(String(b.name)));
   if(!all.length){$("docList").innerHTML='<div class="card empty" style="grid-column:1/-1">No documents yet. Tap <b>+ Add document</b> to take a photo or choose a scan or PDF.</div>';renderDocBadge();return;}
   if(!list.length){$("docList").innerHTML='<div class="card empty" style="grid-column:1/-1">No documents match.</div>';return;}
   $("docList").classList.toggle("selecting",SELECTING);
   $("docList").innerHTML=list.map(d=>{const here=LOCAL.has(d.id),cert=d.cert&&(S.certs||[]).find(c=>c.id===d.cert),xs=cert?docExp(cert):null,cs=!here?["away","In account · download on Sync"]:d.chunks?["ok","✓ In your account"]:savedUser()?["wait","Waiting to sync"]:["away","On this device only"];
     return `<div class="doc ${xs?xs.k:""} ${PICKED.has(d.id)?"picked":""}" data-id="${esc(d.id)}"><span class="pick" aria-hidden="true">✓</span><button type="button" class="thumb" data-open aria-label="Open ${esc(d.name)}"><span class="ph">${here?"…":"Not on this device yet"}</span></button>
     <div class="db"><div class="dn">${esc(d.name)}</div><div class="dm"><span class="ftype">${d.type==="application/pdf"?"PDF":"JPG"}</span><span>${esc(d.cat||"Other")}</span><span>${mb(d.size||0)}</span>${d.pages>1?`<span>${d.pages} pages</span>`:""}</div>
-    ${cert?`<div class="dm">Linked: ${esc(cert.name)}</div>`:""}${xs?`<div class="dm"><span class="xs ${xs.k}">${xs.t}</span></div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
+    ${cert?`<div class="dm">Linked: ${esc(cert.name)}</div>`:""}${shipName(d)?`<div class="dm">🚢 ${esc(shipName(d))}${d.month?" · "+monthLbl(d.month):""}</div>`:""}${xs?`<div class="dm"><span class="xs ${xs.k}">${xs.t}</span></div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
     <div class="dm"><span class="cs ${cs[0]}">${cs[1]}</span></div>
     <div class="row-act">${here?'<button type="button" class="btn-sm btn-primary" data-open>View</button><button type="button" class="btn-sm" data-share>Share</button><button type="button" class="btn-sm" data-save>Save</button>':""}<button type="button" class="btn-sm" data-dedit>Edit</button><button type="button" class="btn-sm btn-danger" data-ddel>Delete</button></div></div></div>`;}).join("");
-  renderDocBadge();renderSelBar();renderLinkBtn();
+  renderDocBadge();renderSelBar();renderLinkBtn();$("docShrink").hidden=!all.some(d=>!d.cz&&LOCAL.has(d.id));
   for(const d of list){if(!LOCAL.has(d.id))continue;const t=await thumbFor(d);const el=$("docList").querySelector(`.doc[data-id="${CSS.escape(d.id)}"] .thumb`);if(el)el.innerHTML=t?`<img src="${t}" alt="">`:'<span class="ph">PDF</span>';}
 }
 $("docCat").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;docCat=b.dataset.c;renderDocs();});
 $("docQ").addEventListener("input",renderDocs);
-function fileName(d){const ext=d.type==="application/pdf"?".pdf":".jpg";return (String(d.name).replace(/[\\/:*?"<>|]+/g," ").trim()||"document")+ext;}
+function fileName(d){const ext=d.type==="application/pdf"?".pdf":".jpg";return (String(d.name).normalize("NFKD").replace(/[\u2010-\u2015]/g,"-").replace(/[^\x20-\x7E]/g,"").replace(/[\\/:*?"<>|]+/g," ").replace(/\s+/g," ").trim()||"document")+ext;}
 async function docFile(d){const b=await blobGet(d.id);if(!b)throw new Error("missing");return new File([b],fileName(d),{type:d.type});}
 async function shareDoc(d){
   let f;try{f=await docFile(d);}catch(e){toast("This file isn't on this device yet. Press Sync while online.");return;}
@@ -1223,6 +1273,57 @@ async function docsDownload(f,u){
 
 
 
+
+/* ======================= documents for each ship ======================= */
+const SHIPOPEN=new Set();
+function shipDocs(c){return (S.docs||[]).filter(d=>d.ship===c.id);}
+function shipDocSummary(c){const l=shipDocs(c),n=k=>l.filter(d=>d.cat===k).length,a=n("Contract letter"),b=n("Salary slip"),o=l.length-a-b;
+  return "📎 "+[a?a+" contract"+(a>1?"s":""):"",b?b+" salary slip"+(b>1?"s":""):"",o?o+" other":""].filter(Boolean).join(" · ");}
+function shipMonths(c){const s=dn(c.on),e=c.off?dn(c.off):TODAY;if(s==null)return [];const out=[];let d=new Date(s*DAY);d=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1));
+  while(d.getTime()/DAY<=e&&out.length<60){out.push(d.getUTCFullYear()+"-"+pad(d.getUTCMonth()+1));d=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1));}return out;}
+function nextSlipMonth(c){const have=new Set(shipDocs(c).filter(d=>d.cat==="Salary slip").map(d=>d.month)),ms=shipMonths(c);return ms.find(m=>!have.has(m))||ms[ms.length-1]||"";}
+function shipDocsHtml(c){
+  const l=shipDocs(c),grp=(t,list)=>list.length?`<div class="sd-group"><h4>${t} (${list.length})</h4><div class="sd-items">${list.map(d=>`<div class="sd-item" data-doc="${esc(d.id)}"><span class="nm" title="${esc(d.name)}">${esc(d.name)}</span><span class="sz">${mb(d.size||0)}</span><button type="button" class="btn-sm btn-primary" data-sview>View</button><button type="button" class="btn-sm" data-sshare>Share</button></div>`).join("")}</div></div>`:"";
+  const slips=l.filter(d=>d.cat==="Salary slip").sort((a,b)=>String(a.month||"").localeCompare(String(b.month||""))),ms=shipMonths(c),missing=ms.filter(m=>!slips.some(d=>d.month===m));
+  return `<div class="shipdocs"><div class="sd-head"><b>Documents for ${esc(c.vessel)}</b><span class="sp" style="flex:1"></span>
+    <button type="button" class="btn-sm" data-sadd="Contract letter">+ Contract letter</button><button type="button" class="btn-sm" data-sadd="Salary slip">+ Salary slip</button><button type="button" class="btn-sm" data-sadd="Other">+ Other document</button>${l.length?'<button type="button" class="btn-sm" data-sall>Share all</button>':""}</div>
+    ${l.length?"":'<div class="small muted">No documents for this ship yet. Add the contract letter, salary slips, or anything else for this contract.</div>'}
+    ${grp("Contract letter",l.filter(d=>d.cat==="Contract letter"))}${grp("Salary slips",slips)}${grp("Other",l.filter(d=>!SHIPCATS.includes(d.cat)))}
+    ${slips.length&&missing.length?`<div class="small muted">Salary slips not added yet: ${missing.slice(0,6).map(monthLbl).join(", ")}${missing.length>6?` and ${missing.length-6} more`:""}</div>`:""}<div class="sd-form"></div></div>`;}
+async function filesOfDocs(list){await refreshLocal();const out=[];for(const d of list){if(!LOCAL.has(d.id))continue;try{out.push(await docFile(d));}catch(e){}}return out;}
+async function shareFiles(files,title){if(!files.length){toast("These files aren't on this device yet. Press Sync while online.");return;}
+  if(navigator.canShare&&navigator.canShare({files})){try{await navigator.share({files,title});}catch(e){if(!(e&&e.name==="AbortError"))saveFiles(files);}return;}saveFiles(files,true);}
+$("ctable").addEventListener("click",async e=>{
+  const t=e.target.closest("[data-sdocs]");if(t){const id=t.dataset.sdocs;SHIPOPEN.has(id)?SHIPOPEN.delete(id):SHIPOPEN.add(id);formBackHome();$("docFormCard").hidden=true;renderShips();return;}
+  const panel=e.target.closest("tr.docpanel");if(!panel)return;const c=S.contracts.find(x=>x.id===panel.dataset.for);if(!c)return;
+  const add=e.target.closest("[data-sadd]");if(add){SHIPATTACH={ship:c.id,cat:add.dataset.sadd};$("shipFile").click();return;}
+  if(e.target.closest("[data-sall]")){shareFiles(await filesOfDocs(shipDocs(c)),"Documents – "+c.vessel);return;}
+  const it=e.target.closest(".sd-item");if(!it)return;const d=(S.docs||[]).find(x=>x.id===it.dataset.doc);if(!d)return;
+  if(e.target.closest("[data-sview]")){await refreshLocal();viewList(shipDocs(c).filter(x=>LOCAL.has(x.id)),d);return;}
+  if(e.target.closest("[data-sshare]")){shareDoc(d);return;}
+});
+$("shipFile").addEventListener("change",()=>{const files=[...$("shipFile").files];$("shipFile").value="";if(!files.length||!SHIPATTACH)return;const a=SHIPATTACH,c=S.contracts.find(x=>x.id===a.ship);if(!c)return;
+  const slot=$("ctable").querySelector(`tr.docpanel[data-for="${CSS.escape(c.id)}"] .sd-form`);if(slot)slot.appendChild($("docFormCard"));SHIPATTACH=a;
+  const base=files[0].name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim();
+  startDocAdd(files,{ship:c.id,cat:a.cat,month:a.cat==="Salary slip"?nextSlipMonth(c):"",name:a.cat==="Contract letter"?"Contract letter – "+c.vessel:a.cat==="Other"?base+" – "+c.vessel:""});});
+
+/* ---------- compress documents added before compression was stronger ---------- */
+async function shrinkAll(btn){
+  await refreshLocal();const list=(S.docs||[]).filter(d=>LOCAL.has(d.id)&&!d.cz);if(!list.length){toast("All documents are already compressed.");renderDocs();return;}
+  btn.disabled=true;let b0=0,b1=0,changed=0,i=0;const now=Date.now();
+  try{for(const d of list){i++;btn.textContent=`Compressing ${i} of ${list.length}…`;
+      let plain;try{plain=await blobGet(d.id);}catch(e){continue;}if(!plain)continue;const f=new File([plain],fileName(d),{type:d.type});let nb=null;
+      try{if(d.type==="application/pdf"){const c=await compressPdf(f);if(!c.kept)nb=c.blob;d.pages=c.pages;}else{const c=await imgToJpeg(f,IMG_MAX);if(!c.kept&&c.blob.size<f.size*.9)nb=c.blob;}}catch(e){}
+      b0+=f.size;
+      if(nb){const nid="doc-"+uid();await blobPut(nid,nb);await blobDel(d.id);(S.deleted=S.deleted||[]).push({id:d.id,u:now,n:d.chunks||0});if(THUMBS[d.id])delete THUMBS[d.id];
+        d.id=nid;d.size=nb.size;d.chunks=0;d.type=d.type==="application/pdf"?"application/pdf":"image/jpeg";changed++;b1+=nb.size;}else b1+=f.size;
+      d.cz=1;d.u=now;}
+    saveLocal();render();renderDocs();
+    toast(changed?`${changed} document${changed===1?"":"s"} compressed: ${mb(b0)} → ${mb(b1)}. Press Sync to replace the copies in your account.`:"Your documents were already as small as they can be without losing quality.",8000);
+  }finally{btn.disabled=false;btn.textContent="Compress my documents";}
+}
+$("docShrink").addEventListener("click",e=>shrinkAll(e.currentTarget));
+
 /* ---------- link documents you already have ---------- */
 function linkCandidates(){return (S.example?[]:(S.docs||[])).filter(d=>!d.cert||!(S.certs||[]).some(c=>c.id===d.cert)).map(d=>({d,c:suggestCert(d.name,d.cat)}));}
 function renderLinkBtn(){const l=linkCandidates(),n=l.filter(x=>x.c).length;$("docLinkBtn").hidden=!l.length||!(S.certs||[]).length;$("docLinkBtn").textContent=n?`Link to certificates (${n} suggested)`:"Link to certificates";}
@@ -1270,7 +1371,10 @@ function renderStorage(){const s=storageInfo(),pct=Math.min(100,s.used/docLimit(
    ${pct>=90?'<p class="small" style="color:var(--bad);margin-top:6px">Almost full. Delete old or replaced documents to make room.</p>':""}<p class="small muted" style="margin-top:6px">On this device: ${mb(s.file)}. Photos are made smaller when you add them.</p><div style="margin-top:8px"><a class="btn btn-sm" href="#docs">Open My documents</a></div>`;}
 
 /* ======================= report for your CA (PDF) ======================= */
-async function makeReport(f){
+function fyDocs(f){const s0=fyStart(f),e0=fyEnd(f);return (S.docs||[]).filter(d=>{if(!d.ship)return false;const c=S.contracts.find(x=>x.id===d.ship);if(!c)return false;
+  if(d.cat==="Salary slip"&&/^\d{4}-\d{2}$/.test(d.month||"")){const m=dn(d.month+"-01");return m>=s0&&m<=e0;}return shipDaysIn(c,f)>0;})
+  .sort((a,b)=>String(a.cat).localeCompare(String(b.cat))||String(a.month||"").localeCompare(String(b.month||"")));}
+async function makeReport(f,asFile){
   try{
     if(!window.jspdf)await loadScript("vendor/jspdf.umd.min.js");
     const {jsPDF}=window.jspdf,doc=new jsPDF({unit:"mm",format:"a4"}),r=C.res[f],W=210,M=16;let y=18;
@@ -1298,11 +1402,14 @@ async function makeReport(f){
     line("Days outside India are counted from passport exit and entry dates. For a voyage that starts or ends at an Indian port, the period from CDC sign-on to sign-off is excluded from the stay in India (Rule 126 of the Income-tax Rules, 1962, and Rule 8 of the Income-tax Rules, 2026). An Indian citizen leaving India for employment, or as a member of the crew of an Indian ship, is resident only if in India for 182 days or more in the year.",8.5,"normal",[80,95,110]);
     y+=3;line(`Prepared with Sea Days Ledger by BlueWave Algo on ${fmt(TODAY)}. Figures are calculated from the dates entered by the seafarer; please verify them against the passport and CDC. This summary is not tax advice.`,8,"italic",[110,120,130]);
     const name=`Sea-Days-${fyLabel(f)}-residential-status.pdf`,blob=doc.output("blob"),file=new File([blob],name,{type:"application/pdf"});
+    if(asFile)return file;
     if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:`Residential status FY ${fyLabel(f)}`});return;}catch(e){if(e&&e.name==="AbortError")return;}}
     const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);toast("Report saved: "+name,4000);
   }catch(e){toast(navigator.onLine===false&&!window.jspdf?"The report maker needs internet the first time. Connect once and try again.":"Couldn't make the report. Please try again.",5000);}
 }
-$("fyList").addEventListener("click",e=>{const b=e.target.closest("[data-report]");if(b)makeReport(+b.dataset.report);});
+$("fyList").addEventListener("click",async e=>{const b=e.target.closest("[data-report]");if(b)makeReport(+b.dataset.report);
+  const y=e.target.closest("[data-fydocs]");if(y){const f=+y.dataset.fydocs;y.disabled=true;const lbl=y.textContent;y.textContent="Preparing…";
+    try{const files=await filesOfDocs(fyDocs(f)),rep=await makeReport(f,true);if(rep)files.unshift(rep);await shareFiles(files,`FY ${fyLabel(f)} documents`);}finally{y.disabled=false;y.textContent=lbl;}}});
 
 /* ======================= tooltip ======================= */
 const tip=document.createElement("div");tip.id="tip";tip.hidden=true;document.body.appendChild(tip);

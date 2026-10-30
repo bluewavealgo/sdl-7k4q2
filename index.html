@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202610301806">
+<link rel="stylesheet" href="app.css?v=202610301821">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body class="locked">
@@ -211,7 +211,7 @@
 
     <!-- CERTIFICATES -->
     <section class="view" id="v-certs" data-title="Certificates" hidden>
-      <div class="vhead"><div><h1>Certificates</h1><p class="muted">Your <b>certificate register</b>: passport, CDC, CoC, endorsements and STCW courses with their numbers and expiry dates, filled in from your seafarer profile. Tap <b>Attach scan</b> to keep the photo or PDF of a certificate with it; the file is saved in My documents too.</p></div><button type="button" class="btn-primary" id="certAdd">+ Add certificate</button></div>
+      <div class="vhead"><div><h1>Certificates</h1><p class="muted">Your <b>certificate register</b>: passport, CDC, CoC, endorsements and STCW courses with their numbers and expiry dates, filled in from your seafarer profile. Tap <b>Attach scan</b> to keep the photo or PDF of a certificate with it; the file is saved in My documents too.</p></div><div class="row-act"><a class="btn" href="#upload">Update from seafarer profile</a><button type="button" class="btn-primary" id="certAdd">+ Add certificate</button></div></div>
       <div class="card" id="certFormCard" hidden>
         <div class="card-h"><h2 id="certFormTitle">Add certificate</h2><button type="button" class="btn-ghost btn-sm" id="certFormClose">Close</button></div>
         <form id="certForm" class="card-b" novalidate>
@@ -241,6 +241,7 @@
       <div class="vhead"><div><h1>My documents</h1><p class="muted">Your <b>file folder</b>: scans and photos of your passport, CDC, CoC, visas, medicals and certificates. Files linked to a certificate also show on that certificate in the Certificates tab. They're saved on this device, and in your private account when you press Sync while signed in, so your other devices get them too. Open them offline, save them to your device, or share them to WhatsApp or email.</p></div><label class="btn-primary" id="docAddLbl" for="docFile" tabindex="0">+ Add document</label></div>
       <input type="file" id="docFile" accept="image/*,application/pdf" multiple hidden>
       <input type="file" id="certFile" accept="image/*,application/pdf" multiple hidden>
+      <input type="file" id="shipFile" accept="image/*,application/pdf" multiple hidden>
       <div class="card" id="docFormCard" hidden>
         <div class="card-h"><h2 id="docFormTitle">Add document</h2><button type="button" class="btn-ghost btn-sm" id="docFormClose">Close</button></div>
         <form id="docForm" class="card-b" novalidate>
@@ -249,12 +250,14 @@
           <label class="chk" id="dcCombineRow" hidden><input type="checkbox" id="dc_combine" checked> <span>Combine these photos into one PDF (for example front and back pages)</span></label>
           <div class="fgrid">
             <label class="f s2"><span>Name *</span><input id="dc_name" placeholder="e.g. Passport front and back" autocomplete="off"></label>
-            <label class="f"><span>Category</span><select id="dc_cat"><option>Passport</option><option>CDC</option><option>CoC</option><option>Endorsement</option><option>STCW course</option><option>Medical</option><option>Visa</option><option>Contract / letter</option><option>Other</option></select></label>
+            <label class="f"><span>Category</span><select id="dc_cat"><option>Passport</option><option>CDC</option><option>CoC</option><option>Endorsement</option><option>STCW course</option><option>Medical</option><option>Visa</option><option>Contract letter</option><option>Salary slip</option><option>Seafarer profile</option><option>Other</option></select></label>
+            <label class="f"><span>Ship (optional)</span><select id="dc_ship"></select></label>
+            <label class="f" id="dcMonthRow" hidden><span>Salary month</span><input type="month" id="dc_month"></label>
             <label class="f"><span>Link to certificate (optional)</span><select id="dc_cert"></select><small class="hint" id="dcHint"></small></label>
             <label class="f s2"><span>Notes</span><input id="dc_notes" autocomplete="off"></label>
           </div>
           <div class="actions" style="margin-top:14px"><button type="submit" class="btn-primary" id="dcSave">Save</button><button type="button" class="btn-ghost" id="dcCancel">Cancel</button><span class="err" id="dcErr"></span></div>
-          <p class="small muted" style="margin-top:8px">Photos are made smaller (about 0.3–0.6 MB each) so they sync quickly over ship Wi-Fi. PDFs up to 8 MB.</p>
+          <p class="small muted" style="margin-top:8px">Every file is compressed before saving: photos stay sharp (up to 2400 px, high quality) and scanned PDFs are rebuilt at print quality (200 dpi). You'll see the size before and after.</p><div class="small" id="dcProg" style="margin-top:6px"></div>
         </form>
       </div>
       <div class="card" id="linkCard" hidden></div>
@@ -263,7 +266,7 @@
         <div class="f wide"><span>Category</span><div class="chips" id="docCat" role="group" aria-label="Category"></div></div>
         <label class="f wide"><span>Search</span><input id="docQ" placeholder="e.g. passport, visa" autocomplete="off"></label>
       </div></div>
-      <div class="selbar" id="docSelBar"><button type="button" class="btn-sm btn-primary" id="docViewAll">View all</button><button type="button" class="btn-sm" id="docSelToggle">Select several</button><button type="button" class="btn-sm" id="docLinkBtn" hidden>Link to certificates</button><span class="small muted" id="docSelInfo"></span><span class="sp"></span><button type="button" class="btn-sm" id="docSelAll" hidden>Select all</button><button type="button" class="btn-sm btn-primary" id="docSelShare" hidden disabled>Share</button><button type="button" class="btn-sm" id="docSelSave" hidden disabled>Save</button></div>
+      <div class="selbar" id="docSelBar"><button type="button" class="btn-sm btn-primary" id="docViewAll">View all</button><button type="button" class="btn-sm" id="docSelToggle">Select several</button><button type="button" class="btn-sm" id="docLinkBtn" hidden>Link to certificates</button><button type="button" class="btn-sm" id="docShrink" hidden>Compress my documents</button><span class="small muted" id="docSelInfo"></span><span class="sp"></span><button type="button" class="btn-sm" id="docSelAll" hidden>Select all</button><button type="button" class="btn-sm btn-primary" id="docSelShare" hidden disabled>Share</button><button type="button" class="btn-sm" id="docSelSave" hidden disabled>Save</button></div>
       <div id="docList" class="doc-grid"></div>
       <div class="card card-b small muted">🔒 Your documents are encrypted with your own key, on this device and in your account. Only your PIN, Face ID / fingerprint, passphrase or recovery key can open them. The app locks itself when you leave it.</div>
     </section>
@@ -388,6 +391,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202610301806"></script>
+<script src="app.js?v=202610301821"></script>
 </body>
 </html>
