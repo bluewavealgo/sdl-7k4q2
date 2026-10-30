@@ -963,21 +963,26 @@ function maskNo(n){n=String(n||"");return n.length>4?"•••• "+n.slice(-4)
 function renderCerts(){
   const all=S.example?[]:(S.certs||[]);const cnt={valid:0,soon:0,expired:0,noexp:0};all.forEach(c=>{const s=certStatus(c);if(cnt[s]!=null)cnt[s]++;});
   $("certTiles").innerHTML=`<div class="tile"><b style="color:var(--ok)">${cnt.valid}</b><span>valid</span></div><div class="tile"><b style="color:var(--warn)">${cnt.soon}</b><span>expire within 6 months</span></div><div class="tile"><b style="color:var(--bad)">${cnt.expired}</b><span>expired</span></div><div class="tile"><b>${cnt.noexp}</b><span>no expiry date</span></div>`;
+  const noScan=all.filter(c=>{const s=certStatus(c);return s!=="replaced"&&s!=="hiddenc"&&!hasScan(c);}).length;$("certNoScan").textContent=`Missing scan (${noScan})`;
   $("certType").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.t===certType)));$("certShow").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.s===certShow)));
   const q=$("certQ").value.trim().toLowerCase();
   const list=all.filter(c=>{const s=certStatus(c);
     if(certType==="coc"&&!(c.kind==="coc"||c.kind==="endorsement"))return false;if(certType==="other"&&!(c.kind==="medical"||c.kind==="other"))return false;if(certType&&certType!=="coc"&&certType!=="other"&&c.kind!==certType)return false;
-    if(certShow==="current"&&(s==="replaced"||s==="hiddenc"))return false;if(certShow==="attention"&&!(s==="expired"||s==="soon"))return false;
+    if(certShow==="current"&&(s==="replaced"||s==="hiddenc"))return false;if(certShow==="attention"&&!(s==="expired"||s==="soon"))return false;if(certShow==="noscan"&&(s==="replaced"||s==="hiddenc"||hasScan(c)))return false;
     if(q&&!(String(c.name)+" "+String(c.issuer||"")+" "+String(c.number||"")).toLowerCase().includes(q))return false;return true;})
    .sort((a,b)=>{const o={expired:0,soon:1,valid:2,noexp:3,replaced:4,hiddenc:5};const sa=o[certStatus(a)],sb=o[certStatus(b)];return sa-sb||String(a.expires||"9").localeCompare(String(b.expires||"9"))||String(a.name).localeCompare(String(b.name));});
   if(!all.length){$("certList").innerHTML='<div class="empty">No certificates yet. Upload your seafarer profile or add one.</div>';return;}
   if(!list.length){$("certList").innerHTML=`<div class="empty">${certShow==="attention"?"Nothing has expired or is expiring soon.":"No certificates match these filters."}</div>`;return;}
   $("certList").innerHTML=list.map(c=>{const s=certStatus(c),e=dn(c.expires);
-    return `<div class="cert ${s}" data-id="${esc(c.id)}"><span class="stripe"></span><div><div class="cn">${esc(c.name)}</div>
+    return `<div class="cert ${s}" data-id="${esc(c.id)}"><span class="stripe"></span><div><div class="cn">${esc(c.name)}${hasScan(c)?` <span class="clip">📎 ${scansOf(c).length>1?scansOf(c).length+" scans":"scan"}</span>`:""}</div>
       <div class="meta"><span class="tchip" style="--tc:${{document:"var(--c0)",coc:"var(--c6)",endorsement:"var(--c6)",course:"var(--c2)",medical:"var(--c7)",other:"var(--cx)"}[c.kind]||"var(--cx)"}">${esc(CERT_KIND[c.kind]||"Other")}</span>${c.number?`<span>No. <span class="num" data-num="${esc(c.number)}">${esc(c.kind==="document"?maskNo(c.number):c.number)}</span>${c.kind==="document"&&String(c.number).length>4?'<button type="button" class="reveal" data-reveal>Show</button>':""}</span>`:""}${c.issuer?`<span>${esc(c.issuer)}</span>`:""}${c.issued?`<span>Issued ${fmt(dn(c.issued))}</span>`:""}</div>${c.notes?`<div class="small muted" style="margin-top:3px">${esc(c.notes)}</div>`:""}</div>
-      <div class="right"><span class="pill ${{valid:"NR",soon:"RNOR",expired:"ROR"}[s]||"UNK"}">${STLBL[s]}</span>${e!=null?`<span class="exp">${s==="expired"?"Expired":"Expires"} ${fmt(e)}<br><span class="muted">${relDays(e)}</span></span>`:""}
-      <div class="row-act">${(S.docs||[]).some(d=>d.cert===c.id)?'<button type="button" class="btn-sm scan" data-cscan>View scan</button>':""}<button type="button" class="btn-sm" data-cedit>Edit</button><button type="button" class="btn-sm" data-chide>${c.hidden?"Unhide":"Hide"}</button><button type="button" class="btn-sm btn-danger" data-cdel>Delete</button></div></div></div>`;}).join("");
+      <div class="right">${hasScan(c)?`<button type="button" class="cthumb" data-cscan aria-label="View scan of ${esc(c.name)}" data-th="${esc(scansOf(c)[0].id)}">📎</button>`:""}<span class="pill ${{valid:"NR",soon:"RNOR",expired:"ROR"}[s]||"UNK"}">${STLBL[s]}</span>${e!=null?`<span class="exp">${s==="expired"?"Expired":"Expires"} ${fmt(e)}<br><span class="muted">${relDays(e)}</span></span>`:""}
+      <div class="row-act">${hasScan(c)?'<button type="button" class="btn-sm btn-primary scan" data-cscan>View scan</button>':""}<button type="button" class="btn-sm" data-cattach>${hasScan(c)?"Add scan":"Attach scan"}</button><button type="button" class="btn-sm" data-cedit>Edit</button><button type="button" class="btn-sm" data-chide>${c.hidden?"Unhide":"Hide"}</button><button type="button" class="btn-sm btn-danger" data-cdel>Delete</button></div></div></div>`;}).join("");
+  fillCertThumbs();
 }
+function scansOf(c){return (S.docs||[]).filter(d=>d.cert===c.id);}
+function hasScan(c){return (S.docs||[]).some(d=>d.cert===c.id);}
+async function fillCertThumbs(){await refreshLocal();for(const b of [...$("certList").querySelectorAll("[data-th]")]){const d=(S.docs||[]).find(x=>x.id===b.dataset.th);if(!d||!LOCAL.has(d.id))continue;try{const t=await thumbFor(d);if(t&&b.isConnected)b.innerHTML=`<img src="${t}" alt="">`;}catch(e){}}}
 function certId(c){const s=[c.kind,c.name,c.number||"",c.issued||""].join("|");let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return "cert-"+(h>>>0).toString(36);}
 function openCertForm(c){$("certForm").reset();$("ceErr").textContent="";$("ce_id").value=c?c.id:"";["name","kind","number","issuer","issued","expires","notes"].forEach(k=>{if(c)$("ce_"+k).value=c[k]||(k==="kind"?"other":"");});
   $("certFormTitle").textContent=c?"Edit certificate":"Add certificate";$("certFormCard").hidden=false;$("certFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});$("ce_name").focus({preventScroll:true});}
@@ -991,6 +996,7 @@ let pendingCDel=null;
 $("certList").addEventListener("click",e=>{const row=e.target.closest(".cert");if(!row)return;const c=(S.certs||[]).find(x=>x.id===row.dataset.id);if(!c)return;
   if(e.target.closest("[data-reveal]")){const n=row.querySelector("[data-num]"),b=e.target.closest("[data-reveal]");const shown=b.textContent==="Hide";n.textContent=shown?maskNo(n.dataset.num):n.dataset.num;b.textContent=shown?"Show":"Hide";return;}
   if(e.target.closest("[data-cedit]")){openCertForm(c);return;}
+  if(e.target.closest("[data-cattach]")){ATTACH=c;$("certFile").click();return;}
   if(e.target.closest("[data-cscan]")){const l=S.docs.filter(x=>x.cert===c.id);if(l.length)refreshLocal().then(()=>viewList(l.filter(x=>LOCAL.has(x.id)),l[0]));return;}
   if(e.target.closest("[data-chide]")){c.hidden=!c.hidden;c.u=Date.now();saveLocal();render();renderCerts();return;}
   const d=e.target.closest("[data-cdel]");if(d){if(pendingCDel!==c.id){pendingCDel=c.id;d.textContent="Tap again to delete";setTimeout(()=>{if(pendingCDel===c.id){pendingCDel=null;d.textContent="Delete";}},4000);return;}
@@ -1030,24 +1036,57 @@ async function imgToJpeg(file,max){
   finally{URL.revokeObjectURL(url);}
 }
 let PEND=[];
+/* ---------- which certificate does a document belong to? ---------- */
+const CABBR=[["pst",/personal survival/i],["fpff",/fire prevention/i],["aff",/advanced (training in )?fire|advanced fire/i],["mfa",/medical first aid/i],["mc",/medical care/i],["pscrb",/survival craft|proficiency in survival/i],["pssr",/personal safety/i],["efa",/elementary first aid/i],["stsdsd",/security duties|security awareness/i],["erm",/engine ?room resource/i],["hv",/high voltage/i],["bst",/basic safety/i],["tasco",/tanker|oil.*chemical|chemical tanker|oil tanker/i],["gmdss",/gmdss/i]];
+function suggestCert(name,cat){
+  const cs=(S.certs||[]).filter(c=>!c.hidden&&certStatus(c)!=="replaced"),n=String(name||"").toLowerCase();
+  const pick=l=>l.slice().sort((a,b)=>String(b.issued||"").localeCompare(String(a.issued||"")))[0]||null;
+  const by=(re,kind)=>pick(cs.filter(c=>(!kind||c.kind===kind)&&re.test(c.name)));
+  if(/passport/.test(n)||(cat==="Passport"&&!n.trim()))return by(/passport/i,"document");
+  if(/\bcdc\b|discharge/.test(n))return by(/cdc|discharge/i,"document");
+  if(/indos/.test(n))return by(/indos/i);
+  if(/\bcoc\b|competen/.test(n))return pick(cs.filter(c=>c.kind==="coc"));
+  if(/endorse|\bdce\b|dangerous cargo/.test(n))return pick(cs.filter(c=>c.kind==="endorsement"));
+  for(const [ab,re] of CABBR)if(new RegExp("\\b"+ab+"\\b").test(n)||re.test(n)){const m=by(new RegExp(re.source+"|\\b"+ab+"\\b","i"));if(m)return m;}
+  const stop=new Set(["certificate","certificates","scan","scanned","copy","page","pages","front","back","training","course","document","photo","image","valid","with","from"]);
+  const words=n.split(/[^a-z0-9]+/).filter(w=>w.length>3&&!stop.has(w));
+  if(words.length){let best=null,bs=0;cs.forEach(c=>{const cn=String(c.name).toLowerCase(),sc=words.filter(w=>cn.includes(w)).length/words.length;if(sc>bs){bs=sc;best=c;}});if(bs>=0.5)return best;}
+  if(cat==="Passport")return by(/passport/i,"document");if(cat==="CDC")return by(/cdc|discharge/i,"document");if(cat==="CoC")return pick(cs.filter(c=>c.kind==="coc"));if(cat==="Endorsement")return pick(cs.filter(c=>c.kind==="endorsement"));
+  if(cat==="Medical")return pick(cs.filter(c=>c.kind==="medical"));
+  return null;
+}
+function catForCert(c){if(!c)return "Other";if(c.kind==="document")return /passport/i.test(c.name)?"Passport":/cdc|discharge/i.test(c.name)?"CDC":"Other";return {coc:"CoC",endorsement:"Endorsement",course:"STCW course",medical:"Medical"}[c.kind]||"Other";}
+let certTouched=false;
+function suggestInForm(){if(certTouched||$("dc_id").value)return;const c=suggestCert($("dc_name").value,$("dc_cat").value);$("dc_cert").innerHTML=docCertOpts(c?c.id:"");$("dcHint").textContent=c?"Suggested from the name. Change it if it's not right.":"";}
+$("dc_name").addEventListener("input",suggestInForm);$("dc_cat").addEventListener("change",suggestInForm);
+$("dc_cert").addEventListener("change",()=>{certTouched=true;$("dcHint").textContent="";});
+/* attach a scan straight from a certificate: the add form opens inside the Certificates tab, already linked */
+let ATTACH=null;const formHome=$("docFormCard").parentNode,formNext=$("docFormCard").nextSibling;
+function formBackHome(){if($("docFormCard").parentNode!==formHome)formHome.insertBefore($("docFormCard"),formNext);ATTACH=null;}
+$("certFile").addEventListener("change",()=>{const files=[...$("certFile").files];$("certFile").value="";if(!files.length||!ATTACH)return;
+  const c=ATTACH,row=$("certList").querySelector(`.cert[data-id="${CSS.escape(c.id)}"]`);(row||$("certList")).after($("docFormCard"));
+  startDocAdd(files,{name:c.name,cat:catForCert(c),cert:c.id});});
+
 const docCertOpts=sel=>{const cs=(S.certs||[]).filter(c=>!c.hidden),cur=cs.filter(c=>certStatus(c)!=="replaced"),old=cs.filter(c=>certStatus(c)==="replaced"),o=c=>`<option value="${esc(c.id)}" ${c.id===sel?"selected":""}>${esc(c.name)}${c.expires?" · exp "+fmt(dn(c.expires)):""}</option>`,srt=l=>l.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
   return `<option value="">— none —</option><optgroup label="Current">${srt(cur).map(o).join("")}</optgroup>${old.length?`<optgroup label="Older (replaced)">${srt(old).map(o).join("")}</optgroup>`:""}`;};
 function guessCat(n){n=n.toLowerCase();return /passport/.test(n)?"Passport":/cdc|discharge/.test(n)?"CDC":/coc|competency/.test(n)?"CoC":/endorse/.test(n)?"Endorsement":/medical|fitness/.test(n)?"Medical":/visa/.test(n)?"Visa":/stcw|course|fire|survival|first aid/.test(n)?"STCW course":"Other";}
 $("docAddLbl").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("docFile").click();}});
-$("docFile").addEventListener("change",async()=>{
-  const files=[...$("docFile").files];$("docFile").value="";if(!files.length)return;
+$("docFile").addEventListener("change",()=>{const files=[...$("docFile").files];$("docFile").value="";if(files.length){formBackHome();startDocAdd(files);}});
+function startDocAdd(files,preset){
   const bad=files.filter(f=>!(/^image\//.test(f.type)||f.type==="application/pdf"));if(bad.length){toast("Only photos and PDF files can be added.");return;}
   const big=files.find(f=>f.type==="application/pdf"&&f.size>PDF_MAX);if(big){toast(`${big.name} is larger than 8 MB. Please use a smaller PDF.`,5000);return;}
   PEND=files;$("docForm").reset();$("dc_id").value="";$("dcErr").textContent="";$("docFormTitle").textContent=files.length>1?`Add ${files.length} files`:"Add document";
   const imgs=files.filter(f=>/^image\//.test(f.type));$("dcCombineRow").hidden=!(imgs.length>1&&imgs.length===files.length);
-  const base=files[0].name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim();$("dc_name").value=files.length>1&&$("dcCombineRow").hidden?"":base;$("dc_cat").value=guessCat(base);$("dc_cert").innerHTML=docCertOpts("");
+  const base=files[0].name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim();certTouched=false;$("dcHint").textContent="";
+  if(preset){$("dc_name").value=preset.name;$("dc_cat").value=preset.cat;$("dc_cert").innerHTML=docCertOpts(preset.cert);certTouched=true;$("docFormTitle").textContent="Attach scan";$("dcHint").textContent="Linked to this certificate.";}
+  else{$("dc_name").value=files.length>1&&$("dcCombineRow").hidden?"":base;$("dc_cat").value=guessCat(base);suggestInForm();}
   $("docPrev").innerHTML=files.map((f,i)=>`<div class="pv" data-i="${i}">${/^image\//.test(f.type)?"":"PDF<br>"+esc(f.name.slice(0,24))}</div>`).join("");
   files.forEach((f,i)=>{if(/^image\//.test(f.type)){const u=URL.createObjectURL(f),im=new Image();im.onload=()=>setTimeout(()=>URL.revokeObjectURL(u),1000);im.src=u;$("docPrev").querySelector(`[data-i="${i}"]`).appendChild(im);}});
   $("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});
-});
-function openDocForm(d){PEND=[];$("docForm").reset();$("dcErr").textContent="";$("dc_id").value=d.id;$("docFormTitle").textContent="Edit document";$("dcCombineRow").hidden=true;$("docPrev").innerHTML="";
+}
+function openDocForm(d){formBackHome();PEND=[];$("dcHint").textContent="";certTouched=true;$("docForm").reset();$("dcErr").textContent="";$("dc_id").value=d.id;$("docFormTitle").textContent="Edit document";$("dcCombineRow").hidden=true;$("docPrev").innerHTML="";
   $("dc_name").value=d.name;$("dc_cat").value=d.cat||"Other";$("dc_cert").innerHTML=docCertOpts(d.cert||"");$("dc_notes").value=d.notes||"";$("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});}
-const closeDocForm=()=>{$("docFormCard").hidden=true;PEND=[];};
+const closeDocForm=()=>{$("docFormCard").hidden=true;PEND=[];formBackHome();};
 $("docFormClose").addEventListener("click",closeDocForm);$("dcCancel").addEventListener("click",closeDocForm);
 $("docForm").addEventListener("submit",async e=>{e.preventDefault();
   const name=$("dc_name").value.trim(),meta={cat:$("dc_cat").value,cert:$("dc_cert").value,notes:$("dc_notes").value.trim()};
@@ -1073,7 +1112,7 @@ $("docForm").addEventListener("submit",async e=>{e.preventDefault();
     }
     for(const it of items){const d=Object.assign({id:"doc-"+uid(),name:it.name,type:it.type,size:it.blob.size,added:new Date().toISOString().slice(0,10),u:Date.now(),chunks:0,enc:1},meta);if(it.pages)d.pages=it.pages;
       await blobPut(d.id,it.blob);LOCAL.add(d.id);S.docs.push(d);}
-    saveLocal();closeDocForm();render();renderDocs();
+    const fromCert=!!ATTACH;saveLocal();closeDocForm();render();renderDocs();if(fromCert)renderCerts();
     toast(items.length===1?"Document saved on this device."+(savedUser()?" Press Sync to keep it in your account.":""):`${items.length} documents saved.`,4000);
   }catch(err){$("dcErr").textContent="Couldn't save this file. "+(err&&err.name==="QuotaExceededError"?"This device is out of storage.":"Please try again.");}
   finally{$("dcSave").disabled=false;$("dcSave").textContent="Save";}
@@ -1104,7 +1143,7 @@ async function renderDocs(){
     ${cert?`<div class="dm">Linked: ${esc(cert.name)}</div>`:""}${xs?`<div class="dm"><span class="xs ${xs.k}">${xs.t}</span></div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
     <div class="dm"><span class="cs ${cs[0]}">${cs[1]}</span></div>
     <div class="row-act">${here?'<button type="button" class="btn-sm btn-primary" data-open>View</button><button type="button" class="btn-sm" data-share>Share</button><button type="button" class="btn-sm" data-save>Save</button>':""}<button type="button" class="btn-sm" data-dedit>Edit</button><button type="button" class="btn-sm btn-danger" data-ddel>Delete</button></div></div></div>`;}).join("");
-  renderDocBadge();renderSelBar();
+  renderDocBadge();renderSelBar();renderLinkBtn();
   for(const d of list){if(!LOCAL.has(d.id))continue;const t=await thumbFor(d);const el=$("docList").querySelector(`.doc[data-id="${CSS.escape(d.id)}"] .thumb`);if(el)el.innerHTML=t?`<img src="${t}" alt="">`:'<span class="ph">PDF</span>';}
 }
 $("docCat").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;docCat=b.dataset.c;renderDocs();});
@@ -1182,6 +1221,22 @@ async function docsDownload(f,u){
   return failed?(failed===1?"one document":failed+" documents"):"";
 }
 
+
+
+/* ---------- link documents you already have ---------- */
+function linkCandidates(){return (S.example?[]:(S.docs||[])).filter(d=>!d.cert||!(S.certs||[]).some(c=>c.id===d.cert)).map(d=>({d,c:suggestCert(d.name,d.cat)}));}
+function renderLinkBtn(){const l=linkCandidates(),n=l.filter(x=>x.c).length;$("docLinkBtn").hidden=!l.length||!(S.certs||[]).length;$("docLinkBtn").textContent=n?`Link to certificates (${n} suggested)`:"Link to certificates";}
+function renderLinkCard(){const l=linkCandidates();
+  if(!l.length){$("linkCard").innerHTML=`<div class="card-h"><h2>Link to certificates</h2><button type="button" class="btn-ghost btn-sm" data-lclose>Close</button></div><div class="card-b small muted">All your documents are linked.</div>`;return;}
+  $("linkCard").innerHTML=`<div class="card-h"><h2>Link to certificates</h2><button type="button" class="btn-ghost btn-sm" data-lclose>Close</button></div>
+   <div class="card-b small muted" style="padding-bottom:6px">Ticked rows have a suggested certificate. Check each one, change it if needed, then tap Link.</div>
+   ${l.map(({d,c})=>`<div class="link-row" data-id="${esc(d.id)}"><input type="checkbox" ${c?"checked":""} aria-label="Link ${esc(d.name)}"><div><div class="nm">${esc(d.name)}</div><div class="small muted">${esc(d.cat||"Other")}</div></div><select aria-label="Certificate for ${esc(d.name)}">${docCertOpts(c?c.id:"")}</select></div>`).join("")}
+   <div class="card-b actions" style="border-top:1px solid var(--line)"><button type="button" class="btn-primary" data-ldo>Link ticked documents</button><button type="button" class="btn-ghost" data-lclose>Cancel</button></div>`;}
+$("docLinkBtn").addEventListener("click",()=>{renderLinkCard();$("linkCard").hidden=false;$("linkCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});});
+$("linkCard").addEventListener("change",e=>{if(e.target.tagName==="SELECT"){const cb=e.target.closest(".link-row").querySelector("input");cb.checked=!!e.target.value;}});
+$("linkCard").addEventListener("click",e=>{if(e.target.closest("[data-lclose]")){$("linkCard").hidden=true;return;}
+  if(e.target.closest("[data-ldo]")){let n=0;$("linkCard").querySelectorAll(".link-row").forEach(row=>{const cb=row.querySelector("input"),sel=row.querySelector("select");if(!cb.checked||!sel.value)return;const d=S.docs.find(x=>x.id===row.dataset.id);if(d){d.cert=sel.value;d.u=Date.now();n++;}});
+    if(n){saveLocal();render();renderDocs();}$("linkCard").hidden=true;toast(n?`${n} document${n===1?"":"s"} linked. Open Certificates to see them.`:"Nothing was ticked.",5000);}});
 
 /* expiry of the linked certificate, shown on the document card */
 function docExp(c){if(!c||!c.expires)return null;const e=dn(c.expires),n=e-TODAY;
