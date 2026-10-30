@@ -1004,7 +1004,7 @@ function idb(){if(!idbP)idbP=new Promise((res,rej)=>{const q=indexedDB.open("sdl
 async function idbDo(mode,fn){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction("files",mode),st=tx.objectStore("files");const q=fn(st);tx.oncomplete=()=>res(q&&q.result);tx.onerror=()=>rej(tx.error);});}
 const blobGet=id=>idbDo("readonly",st=>st.get(id)),blobPut=(id,b)=>idbDo("readwrite",st=>st.put(b,id)),blobDel=id=>idbDo("readwrite",st=>st.delete(id)),blobKeys=()=>idbDo("readonly",st=>st.getAllKeys());
 let LOCAL=new Set();async function refreshLocal(){try{LOCAL=new Set(await blobKeys());}catch(e){LOCAL=new Set();}}
-const mb=n=>n>=1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
+const mb=n=>!n?"0 KB":n>=1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
 function renderDocBadge(){const n=S.example?0:(S.docs||[]).filter(d=>!d.chunks).length;$("docBadge").hidden=!n||!savedUser();$("docBadge").textContent=n;$("docBadge").title="Waiting to sync";}
 async function imgToJpeg(file,max){
   const url=URL.createObjectURL(file);try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
@@ -1039,7 +1039,7 @@ $("docForm").addEventListener("submit",async e=>{e.preventDefault();
   const id=$("dc_id").value;
   if(id){const d=S.docs.find(x=>x.id===id);if(d){Object.assign(d,meta,{name,u:Date.now()});saveLocal();render();renderDocs();}closeDocForm();toast("Document updated");return;}
   const addSize=PEND.reduce((a,f)=>a+(/^image\//.test(f.type)?500000:f.size),0);
-  if(storageInfo().used+addSize*4/3>FAIR){$("dcErr").textContent=`This would go over the ${mb(FAIR)} document space for your account. Delete old or replaced documents first.`;return;}
+  if(storageInfo().used+addSize*4/3>docLimit()){$("dcErr").textContent=`This would go over the ${mb(docLimit())} document space for your account. Delete old or replaced documents first.`;return;}
   $("dcSave").disabled=true;$("dcSave").textContent="Saving…";
   try{
     if(S.example)leaveExample();S.docs=S.docs||[];
@@ -1074,7 +1074,7 @@ async function thumbFor(d){
 async function renderDocs(){
   await refreshLocal();
   const all=S.example?[]:(S.docs||[]),total=all.reduce((a,d)=>a+(d.size||0),0),waiting=all.filter(d=>!d.chunks).length,away=all.filter(d=>!LOCAL.has(d.id)).length;
-  $("docTiles").innerHTML=`<div class="tile"><b>${all.length}</b><span>documents</span></div><div class="tile"><b>${mb(storageInfo().used)}</b><span>of ${mb(FAIR)} cloud space used</span></div><div class="tile"><b style="color:${waiting?"var(--warn)":"var(--ok)"}">${savedUser()?waiting:"—"}</b><span>${savedUser()?"waiting to sync":"sign in to back up"}</span></div>${away?`<div class="tile"><b>${away}</b><span>in your account, not on this device yet</span></div>`:""}`;
+  $("docTiles").innerHTML=`<div class="tile"><b>${all.length}</b><span>documents</span></div><div class="tile"><b>${mb(storageInfo().used)}</b><span>of ${mb(docLimit())} cloud space used</span></div><div class="tile"><b style="color:${waiting?"var(--warn)":"var(--ok)"}">${savedUser()?waiting:"—"}</b><span>${savedUser()?"waiting to sync":"sign in to back up"}</span></div>${away?`<div class="tile"><b>${away}</b><span>in your account, not on this device yet</span></div>`:""}`;
   const cats=DOC_CATS.filter(c=>all.some(d=>d.cat===c));if(docCat&&!cats.includes(docCat))docCat="";
   $("docCat").innerHTML=`<button type="button" data-c="" aria-pressed="${!docCat}">All</button>`+cats.map(c=>`<button type="button" data-c="${esc(c)}" aria-pressed="${docCat===c}">${esc(c)}</button>`).join("");
   const q=$("docQ").value.trim().toLowerCase();
@@ -1177,12 +1177,14 @@ $("docSelShare").addEventListener("click",async()=>{const files=await pickedFile
   saveFiles(files,true);});
 $("docSelSave").addEventListener("click",async()=>{const files=await pickedFiles();if(files.length)saveFiles(files);});
 /* storage used: the cloud copy is about a third bigger than the file itself */
-const FAIR=50*1048576;
+/* the owner account can use the whole free space (kept a little under 1 GB for the ledger and notices); other accounts get a fair share */
+const OWNER_SPACE=900*1048576,USER_SPACE=50*1048576;
+function docLimit(){const u=fbUser||savedUser();return u&&u.email&&u.email.toLowerCase()===ADMIN_EMAIL?OWNER_SPACE:USER_SPACE;}
 function storageInfo(){const docs=S.example?[]:(S.docs||[]),file=docs.reduce((a,d)=>a+(d.size||0),0),cloud=docs.filter(d=>d.chunks).reduce((a,d)=>a+Math.ceil((d.size||0)*4/3)+200*(d.chunks||1),0),pend=docs.filter(d=>!d.chunks).reduce((a,d)=>a+Math.ceil((d.size||0)*4/3),0);return {n:docs.length,file,cloud,pend,used:cloud+pend};}
-function renderStorage(){const s=storageInfo(),pct=Math.min(100,s.used/FAIR*100),col=pct>=90?"var(--bad)":pct>=70?"var(--warn)":"var(--ok)";
-  $("storeCard").innerHTML=`<h2 style="margin-bottom:4px">Document storage</h2><p class="small muted">Each account can keep up to ${mb(FAIR)} of documents in the cloud, so the free space is shared fairly between all seafarers using the app.</p>
-   <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="${FAIR}" aria-valuenow="${s.used}" aria-label="Document storage used"><i style="width:${Math.max(pct,s.used?2:0)}%;background:${col}"></i></div>
-   <div class="small"><b>${mb(s.used)}</b> of ${mb(FAIR)} used · ${s.n} document${s.n===1?"":"s"}${s.pend?` · ${mb(s.pend)} waiting to sync`:""}</div>
+function renderStorage(){const s=storageInfo(),pct=Math.min(100,s.used/docLimit()*100),col=pct>=90?"var(--bad)":pct>=70?"var(--warn)":"var(--ok)";
+  $("storeCard").innerHTML=`<h2 style="margin-bottom:4px">Document storage</h2><p class="small muted">${docLimit()===OWNER_SPACE?"Your account can use the whole free document space.":`Each account can keep up to ${mb(docLimit())} of documents in the cloud, so the free space is shared fairly between all seafarers using the app.`}</p>
+   <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="${docLimit()}" aria-valuenow="${s.used}" aria-label="Document storage used"><i style="width:${Math.max(pct,s.used?2:0)}%;background:${col}"></i></div>
+   <div class="small"><b>${mb(s.used)}</b> of ${mb(docLimit())} used · ${s.n} document${s.n===1?"":"s"}${s.pend?` · ${mb(s.pend)} waiting to sync`:""}</div>
    ${pct>=90?'<p class="small" style="color:var(--bad);margin-top:6px">Almost full. Delete old or replaced documents to make room.</p>':""}<p class="small muted" style="margin-top:6px">On this device: ${mb(s.file)}. Photos are made smaller when you add them.</p><div style="margin-top:8px"><a class="btn btn-sm" href="#docs">Open My documents</a></div>`;}
 
 /* ======================= report for your CA (PDF) ======================= */
