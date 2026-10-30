@@ -10,10 +10,19 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202610301322">
+<link rel="stylesheet" href="app.css?v=202610301350">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
-<body>
+<body class="locked">
+<div class="lock" id="lock" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+  <div class="lock-card">
+    <div class="lock-brand"><img src="bluewave-icon.png" alt="" width="40" height="40"><div><b>Sea Days Ledger</b><span>Private</span></div></div>
+    <div class="lock-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+    <h1 id="lockTitle">Locked</h1>
+    <div id="lockBody"><p class="muted">Opening…</p></div>
+  </div>
+  <p class="lock-foot">Your data is encrypted on this device and in your account.</p>
+</div>
 <div class="app">
   <aside class="rail" aria-label="Sections">
     <div class="brand">
@@ -44,6 +53,7 @@
     <div class="rail-foot">
       <button type="button" class="syncbtn" id="syncBtn"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg><span class="dot" id="syncDot" hidden></span></span><span><b id="syncLbl">Sync</b><small id="syncWhen">Not synced yet</small></span></button>
       <div class="rail-row"><span class="net" id="netState"><i></i><span>Offline</span></span><button type="button" class="themebtn" id="themeBtn">Night</button></div>
+      <button type="button" class="lockbtn" id="lockBtn" aria-label="Lock the app now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Lock</span></button>
       <div class="rail-ver" id="railVer"></div>
     </div>
   </aside>
@@ -251,12 +261,12 @@
         <div class="f wide"><span>Category</span><div class="chips" id="docCat" role="group" aria-label="Category"></div></div>
         <label class="f wide"><span>Search</span><input id="docQ" placeholder="e.g. passport, visa" autocomplete="off"></label>
       </div></div>
-      <div class="selbar" id="docSelBar"><button type="button" class="btn-sm" id="docSelToggle">Select several</button><span class="small muted" id="docSelInfo"></span><span class="sp"></span><button type="button" class="btn-sm" id="docSelAll" hidden>Select all</button><button type="button" class="btn-sm btn-primary" id="docSelShare" hidden disabled>Share</button><button type="button" class="btn-sm" id="docSelSave" hidden disabled>Save</button></div>
+      <div class="selbar" id="docSelBar"><button type="button" class="btn-sm btn-primary" id="docViewAll">View all</button><button type="button" class="btn-sm" id="docSelToggle">Select several</button><span class="small muted" id="docSelInfo"></span><span class="sp"></span><button type="button" class="btn-sm" id="docSelAll" hidden>Select all</button><button type="button" class="btn-sm btn-primary" id="docSelShare" hidden disabled>Share</button><button type="button" class="btn-sm" id="docSelSave" hidden disabled>Save</button></div>
       <div id="docList" class="doc-grid"></div>
-      <div class="card card-b small muted">Your documents are private: only you can open them, after signing in. On this device anyone who can open the app can see them, so keep your phone locked.</div>
+      <div class="card card-b small muted">🔒 Your documents are encrypted with your own key, on this device and in your account. Only your PIN, Face ID / fingerprint, passphrase or recovery key can open them. The app locks itself when you leave it.</div>
     </section>
     <div class="viewer" id="docViewer" hidden role="dialog" aria-modal="true" aria-labelledby="dvTitle">
-      <div class="viewer-bar"><b id="dvTitle"></b><div class="row-act"><button type="button" class="btn-sm" id="dvShare">Share</button><button type="button" class="btn-sm" id="dvSave">Save to device</button><button type="button" class="btn-sm btn-primary" id="dvClose">Close</button></div></div>
+      <div class="viewer-bar"><b id="dvTitle"></b><span class="dv-count" id="dvCount"></span><div class="row-act"><button type="button" class="btn-sm" id="dvPrev" aria-label="Previous document">‹ Prev</button><button type="button" class="btn-sm" id="dvNext" aria-label="Next document">Next ›</button><button type="button" class="btn-sm" id="dvShare">Share</button><button type="button" class="btn-sm" id="dvSave">Save to device</button><button type="button" class="btn-sm btn-primary" id="dvClose">Close</button></div></div>
       <div class="viewer-body" id="dvBody"></div>
     </div>
 
@@ -288,8 +298,9 @@
 
     <!-- ACCOUNT -->
     <section class="view" id="v-account" data-title="Account and sync" hidden>
-      <div class="vhead"><div><h1>Account &amp; sync</h1><p class="muted">Sign in to keep the same data on your phone, iPad and computer.</p></div></div>
+      <div class="vhead"><div><h1>Account &amp; sync</h1><p class="muted">Your account, security and sync between your phone, iPad and computer.</p></div></div>
       <div class="card card-b"><div class="acct" id="acctBox"></div></div>
+      <div class="card card-b" id="secCard"></div>
       <div class="card card-b" id="storeCard"></div>
       <div class="card card-b">
         <h2 style="margin-bottom:8px">How Sync works</h2>
@@ -375,6 +386,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202610301322"></script>
+<script src="app.js?v=202610301350"></script>
 </body>
 </html>

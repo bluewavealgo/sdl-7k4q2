@@ -66,21 +66,24 @@ const EXAMPLE={v:2,example:true,settings:{edge:true},fy:{},deleted:[],updatedAt:
 let S;
 function adopt(o){S={v:2,example:false,settings:Object.assign({edge:true},o.settings||{}),fy:o.fy||{},contracts:(o.contracts||[]).map(c=>Object.assign({company:"",fleet:"",flag:"",registry:""},c)),deleted:Array.isArray(o.deleted)?o.deleted:[],certs:Array.isArray(o.certs)?o.certs:[],docs:Array.isArray(o.docs)?o.docs:[],updatedAt:+o.updatedAt||0};}
 function snapshot(){return {v:2,app:"sea-days-ledger",settings:S.settings,fy:S.fy,contracts:S.contracts,certs:S.certs||[],docs:S.docs||[],deleted:S.deleted||[],updatedAt:S.updatedAt||0};}
-function saveLocal(){if(S.example)return;S.updatedAt=Date.now();lsSet("seaDaysLedger",JSON.stringify(snapshot()));updateSyncUI();}
+let saveQ=Promise.resolve();
+function saveLocal(){if(S.example)return;S.updatedAt=Date.now();const j=JSON.stringify(snapshot());saveQ=saveQ.then(()=>storeLedger(j)).catch(()=>{});updateSyncUI();}
+/* the ledger is kept on the device only in encrypted form */
+async function storeLedger(json){if(!MK)return;lsSet("sdlLedgerEnc",b64(await aesEnc(MK,TE.encode(json))));try{localStorage.removeItem("seaDaysLedger");}catch(e){}}
 function loadLocal(){try{const o=JSON.parse(lsGet("seaDaysLedger"));if(o&&Array.isArray(o.contracts))return o;}catch(e){}return null;}
 function leaveExample(){if(S.example)S={v:2,example:false,settings:{edge:S.settings.edge!==false},fy:{},contracts:[],certs:[],docs:[],deleted:[],updatedAt:0};}
 /* combine another copy into S: newest edit of each contract wins, deletions carry over, nothing is wiped */
 function merge(o){
   if(S.example)leaveExample();
   S.certs=S.certs||[];S.docs=S.docs||[];const before=JSON.stringify([S.contracts,S.fy,S.deleted,S.certs,S.docs]);
-  const tomb={};(S.deleted||[]).concat(Array.isArray(o.deleted)?o.deleted:[]).forEach(d=>{if(d&&d.id)tomb[d.id]=Math.max(tomb[d.id]||0,+d.u||0);});
+  const tomb={},tn={};(S.deleted||[]).concat(Array.isArray(o.deleted)?o.deleted:[]).forEach(d=>{if(d&&d.id){tomb[d.id]=Math.max(tomb[d.id]||0,+d.u||0);if(d.n)tn[d.id]=Math.max(tn[d.id]||0,+d.n);}});
   const m={};S.contracts.concat((o.contracts||[]).map(c=>Object.assign({company:"",fleet:"",flag:"",registry:""},c))).forEach(c=>{if(!c||!c.id)return;const p=m[c.id];if(!p||(+c.u||0)>(+p.u||0))m[c.id]=c;});
   S.contracts=Object.values(m).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
   const cm={};S.certs.concat(Array.isArray(o.certs)?o.certs:[]).forEach(c=>{if(!c||!c.id)return;const p=cm[c.id];if(!p||(+c.u||0)>(+p.u||0))cm[c.id]=c;});
   S.certs=Object.values(cm).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
   const dm={};S.docs.concat(Array.isArray(o.docs)?o.docs:[]).forEach(c=>{if(!c||!c.id)return;const p=dm[c.id];if(!p||(+c.u||0)>(+p.u||0)||((+c.u||0)===(+p.u||0)&&(c.chunks||0)>(p.chunks||0)))dm[c.id]=c;});
   S.docs=Object.values(dm).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
-  S.deleted=Object.entries(tomb).map(([id,u])=>({id,u})).slice(-500);
+  S.deleted=Object.entries(tomb).map(([id,u])=>tn[id]?{id,u,n:tn[id]}:{id,u}).slice(-500);
   const newer=(+o.updatedAt||0)>(+S.updatedAt||0);
   Object.entries(o.fy||{}).forEach(([k,v])=>{S.fy[k]=newer?Object.assign({},S.fy[k],v):Object.assign({},v,S.fy[k]);});
   if(newer&&o.settings)S.settings=Object.assign({},S.settings,o.settings);
@@ -603,7 +606,7 @@ async function fbReady(){
 function rememberUser(u){if(u){lsSet("sdlUser",JSON.stringify({email:u.email,verified:!!u.emailVerified,uid:u.uid}));}else lsSet("sdlUser","");}
 const savedUser=()=>lsJSON("sdlUser",null);
 const isAdmin=()=>{const u=fbUser||savedUser();return !!(u&&u.email&&u.email.toLowerCase()===ADMIN_EMAIL&&(u.emailVerified||u.verified));};
-function authMsg(e){const c=(e&&e.code)||"";return ({"auth/invalid-email":"That email address doesn't look right.","auth/missing-password":"Enter your password.","auth/weak-password":"Use a password of at least 6 characters.","auth/email-already-in-use":"An account with this email already exists. Sign in instead.","auth/invalid-credential":"Email or password is wrong. First time here? Tap Create account instead.","auth/wrong-password":"Email or password is wrong.","auth/user-not-found":"No account with this email. Create one first.","auth/too-many-requests":"Too many tries. Wait a few minutes and try again.","auth/network-request-failed":"No internet connection. Try again when you're online.","offline":"You're offline. Connect to the internet and try again."})[c]||"Something went wrong. Please try again.";}
+function authMsg(e){const c=(e&&e.code)||"";return ({"auth/admin-restricted-operation":"New accounts are closed. This app is private.","auth/invalid-credential":"Email or password isn't right.","auth/invalid-email":"That email address doesn't look right.","auth/missing-password":"Enter your password.","auth/weak-password":"Use a password of at least 6 characters.","auth/email-already-in-use":"An account with this email already exists. Sign in instead.","auth/invalid-credential":"Email or password isn't right.","auth/wrong-password":"Email or password is wrong.","auth/user-not-found":"No account with this email. Create one first.","auth/too-many-requests":"Too many tries. Wait a few minutes and try again.","auth/network-request-failed":"No internet connection. Try again when you're online.","offline":"You're offline. Connect to the internet and try again."})[c]||"Something went wrong. Please try again.";}
 
 /* ---------- account view ---------- */
 function renderAccount(){
@@ -623,7 +626,7 @@ function renderAccount(){
     <form id="authForm" class="acct" novalidate>
       <label class="f"><span>Email</span><input id="aEmail" type="email" autocomplete="email" inputmode="email"></label>
       <label class="f"><span>Password</span><input id="aPass" type="password" autocomplete="current-password" minlength="6"></label>
-      <div class="actions"><button type="submit" class="btn-primary" id="aIn">Sign in</button><button type="button" id="aUp">Create account</button><button type="button" class="btn-ghost" id="aReset">Forgot password?</button></div>
+      <div class="actions"><button type="submit" class="btn-primary" id="aIn">Sign in</button>${PRIVATE?"":'<button type="button" id="aUp">Create account</button>'}<button type="button" class="btn-ghost" id="aReset">Forgot password?</button></div>
       <span class="err" id="aErr"></span>
       <p class="small muted">${navigator.onLine?"":"You're offline. Signing in needs internet."}</p>
     </form>`;
@@ -637,7 +640,7 @@ function renderAccount(){
       fbUser=f.auth.currentUser;rememberUser(fbUser);renderAccount();renderNotices();updateSyncUI();
     }catch(e){$("aErr").textContent=authMsg(e);}};
   $("authForm").addEventListener("submit",e=>{e.preventDefault();go("in");});
-  $("aUp").onclick=()=>go("up");$("aReset").onclick=()=>go("reset");
+  if($("aUp"))$("aUp").onclick=()=>go("up");$("aReset").onclick=()=>go("reset");
 }
 
 /* ---------- notices: post / delete (author only) ---------- */
@@ -725,9 +728,12 @@ async function syncAll(){
         if(u){try{await u.reload();}catch(e){}rememberUser(f.auth.currentUser);}
         if(!u){dataMsg="Sign in again to sync your data.";}
         else{const ref=f.db.collection("users").doc(u.uid);const snap=await ref.get({source:"server"});
-          if(snap.exists&&snap.data().ledger){merge(JSON.parse(snap.data().ledger));}
+          const cd=snap.exists?snap.data():{};
+          if(cd.vault&&VAULT&&(+cd.vault.u||0)>(+VAULT.u||0)){VAULT=cd.vault;saveVault();}
+          if(cd.enc){let o=null;try{o=await decJSON(cd.enc);}catch(e){}if(o)merge(o);else throw new Error("key");}
+          if(cd.ledger){try{merge(JSON.parse(cd.ledger));}catch(e){}}
           let docNote="";try{docNote=await docsUpload(f,u);}catch(e){docNote="docs";}if(docNote)notes.push(docNote==="docs"?"some documents":docNote);
-          if(!S.example){S.updatedAt=Date.now();lsSet("seaDaysLedger",JSON.stringify(snapshot()));await ref.set({ledger:JSON.stringify(snapshot()),updatedAt:S.updatedAt,email:u.email||""});}
+          if(!S.example){S.updatedAt=Date.now();await storeLedger(JSON.stringify(snapshot()));await ref.set({enc:await encJSON(snapshot()),vault:VAULT,updatedAt:S.updatedAt,email:u.email||""});}
           try{const dn2=await docsDownload(f,u);if(dn2)notes.push(dn2);}catch(e){notes.push("some documents");}
           dataMsg="Your data is synced.";}
       }catch(e){notes.push("your data");}
@@ -985,7 +991,7 @@ let pendingCDel=null;
 $("certList").addEventListener("click",e=>{const row=e.target.closest(".cert");if(!row)return;const c=(S.certs||[]).find(x=>x.id===row.dataset.id);if(!c)return;
   if(e.target.closest("[data-reveal]")){const n=row.querySelector("[data-num]"),b=e.target.closest("[data-reveal]");const shown=b.textContent==="Hide";n.textContent=shown?maskNo(n.dataset.num):n.dataset.num;b.textContent=shown?"Show":"Hide";return;}
   if(e.target.closest("[data-cedit]")){openCertForm(c);return;}
-  if(e.target.closest("[data-cscan]")){const d=S.docs.find(x=>x.cert===c.id);if(d)openDoc(d);return;}
+  if(e.target.closest("[data-cscan]")){const l=S.docs.filter(x=>x.cert===c.id);if(l.length)refreshLocal().then(()=>viewList(l.filter(x=>LOCAL.has(x.id)),l[0]));return;}
   if(e.target.closest("[data-chide]")){c.hidden=!c.hidden;c.u=Date.now();saveLocal();render();renderCerts();return;}
   const d=e.target.closest("[data-cdel]");if(d){if(pendingCDel!==c.id){pendingCDel=c.id;d.textContent="Tap again to delete";setTimeout(()=>{if(pendingCDel===c.id){pendingCDel=null;d.textContent="Delete";}},4000);return;}
     pendingCDel=null;S.certs=S.certs.filter(x=>x.id!==c.id);(S.deleted=S.deleted||[]).push({id:c.id,u:Date.now()});saveLocal();render();renderCerts();toast("Certificate deleted");}});
@@ -1002,7 +1008,17 @@ const CHUNK=700000,PDF_MAX=8*1024*1024;
 let idbP=null;
 function idb(){if(!idbP)idbP=new Promise((res,rej)=>{const q=indexedDB.open("sdl-docs",1);q.onupgradeneeded=()=>q.result.createObjectStore("files");q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});return idbP;}
 async function idbDo(mode,fn){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction("files",mode),st=tx.objectStore("files");const q=fn(st);tx.oncomplete=()=>res(q&&q.result);tx.onerror=()=>rej(tx.error);});}
-const blobGet=id=>idbDo("readonly",st=>st.get(id)),blobPut=(id,b)=>idbDo("readwrite",st=>st.put(b,id)),blobDel=id=>idbDo("readwrite",st=>st.delete(id)),blobKeys=()=>idbDo("readonly",st=>st.getAllKeys());
+const rawGet=id=>idbDo("readonly",st=>st.get(id)),rawPut=(id,b)=>idbDo("readwrite",st=>st.put(b,id)),blobDel=id=>idbDo("readwrite",st=>st.delete(id)),blobKeys=()=>idbDo("readonly",st=>st.getAllKeys());
+/* files are stored encrypted; these two give back / take the readable file */
+async function blobGet(id){const raw=await rawGet(id);if(!raw)return null;const d=(S.docs||[]).find(x=>x.id===id);if(!d||!d.enc)return raw;
+  return new Blob([await aesDec(MK,new Uint8Array(await raw.arrayBuffer()))],{type:d.type});}
+async function blobPut(id,b){await rawPut(id,new Blob([await aesEnc(MK,new Uint8Array(await b.arrayBuffer()))],{type:"application/octet-stream"}));}
+/* older, unencrypted files on this device are encrypted and given a new id; the old copy in the account is removed on the next Sync */
+async function migrateDocs(){if(!MK)return 0;let n=0;const now=Date.now();
+  for(const d of (S.docs||[])){if(d.enc)continue;const raw=await rawGet(d.id);if(!raw)continue;
+    const nid="doc-"+uid();await rawPut(nid,new Blob([await aesEnc(MK,new Uint8Array(await raw.arrayBuffer()))],{type:"application/octet-stream"}));await blobDel(d.id);
+    (S.deleted=S.deleted||[]).push({id:d.id,u:now,n:d.chunks||0});if(THUMBS[d.id])delete THUMBS[d.id];d.id=nid;d.enc=1;d.chunks=0;d.u=now;n++;}
+  if(n){S.updatedAt=now;await storeLedger(JSON.stringify(snapshot()));}return n;}
 let LOCAL=new Set();async function refreshLocal(){try{LOCAL=new Set(await blobKeys());}catch(e){LOCAL=new Set();}}
 const mb=n=>!n?"0 KB":n>=1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
 function renderDocBadge(){const n=S.example?0:(S.docs||[]).filter(d=>!d.chunks).length;$("docBadge").hidden=!n||!savedUser();$("docBadge").textContent=n;$("docBadge").title="Waiting to sync";}
@@ -1055,7 +1071,7 @@ $("docForm").addEventListener("submit",async e=>{e.preventDefault();
         if(/^image\//.test(f.type)){const {blob}=await imgToJpeg(f,2000);items.push({name:nm,blob,type:"image/jpeg"});}
         else items.push({name:nm,blob:f,type:"application/pdf"});}
     }
-    for(const it of items){const d=Object.assign({id:"doc-"+uid(),name:it.name,type:it.type,size:it.blob.size,added:new Date().toISOString().slice(0,10),u:Date.now(),chunks:0},meta);if(it.pages)d.pages=it.pages;
+    for(const it of items){const d=Object.assign({id:"doc-"+uid(),name:it.name,type:it.type,size:it.blob.size,added:new Date().toISOString().slice(0,10),u:Date.now(),chunks:0,enc:1},meta);if(it.pages)d.pages=it.pages;
       await blobPut(d.id,it.blob);LOCAL.add(d.id);S.docs.push(d);}
     saveLocal();closeDocForm();render();renderDocs();
     toast(items.length===1?"Document saved on this device."+(savedUser()?" Press Sync to keep it in your account.":""):`${items.length} documents saved.`,4000);
@@ -1087,7 +1103,7 @@ async function renderDocs(){
     <div class="db"><div class="dn">${esc(d.name)}</div><div class="dm"><span class="ftype">${d.type==="application/pdf"?"PDF":"JPG"}</span><span>${esc(d.cat||"Other")}</span><span>${mb(d.size||0)}</span>${d.pages>1?`<span>${d.pages} pages</span>`:""}</div>
     ${cert?`<div class="dm">Linked: ${esc(cert.name)}</div>`:""}${xs?`<div class="dm"><span class="xs ${xs.k}">${xs.t}</span></div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
     <div class="dm"><span class="cs ${cs[0]}">${cs[1]}</span></div>
-    <div class="row-act">${here?'<button type="button" class="btn-sm" data-share>Share</button><button type="button" class="btn-sm" data-save>Save</button>':""}<button type="button" class="btn-sm" data-dedit>Edit</button><button type="button" class="btn-sm btn-danger" data-ddel>Delete</button></div></div></div>`;}).join("");
+    <div class="row-act">${here?'<button type="button" class="btn-sm btn-primary" data-open>View</button><button type="button" class="btn-sm" data-share>Share</button><button type="button" class="btn-sm" data-save>Save</button>':""}<button type="button" class="btn-sm" data-dedit>Edit</button><button type="button" class="btn-sm btn-danger" data-ddel>Delete</button></div></div></div>`;}).join("");
   renderDocBadge();renderSelBar();
   for(const d of list){if(!LOCAL.has(d.id))continue;const t=await thumbFor(d);const el=$("docList").querySelector(`.doc[data-id="${CSS.escape(d.id)}"] .thumb`);if(el)el.innerHTML=t?`<img src="${t}" alt="">`:'<span class="ph">PDF</span>';}
 }
@@ -1105,10 +1121,19 @@ async function saveDoc(d,f,fromShare){
   const url=URL.createObjectURL(f),a=document.createElement("a");a.href=url;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),8000);
   toast(fromShare?`This browser can't share files directly, so ${f.name} was saved. Attach it in WhatsApp or your email.`:`Saved: ${f.name}`,6000);
 }
-let VIEWING=null;
-async function openDoc(d){
+let VIEWING=null,VLIST=[],VIDX=0;
+function shownDocs(){return [...$("docList").querySelectorAll(".doc")].map(c=>(S.docs||[]).find(x=>x.id===c.dataset.id)).filter(d=>d&&LOCAL.has(d.id));}
+function viewList(list,d){VLIST=list.length?list:[d];VIDX=Math.max(0,VLIST.indexOf(d));openDoc(VLIST[VIDX],true);}
+function stepView(n){if(VLIST.length<2)return;VIDX=(VIDX+n+VLIST.length)%VLIST.length;openDoc(VLIST[VIDX],true);}
+$("dvPrev").addEventListener("click",()=>stepView(-1));$("dvNext").addEventListener("click",()=>stepView(1));
+document.addEventListener("keydown",e=>{if($("docViewer").hidden)return;if(e.key==="ArrowLeft")stepView(-1);if(e.key==="ArrowRight")stepView(1);});
+let tx0=null;$("dvBody").addEventListener("touchstart",e=>{tx0=e.touches.length===1?e.touches[0].clientX:null;},{passive:true});
+$("dvBody").addEventListener("touchend",e=>{if(tx0==null)return;const dx=e.changedTouches[0].clientX-tx0;tx0=null;if(Math.abs(dx)>70&&$("dvBody").scrollWidth<=$("dvBody").clientWidth+4)stepView(dx<0?1:-1);},{passive:true});
+$("docViewAll").addEventListener("click",()=>{const l=shownDocs();if(!l.length){toast("No documents on this device to view yet. Press Sync while online.");return;}viewList(l,l[0]);});
+async function openDoc(d,inList){if(!inList){VLIST=[d];VIDX=0;}
   const b=await blobGet(d.id);if(!b){toast("This file isn't on this device yet. Press Sync while online.");return;}
-  VIEWING=d;$("dvTitle").textContent=d.name;$("dvBody").innerHTML='<div class="empty" style="color:#fff">Opening…</div>';$("docViewer").hidden=false;document.body.style.overflow="hidden";$("dvClose").focus();
+  $("dvBody").querySelectorAll("img").forEach(i=>URL.revokeObjectURL(i.src));
+  VIEWING=d;$("dvTitle").textContent=d.name;const many=VLIST.length>1;$("dvPrev").hidden=$("dvNext").hidden=!many;$("dvCount").textContent=many?`${VIDX+1} / ${VLIST.length}`:"";$("dvBody").innerHTML='<div class="empty" style="color:#fff">Opening…</div>';$("docViewer").hidden=false;document.body.style.overflow="hidden";$("dvClose").focus();
   if(d.type!=="application/pdf"){const u=URL.createObjectURL(b);$("dvBody").innerHTML=`<img src="${u}" alt="${esc(d.name)}">`;return;}
   try{if(!window.pdfjsLib){await loadScript("vendor/pdf.min.js");window.pdfjsLib.GlobalWorkerOptions.workerSrc="vendor/pdf.worker.min.js";}
     const pdf=await window.pdfjsLib.getDocument({data:new Uint8Array(await b.arrayBuffer())}).promise,wrap=document.createElement("div");wrap.className="pg";$("dvBody").innerHTML="";$("dvBody").appendChild(wrap);
@@ -1122,7 +1147,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("docViewer").hid
 let pendingDDel=null;
 $("docList").addEventListener("click",async e=>{const card=e.target.closest(".doc");if(!card)return;const d=(S.docs||[]).find(x=>x.id===card.dataset.id);if(!d)return;
   if(SELECTING){e.preventDefault();if(!LOCAL.has(d.id)){toast("This file isn't on this device yet. Press Sync while online.");return;}PICKED.has(d.id)?PICKED.delete(d.id):PICKED.add(d.id);card.classList.toggle("picked",PICKED.has(d.id));renderSelBar();return;}
-  if(e.target.closest("[data-open]")){openDoc(d);return;}
+  if(e.target.closest("[data-open]")){viewList(shownDocs(),d);return;}
   if(e.target.closest("[data-share]")){shareDoc(d);return;}
   if(e.target.closest("[data-save]")){saveDoc(d);return;}
   if(e.target.closest("[data-dedit]")){openDocForm(d);return;}
@@ -1133,10 +1158,11 @@ function b64(buf){let s="";const a=new Uint8Array(buf);for(let i=0;i<a.length;i+
 function unb64(s){const bin=atob(s),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
 /* during Sync: send new files, remove deleted ones */
 async function docsUpload(f,u){
+  await migrateDocs();
   const col=f.db.collection("users").doc(u.uid).collection("files");let failed=0;
-  for(const d of (S.docs||[])){if(d.chunks)continue;const b=await blobGet(d.id);if(!b)continue;
+  for(const d of (S.docs||[])){if(d.chunks||!d.enc)continue;const b=await rawGet(d.id);if(!b)continue;
     try{const buf=await b.arrayBuffer(),n=Math.max(1,Math.ceil(buf.byteLength/CHUNK));
-      for(let i=0;i<n;i++)await col.doc(d.id+"_"+i).set({d:b64(buf.slice(i*CHUNK,(i+1)*CHUNK)),i,n,type:d.type});
+      for(let i=0;i<n;i++)await col.doc(d.id+"_"+i).set({d:b64(buf.slice(i*CHUNK,(i+1)*CHUNK)),i,n,e:true});
       d.chunks=n;}catch(e){failed++;}}
   const done=new Set(lsJSON("sdlDocPurged",[]));
   for(const t of (S.deleted||[])){if(!String(t.id).startsWith("doc-")||!t.n||done.has(t.id))continue;
@@ -1150,7 +1176,8 @@ async function docsDownload(f,u){
   for(const k of LOCAL){if(!ids.has(k)){try{await blobDel(k);}catch(e){}}}
   for(const d of (S.docs||[])){if(LOCAL.has(d.id)||!d.chunks)continue;
     try{const parts=[];for(let i=0;i<d.chunks;i++){const sn=await col.doc(d.id+"_"+i).get();if(!sn.exists)throw new Error("part");parts.push(unb64(sn.data().d));}
-      await blobPut(d.id,new Blob(parts,{type:d.type}));LOCAL.add(d.id);}catch(e){failed++;}}
+      await rawPut(d.id,new Blob(parts,{type:d.enc?"application/octet-stream":d.type}));LOCAL.add(d.id);}catch(e){failed++;}}
+  await migrateDocs();
   if(VIEW==="docs")renderDocs();
   return failed?(failed===1?"one document":failed+" documents"):"";
 }
@@ -1237,12 +1264,241 @@ function takeCarry(){
   history.replaceState(null,"",location.pathname+"#dashboard");return false;
 }
 
+/* ======================= privacy: lock screen and encryption ======================= */
+/* One random master key encrypts the ledger and every document. It is stored only in wrapped (encrypted) form:
+   by the passphrase and by the recovery key in the account (so a new device can be set up), and by the PIN
+   (or Face ID / fingerprint, where the browser supports it) on each device. Nothing readable leaves the device. */
+const PRIVATE=true;
+const TE=new TextEncoder(),TD=new TextDecoder(),rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+const ITER_P=600000,ITER_R=300000,ITER_PIN=400000,PRF_SALT=TE.encode("sea-days-ledger/unlock/v1");
+let MK=null,MKraw=null,VAULT=lsJSON("sdlVault",null),DEV=lsJSON("sdlDevLock",null)||{},UNLOCKED=false;
+async function kdf(secret,salt,iter){const base=await crypto.subtle.importKey("raw",TE.encode(secret),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:iter,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);}
+async function aesEnc(key,data){const iv=rnd(12),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},key,data)),o=new Uint8Array(12+ct.length);o.set(iv);o.set(ct,12);return o;}
+async function aesDec(key,data){data=new Uint8Array(data);return new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:data.slice(0,12)},key,data.slice(12)));}
+async function setMK(raw){MKraw=new Uint8Array(raw);MK=await crypto.subtle.importKey("raw",MKraw,"AES-GCM",false,["encrypt","decrypt"]);}
+async function wrapMK(secret,iter){const salt=rnd(16);return {s:b64(salt),i:iter,w:b64(await aesEnc(await kdf(secret,salt,iter),MKraw))};}
+async function unwrapMK(secret,w){return aesDec(await kdf(secret,unb64(w.s),w.i),unb64(w.w));}
+const encJSON=async o=>b64(await aesEnc(MK,TE.encode(JSON.stringify(o)))),decJSON=async t=>JSON.parse(TD.decode(await aesDec(MK,unb64(t))));
+const saveVault=()=>lsSet("sdlVault",JSON.stringify(VAULT)),saveDev=()=>lsSet("sdlDevLock",JSON.stringify(DEV));
+const B32="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function newRecovery(){let bits=0,val=0,out="";for(const x of rnd(20)){val=((val<<8)|x)&0xffff;bits+=8;while(bits>=5){out+=B32[(val>>>(bits-5))&31];bits-=5;}}return out.match(/.{4}/g).join("-");}
+const rkNorm=t=>String(t||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+const looksLikeRK=t=>rkNorm(t).length===32&&/^[A-HJ-NP-Z2-9]+$/.test(rkNorm(t));
+
+/* ---------- Face ID / fingerprint (only where the key itself can be protected by it) ---------- */
+async function bioAvailable(){try{return !!(window.PublicKeyCredential&&PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable());}catch(e){return false;}}
+async function bioSecret(rawId){const a=await navigator.credentials.get({publicKey:{challenge:rnd(32),allowCredentials:[{type:"public-key",id:rawId}],userVerification:"required",timeout:60000,extensions:{prf:{eval:{first:PRF_SALT}}}}});
+  const e=a.getClientExtensionResults&&a.getClientExtensionResults(),o=e&&e.prf&&e.prf.results&&e.prf.results.first;if(!o)throw Object.assign(new Error("noprf"),{code:"noprf"});
+  return crypto.subtle.importKey("raw",await crypto.subtle.digest("SHA-256",o),"AES-GCM",false,["encrypt","decrypt"]);}
+async function bioEnable(){
+  const u=savedUser()||{},cred=await navigator.credentials.create({publicKey:{rp:{name:"Sea Days Ledger"},user:{id:rnd(16),name:u.email||"Sea Days Ledger",displayName:"Sea Days Ledger"},challenge:rnd(32),
+    pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"required"},timeout:60000,extensions:{prf:{eval:{first:PRF_SALT}}}}});
+  const ext=cred.getClientExtensionResults&&cred.getClientExtensionResults();if(!ext||!ext.prf||ext.prf.enabled===false)throw Object.assign(new Error("noprf"),{code:"noprf"});
+  let key;const o=ext.prf.results&&ext.prf.results.first;
+  if(o)key=await crypto.subtle.importKey("raw",await crypto.subtle.digest("SHA-256",o),"AES-GCM",false,["encrypt","decrypt"]);else key=await bioSecret(cred.rawId);
+  DEV.bio={id:b64(cred.rawId),w:b64(await aesEnc(key,MKraw))};saveDev();}
+async function bioUnlock(){const key=await bioSecret(unb64(DEV.bio.id));await setMK(await aesDec(key,unb64(DEV.bio.w)));}
+const bioMsg=e=>e&&e.code==="noprf"?"Face ID / fingerprint unlock isn't supported in this browser yet. Your PIN works as normal.":e&&e.name==="NotAllowedError"?"Face ID / fingerprint was cancelled.":"Face ID / fingerprint didn't work. Use your PIN.";
+
+/* ---------- lock screen ---------- */
+const LB=()=>$("lockBody");
+function lockView(title,html,focus){$("lockTitle").textContent=title;LB().innerHTML=html;const f=focus&&LB().querySelector(focus);if(f)setTimeout(()=>f.focus(),60);}
+function lockErr(m){const e=LB().querySelector(".err");if(e)e.textContent=m||"";}
+function busy(btn,on,label){if(!btn)return;btn.disabled=on;if(on){btn.dataset.l=btn.textContent;btn.textContent=label||"Please wait…";}else if(btn.dataset.l)btn.textContent=btn.dataset.l;}
+const dots=(n,of)=>`<div class="steps-dots" aria-hidden="true">${Array.from({length:of},(_,i)=>`<i class="${i<n?"on":""}"></i>`).join("")}</div>`;
+const pinOk=p=>/^\d{6,12}$/.test(p);
+function lockStart(){
+  if(VAULT&&DEV.pin)return showUnlock();
+  if(VAULT)return showPassUnlock("");
+  return showFirst();
+}
+/* first time on this device: sign in with the owner account, then set up or restore the lock */
+async function showFirst(msg){
+  if(!navigator.onLine){lockView("Connect to the internet",`<p class="muted">This app is private. The first time on a new device you need to sign in, so connect to the internet once.</p><span class="err">${esc(msg||"")}</span><div class="lbtns"><button type="button" class="btn-primary" id="lkRetry">Try again</button></div>`,"#lkRetry");
+    $("lkRetry").onclick=()=>showFirst();return;}
+  lockView("Checking…",`<p class="muted">One moment.</p>`);
+  let f;try{f=await fbReady();}catch(e){lockView("Can't reach the server",`<p class="muted">Check your connection and try again.</p><div class="lbtns"><button type="button" class="btn-primary" id="lkRetry">Try again</button></div>`,"#lkRetry");$("lkRetry").onclick=()=>showFirst();return;}
+  const u=f.auth.currentUser;if(u)return ownerGate(f,u);
+  lockView("Private app",`<p class="muted">Sign in with the owner account to open Sea Days Ledger on this device.</p>
+    <form id="lkIn" novalidate><label class="f"><span>Email</span><input id="lkEm" type="email" autocomplete="username" inputmode="email"></label>
+    <label class="f"><span>Password</span><input id="lkPw" type="password" autocomplete="current-password"></label><span class="err">${esc(msg||"")}</span>
+    <div class="lbtns"><button type="submit" class="btn-primary">Sign in</button><button type="button" class="linky" id="lkReset">Forgot password?</button></div></form>`,"#lkEm");
+  $("lkReset").onclick=async()=>{const em=$("lkEm").value.trim();if(!em){lockErr("Enter your email first.");return;}try{await f.auth.sendPasswordResetEmail(em);lockErr("Password reset email sent.");}catch(e){lockErr(authMsg(e));}};
+  $("lkIn").onsubmit=async e=>{e.preventDefault();const b=e.submitter||$("lkIn").querySelector("button[type=submit]");busy(b,true,"Signing in…");
+    try{const cr=await f.auth.signInWithEmailAndPassword($("lkEm").value.trim(),$("lkPw").value);fbUser=cr.user;rememberUser(cr.user);await ownerGate(f,cr.user);}catch(err){busy(b,false);lockErr(authMsg(err));}};
+}
+async function ownerGate(f,u){
+  try{await u.reload();}catch(e){}u=f.auth.currentUser||u;
+  if(String(u.email||"").toLowerCase()!==ADMIN_EMAIL){lockView("This app is private",`<p class="muted">${esc(u.email||"This account")} can't open this app.</p><div class="lbtns"><button type="button" class="btn-primary" id="lkOut">Sign out</button></div>`);
+    $("lkOut").onclick=async()=>{try{await f.auth.signOut();}catch(e){}rememberUser(null);showFirst();};return;}
+  if(!u.emailVerified){lockView("Verify your email",`<p class="muted">Open the link we emailed to ${esc(u.email)}, then tap Continue.</p><span class="err"></span><div class="lbtns"><button type="button" class="btn-primary" id="lkGo">Continue</button><button type="button" class="ghost" id="lkSend">Send the link again</button></div>`);
+    $("lkGo").onclick=()=>ownerGate(f,f.auth.currentUser);$("lkSend").onclick=async()=>{try{await u.sendEmailVerification();lockErr("Link sent.");}catch(e){lockErr(authMsg(e));}};return;}
+  lockView("Checking your account…",`<p class="muted">One moment.</p>`);
+  let cd={};try{const sn=await f.db.collection("users").doc(u.uid).get({source:"server"});cd=sn.exists?sn.data():{};}catch(e){lockView("Can't reach your account",`<p class="muted">Check your connection and try again.</p><div class="lbtns"><button type="button" class="btn-primary" id="lkRetry">Try again</button></div>`,"#lkRetry");$("lkRetry").onclick=()=>ownerGate(f,u);return;}
+  if(cd.vault)showRestore(f,u,cd);else showSetup(f,u,cd);
+}
+/* set up: passphrase → recovery key → PIN → Face ID */
+function showSetup(f,u,cd){
+  lockView("Set up your lock",`${dots(1,4)}<p class="muted">Choose a <b>passphrase</b>. It protects your data and documents, and you'll need it once on each new device. Use at least 10 characters, for example three or four words you'll remember.</p>
+    <form id="lkP" novalidate><label class="f"><span>Passphrase</span><input id="lkP1" type="password" autocomplete="new-password"></label><label class="f"><span>Type it again</span><input id="lkP2" type="password" autocomplete="new-password"></label>
+    <label class="chk"><input type="checkbox" id="lkShow"> <span>Show passphrase</span></label><span class="err"></span><div class="lbtns"><button type="submit" class="btn-primary">Next</button></div></form>`,"#lkP1");
+  $("lkShow").onchange=()=>["lkP1","lkP2"].forEach(i=>$(i).type=$("lkShow").checked?"text":"password");
+  $("lkP").onsubmit=async e=>{e.preventDefault();const p=$("lkP1").value;
+    if(p.length<10){lockErr("Use at least 10 characters.");return;}if(p!==$("lkP2").value){lockErr("The two passphrases don't match.");return;}if(/^\d+$/.test(p)){lockErr("Use words, not only numbers.");return;}
+    const b=e.submitter;busy(b,true,"Creating your key…");
+    await setMK(rnd(32));const rk=newRecovery();VAULT={v:1,p:await wrapMK(p,ITER_P),r:await wrapMK(rkNorm(rk),ITER_R),u:Date.now()};showRecovery(rk,()=>showNewPin(()=>finishSetup(f,u,cd),2,4));};
+}
+function showRecovery(rk,next,inApp){
+  const html=`${inApp?"":dots(2,4)}<p class="muted">This is your <b>recovery key</b>. If you forget your passphrase, it's the only way to open your documents. Write it down or save it, and keep it somewhere safe at home, not on this device only.</p>
+    <div class="rk" id="lkRK">${rk}</div><div class="row2" style="margin-bottom:10px"><button type="button" class="ghost" id="lkCopy">Copy</button><button type="button" class="ghost" id="lkSave">Save as file</button></div>
+    <label class="chk"><input type="checkbox" id="lkOk"> <span>I've saved my recovery key somewhere safe.</span></label><span class="err"></span><div class="lbtns"><button type="button" class="btn-primary" id="lkNext">${inApp?"Done":"Next"}</button></div>`;
+  return {html,bind:()=>{
+    $("lkCopy").onclick=async()=>{try{await navigator.clipboard.writeText(rk);$("lkCopy").textContent="Copied";}catch(e){$("lkCopy").textContent="Select and copy it";}};
+    $("lkSave").onclick=()=>{const t=`Sea Days Ledger - recovery key\n\n${rk}\n\nKeep this somewhere safe. With it, anyone who can sign in to your account could open your documents.\nCreated ${new Date().toDateString()}\n`;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain"}));a.download="Sea-Days-Ledger-recovery-key.txt";document.body.appendChild(a);a.click();a.remove();};
+    $("lkNext").onclick=()=>{if(!$("lkOk").checked){lockErr("Tick the box once you've saved it.");return;}next();};}};
+}
+const _showRecovery=showRecovery;
+showRecovery=function(rk,next,inApp){const v=_showRecovery(rk,next,inApp);if(inApp)return v;lockView("Save your recovery key",v.html,"#lkCopy");v.bind();};
+function showNewPin(next,step,of,msg){
+  lockView("Choose a PIN for this device",`${step?dots(step+1,of):""}<p class="muted">You'll use this PIN to unlock the app on this device. Use 6 to 12 digits, not your bank PIN.</p>
+    <form id="lkN" novalidate><label class="f"><span>New PIN</span><input id="lkN1" class="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12"></label><label class="f"><span>Type it again</span><input id="lkN2" class="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12"></label>
+    <span class="err">${esc(msg||"")}</span><div class="lbtns"><button type="submit" class="btn-primary">Next</button></div></form>`,"#lkN1");
+  $("lkN").onsubmit=async e=>{e.preventDefault();const p=$("lkN1").value;if(!pinOk(p)){lockErr("Use 6 to 12 digits.");return;}if(/^(\d)\1+$/.test(p)||"0123456789012".includes(p)||"9876543210987".includes(p)){lockErr("That PIN is too easy to guess.");return;}if(p!==$("lkN2").value){lockErr("The two PINs don't match.");return;}
+    busy(e.submitter,true,"Saving…");DEV={pin:await wrapMK(p,ITER_PIN),fails:0};saveDev();await offerBio(next);};
+}
+async function offerBio(next){
+  if(!(await bioAvailable()))return next();
+  lockView("Use Face ID or fingerprint?",`<p class="muted">Unlock with Face ID, Touch ID, fingerprint or Windows Hello instead of typing your PIN. Your PIN still works.</p><span class="err"></span><div class="lbtns"><button type="button" class="btn-primary" id="lkBio">Turn on</button><button type="button" class="ghost" id="lkSkip">Not now</button></div>`);
+  $("lkSkip").onclick=()=>next();
+  $("lkBio").onclick=async()=>{busy($("lkBio"),true,"Waiting…");try{await bioEnable();next();}catch(e){busy($("lkBio"),false);lockErr(bioMsg(e));$("lkBio").hidden=e&&e.code==="noprf";$("lkSkip").textContent="Continue";}};
+}
+async function loadLedgerLocal(){
+  const t=lsGet("sdlLedgerEnc");if(t){try{return await decJSON(t);}catch(e){}}
+  return loadLocal(); /* an older version kept it readable; it is encrypted below and the readable copy removed */
+}
+async function finishSetup(f,u,cd){
+  lockView("Encrypting your data…",`<p class="muted">Please keep the app open.</p>`);
+  const local=await loadLedgerLocal();if(local)adopt(local);else S=JSON.parse(JSON.stringify(EXAMPLE));
+  if(cd.ledger){try{merge(JSON.parse(cd.ledger));}catch(e){}}
+  await migrateDocs();saveVault();if(!S.example)S.updatedAt=Date.now();await storeLedger(JSON.stringify(snapshot()));
+  try{await f.db.collection("users").doc(u.uid).set({enc:await encJSON(snapshot()),vault:VAULT,updatedAt:S.updatedAt||Date.now(),email:u.email||""});}catch(e){}
+  enterApp("Your lock is set up. Press Sync to replace the copies in your account with encrypted ones.");
+}
+/* new device: the account already has a lock */
+function showRestore(f,u,cd,useRK){
+  lockView("Unlock on this device",`${dots(1,3)}<p class="muted">${useRK?"Enter your recovery key.":"Enter the passphrase you chose when you set up the lock."}</p>
+    <form id="lkR" novalidate><label class="f"><span>${useRK?"Recovery key":"Passphrase"}</span><input id="lkR1" type="password" autocomplete="${useRK?"off":"current-password"}" ${useRK?'style="text-transform:uppercase;font-family:var(--f-mono)"':""}></label><span class="err"></span>
+    <div class="lbtns"><button type="submit" class="btn-primary">Unlock</button><button type="button" class="linky" id="lkAlt">${useRK?"Use passphrase instead":"Forgot passphrase? Use recovery key"}</button></div></form>`,"#lkR1");
+  $("lkAlt").onclick=()=>showRestore(f,u,cd,!useRK);
+  $("lkR").onsubmit=async e=>{e.preventDefault();const v=$("lkR1").value;if(!v){lockErr("Enter it first.");return;}busy(e.submitter,true,"Checking…");
+    try{await setMK(useRK?await unwrapMK(rkNorm(v),cd.vault.r):await unwrapMK(v,cd.vault.p));}catch(err){busy(e.submitter,false);lockErr(useRK?"That recovery key isn't right.":"That passphrase isn't right.");return;}
+    VAULT=cd.vault;showNewPin(()=>finishRestore(cd,useRK),1,3);};
+}
+async function finishRestore(cd,usedRK){try{await _finishRestore(cd,usedRK);}catch(e){lockView("Something went wrong",`<p class="muted">${esc(String(e&&e.message||e))}</p><div class="lbtns"><button type="button" class="btn-primary" onclick="location.reload()">Try again</button></div>`);}}
+async function _finishRestore(cd,usedRK){
+  lockView("Opening your data…",`<p class="muted">Please keep the app open.</p>`);
+  const local=await loadLedgerLocal();if(local)adopt(local);else S=JSON.parse(JSON.stringify(EXAMPLE));
+  if(cd.enc){try{merge(await decJSON(cd.enc));}catch(e){}}if(cd.ledger){try{merge(JSON.parse(cd.ledger));}catch(e){}}
+  try{await migrateDocs();}catch(e){}saveVault();await storeLedger(JSON.stringify(snapshot()));
+  enterApp(usedRK?"Unlocked with your recovery key. Set a new passphrase under Account → Security.":"Unlocked. Press Sync to bring your documents to this device.");
+}
+/* every day: PIN or Face ID */
+function showUnlock(msg){
+  const wait=Math.max(0,(DEV.until||0)-Date.now());
+  lockView("Locked",`<form id="lkU" novalidate><label class="f"><span>PIN</span><input id="lkPin" class="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" ${wait?"disabled":""}></label>
+    <span class="err">${esc(msg||"")}</span><div class="lbtns"><button type="submit" class="btn-primary" ${wait?"disabled":""}>Unlock</button>${DEV.bio?'<button type="button" class="ghost" id="lkBioU">Use Face ID / fingerprint</button>':""}
+    <button type="button" class="linky" id="lkForgot">Forgot PIN? Use passphrase or recovery key</button><button type="button" class="linky" id="lkErase">Erase this device</button></div></form>`,wait?null:"#lkPin");
+  if(wait){const t=setInterval(()=>{const w=Math.ceil(((DEV.until||0)-Date.now())/1000);if(w<=0){clearInterval(t);showUnlock();}else lockErr(`Too many wrong PINs. Try again in ${w} s.`);},500);}
+  $("lkForgot").onclick=()=>showPassUnlock("");$("lkErase").onclick=()=>showErase(()=>showUnlock());
+  if($("lkBioU"))$("lkBioU").onclick=async()=>{try{await bioUnlock();DEV.fails=0;DEV.until=0;saveDev();await openApp();}catch(e){lockErr(bioMsg(e));}};
+  $("lkPin").addEventListener("input",()=>{if($("lkPin").value.length>=12)$("lkU").requestSubmit();});
+  $("lkU").onsubmit=async e=>{e.preventDefault();const p=$("lkPin").value;if(!p)return;const b=$("lkU").querySelector("button[type=submit]");busy(b,true,"Checking…");
+    try{await setMK(await unwrapMK(p,DEV.pin));DEV.fails=0;DEV.until=0;saveDev();await openApp();}
+    catch(err){DEV.fails=(DEV.fails||0)+1;
+      if(DEV.fails>=10){delete DEV.pin;delete DEV.bio;DEV.fails=0;saveDev();return showPassUnlock("Too many wrong PINs. Unlock with your passphrase or recovery key, then choose a new PIN.");}
+      if(DEV.fails>=5)DEV.until=Date.now()+30000*Math.pow(2,DEV.fails-5);saveDev();showUnlock(DEV.fails>=5?"":`Wrong PIN. ${10-DEV.fails} tries left before the PIN is turned off.`);}};
+}
+function showPassUnlock(msg,useRK){
+  lockView(useRK?"Use your recovery key":"Use your passphrase",`<form id="lkPP" novalidate><label class="f"><span>${useRK?"Recovery key":"Passphrase"}</span><input id="lkPP1" type="password" autocomplete="off" ${useRK?'style="text-transform:uppercase;font-family:var(--f-mono)"':""}></label><span class="err">${esc(msg||"")}</span>
+    <div class="lbtns"><button type="submit" class="btn-primary">Unlock</button><button type="button" class="linky" id="lkAlt">${useRK?"Use passphrase instead":"Use recovery key instead"}</button>${DEV.pin?'<button type="button" class="linky" id="lkBack">Back to PIN</button>':""}<button type="button" class="linky" id="lkErase">Erase this device</button></div></form>`,"#lkPP1");
+  $("lkAlt").onclick=()=>showPassUnlock("",!useRK);if($("lkBack"))$("lkBack").onclick=()=>showUnlock();$("lkErase").onclick=()=>showErase(()=>showPassUnlock("",useRK));
+  $("lkPP").onsubmit=async e=>{e.preventDefault();const v=$("lkPP1").value;if(!v)return;busy(e.submitter,true,"Checking…");
+    try{await setMK(useRK?await unwrapMK(rkNorm(v),VAULT.r):await unwrapMK(v,VAULT.p));}catch(err){busy(e.submitter,false);lockErr(useRK?"That recovery key isn't right.":"That passphrase isn't right.");return;}
+    showNewPin(()=>openApp(useRK?"Unlocked with your recovery key. Set a new passphrase under Account → Security.":""));};
+}
+function showErase(back){
+  lockView("Erase this device?",`<p class="muted">This removes your data, documents, PIN and sign-in from this device only. The encrypted copy in your account stays, so after signing in again with your passphrase you get back everything you had synced.</p><p class="muted">Anything you haven't synced from this device will be lost.</p><span class="err"></span>
+    <div class="lbtns"><button type="button" class="btn-primary" id="lkEr" style="background:#c0392b;border-color:#c0392b">Erase this device</button><button type="button" class="ghost" id="lkNo">Cancel</button></div>`,"#lkNo");
+  $("lkNo").onclick=back;$("lkEr").onclick=()=>eraseDevice();
+}
+async function eraseDevice(){
+  try{if(fb)await fb.auth.signOut();}catch(e){}
+  try{Object.keys(localStorage).filter(k=>/^(sdl|seaDays)/.test(k)&&k!=="sdlTheme").forEach(k=>localStorage.removeItem(k));}catch(e){}
+  const del=n=>new Promise(r=>{try{const q=indexedDB.deleteDatabase(n);q.onsuccess=q.onerror=q.onblocked=()=>r();}catch(e){r();}});
+  try{if(idbP)(await idbP).close();}catch(e){}await del("sdl-docs");await del("firebaseLocalStorageDb");
+  try{sessionStorage.clear();}catch(e){}location.replace(location.pathname);
+}
+async function openApp(msg){
+  lockView("Opening…",`<p class="muted">One moment.</p>`);
+  const local=await loadLedgerLocal();if(local)adopt(local);else S=JSON.parse(JSON.stringify(EXAMPLE));
+  if(!lsGet("sdlLedgerEnc")&&local)await storeLedger(JSON.stringify(snapshot()));
+  await migrateDocs();enterApp(msg);
+}
+function enterApp(msg){UNLOCKED=true;document.body.classList.remove("locked");$("lock").setAttribute("aria-hidden","true");LB().innerHTML="";boot();if(msg)setTimeout(()=>toast(msg,7000),300);}
+
+/* ---------- lock again: button, away from the app, idle ---------- */
+let lastAct=Date.now(),hiddenAt=0;const lockMin=()=>+(lsGet("sdlLockMin")||3);
+["pointerdown","keydown","touchstart","wheel"].forEach(ev=>addEventListener(ev,()=>{lastAct=Date.now();},{passive:true,capture:true}));
+document.addEventListener("visibilitychange",()=>{if(!UNLOCKED)return;if(document.hidden)hiddenAt=Date.now();else{if(hiddenAt&&Date.now()-hiddenAt>lockMin()*60000)lockNow();hiddenAt=0;lastAct=Date.now();}});
+setInterval(()=>{if(UNLOCKED&&!syncing&&!document.hidden&&Date.now()-lastAct>Math.max(5,lockMin())*60000)lockNow();},15000);
+async function lockNow(){if(!UNLOCKED)return;UNLOCKED=false;try{await saveQ;}catch(e){}MK=null;MKraw=null;document.body.classList.add("locked");location.reload();}
+$("lockBtn").addEventListener("click",lockNow);
+
+/* ---------- Account → Security ---------- */
+let secOpen="";
+function renderSecurity(){
+  const el=$("secCard");if(!el)return;const bio=!!DEV.bio;
+  const form=(k,inner)=>secOpen===k?`<form class="sec-form" data-sf="${k}" novalidate>${inner}<div class="actions"><button type="submit" class="btn-primary btn-sm">Save</button><button type="button" class="btn-ghost btn-sm" data-scancel>Cancel</button><span class="err" id="sfErr"></span></div></form>`:"";
+  const pw=(id,l,ac)=>`<label class="f"><span>${l}</span><input id="${id}" type="password" autocomplete="${ac||"off"}"></label>`;
+  const pn=(id,l)=>`<label class="f"><span>${l}</span><input id="${id}" type="password" inputmode="numeric" maxlength="12" autocomplete="off"></label>`;
+  el.innerHTML=`<h2 style="margin-bottom:4px">Security</h2><p class="small muted" style="margin-bottom:6px">Your ledger and documents are encrypted with your own key, on this device and in your account. Only your passphrase, recovery key, or this device's PIN${bio?" or Face ID / fingerprint":""} can open them.</p>
+   <div class="sec-row"><div><b>Lock now</b><div class="small muted">Locks the app until you enter your PIN.</div></div><button type="button" class="btn-sm" data-s="lock">Lock now</button></div>
+   <div class="sec-row"><div><b>Auto-lock</b><div class="small muted">Locks when you leave the app for this long (and after 5 minutes without use).</div></div><select id="secLockMin" class="btn-sm">${[1,3,5,10].map(m=>`<option value="${m}" ${lockMin()===m?"selected":""}>After ${m} min</option>`).join("")}</select></div>
+   <div class="sec-row"><div><b>PIN</b><div class="small muted">Used on this device only.</div></div><button type="button" class="btn-sm" data-s="pin">Change PIN</button></div>${form("pin",pw("sfCur","Current passphrase","current-password")+pn("sfN1","New PIN (6–12 digits)")+pn("sfN2","Type it again"))}
+   <div class="sec-row"><div><b>Face ID / fingerprint</b><div class="small muted">${bio?"On for this device.":"Off on this device."}</div></div><button type="button" class="btn-sm" data-s="bio">${bio?"Turn off":"Turn on"}</button></div>
+   <div class="sec-row"><div><b>Passphrase</b><div class="small muted">Needed once on each new device. Press Sync after changing it.</div></div><button type="button" class="btn-sm" data-s="pass">Change passphrase</button></div>${form("pass",pw("sfCur","Current passphrase or recovery key","current-password")+pw("sfP1","New passphrase (10+ characters)","new-password")+pw("sfP2","Type it again","new-password"))}
+   <div class="sec-row"><div><b>Recovery key</b><div class="small muted">Lost it? Make a new one; the old one stops working after Sync.</div></div><button type="button" class="btn-sm" data-s="rk">New recovery key</button></div>${form("rk",pw("sfCur","Current passphrase","current-password"))}
+   <div class="sec-row"><div><b>Erase this device</b><div class="small muted">Removes everything from this device. Your encrypted copy in your account stays.</div></div><button type="button" class="btn-sm btn-danger" data-s="erase">Erase…</button></div>
+   <div id="secRK"></div>`;
+}
+async function checkCur(v){try{return !!await unwrapMK(v,VAULT.p);}catch(e){}try{return looksLikeRK(v)&&!!await unwrapMK(rkNorm(v),VAULT.r);}catch(e){}return false;}
+$("secCard").addEventListener("change",e=>{if(e.target.id==="secLockMin"){lsSet("sdlLockMin",e.target.value);toast("Auto-lock updated.");}});
+$("secCard").addEventListener("click",async e=>{
+  if(e.target.closest("[data-scancel]")){secOpen="";renderSecurity();return;}
+  const b=e.target.closest("[data-s]");if(!b)return;const k=b.dataset.s;
+  if(k==="lock")return lockNow();
+  if(k==="erase"){if(b.dataset.c){await saveQ;return eraseDevice();}b.dataset.c="1";b.textContent="Tap again to erase";setTimeout(()=>{if(b.isConnected){delete b.dataset.c;b.textContent="Erase…";}},5000);return;}
+  if(k==="bio"){if(DEV.bio){delete DEV.bio;saveDev();renderSecurity();toast("Face ID / fingerprint turned off on this device.");return;}
+    if(!(await bioAvailable())){toast("This device or browser doesn't offer Face ID / fingerprint unlock.",5000);return;}
+    try{await bioEnable();renderSecurity();toast("Face ID / fingerprint turned on.");}catch(err){toast(bioMsg(err),6000);}return;}
+  secOpen=secOpen===k?"":k;renderSecurity();const i=$("secCard").querySelector("input");if(i)i.focus();
+});
+$("secCard").addEventListener("submit",async e=>{e.preventDefault();const k=e.target.dataset.sf,err=m=>$("sfErr").textContent=m,btn=e.target.querySelector("button[type=submit]");
+  busy(btn,true,"Checking…");const ok=await checkCur($("sfCur").value);busy(btn,false);if(!ok){err("That passphrase isn't right.");return;}
+  if(k==="pin"){const p=$("sfN1").value;if(!pinOk(p)){err("Use 6 to 12 digits.");return;}if(p!==$("sfN2").value){err("The two PINs don't match.");return;}
+    busy(btn,true,"Saving…");DEV.pin=await wrapMK(p,ITER_PIN);DEV.fails=0;saveDev();secOpen="";renderSecurity();toast("PIN changed.");return;}
+  if(k==="pass"){const p=$("sfP1").value;if(p.length<10){err("Use at least 10 characters.");return;}if(p!==$("sfP2").value){err("The two passphrases don't match.");return;}
+    busy(btn,true,"Saving…");VAULT=Object.assign({},VAULT,{p:await wrapMK(p,ITER_P),u:Date.now()});saveVault();S.updatedAt=Date.now();await storeLedger(JSON.stringify(snapshot()));updateSyncUI();secOpen="";renderSecurity();toast("Passphrase changed. Press Sync so your account uses it too.",6000);return;}
+  if(k==="rk"){busy(btn,true,"Saving…");const rk=newRecovery();VAULT=Object.assign({},VAULT,{r:await wrapMK(rkNorm(rk),ITER_R),u:Date.now()});saveVault();S.updatedAt=Date.now();await storeLedger(JSON.stringify(snapshot()));updateSyncUI();secOpen="";renderSecurity();
+    const v=_showRecovery(rk,()=>{$("secRK").innerHTML="";toast("Press Sync so the new recovery key works for your account.",6000);},true);$("secRK").innerHTML=`<div class="lock" style="position:static;background:none;padding:10px 0"><div class="lock-card" style="max-width:none"><h3 style="color:#fff;margin:0 0 8px">Your new recovery key</h3>${v.html}</div></div>`;v.bind();}
+});
+
 /* ======================= start ======================= */
-const local=loadLocal();if(local)adopt(local);else S=JSON.parse(JSON.stringify(EXAMPLE));
-takeCarry();
-applyTheme();syncSegs();render();renderAccount();renderUploadState();planDefaults();
-show(location.hash.slice(1)||"dashboard");
+S=JSON.parse(JSON.stringify(EXAMPLE)); /* placeholder until unlocked; nothing is shown before then */
+applyTheme();
 if(APP_V){const t="Version "+APP_V.slice(0,8)+"."+APP_V.slice(8);if($("appVer"))$("appVer").textContent="App "+t;if($("railVer"))$("railVer").textContent=t;}
 if(/[?&]v=/.test(location.search))history.replaceState(null,"",location.pathname+location.hash);
-window.__sdl={get S(){return S;},get C(){return C;},merge,compute,syncAll};
+function boot(){takeCarry();syncSegs();render();renderAccount();renderUploadState();planDefaults();renderSecurity();show(location.hash.slice(1)||"dashboard");}
+lockStart();
 })();
