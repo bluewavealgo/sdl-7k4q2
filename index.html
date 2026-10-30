@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202610301207">
+<link rel="stylesheet" href="app.css?v=202610301253">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body>
@@ -31,6 +31,8 @@
       <a href="#ships" data-v="ships"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l2 4h14l2-4z"/><path d="M6 17V9h12v8M12 9V3l5 3"/></svg><span>Sea <span class="lbl-long">service</span></span></a>
       <a href="#upload" data-v="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg><span>Upload <span class="lbl-long">seafarer profile</span></span></a>
       <a href="#complete" data-v="complete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4h6M9 4a2 2 0 0 0-2 2v0h10v0a2 2 0 0 0-2-2M7 6H5v15h14V6h-2"/><path d="M8.5 13.5l2.2 2.2 4.8-4.8"/></svg><span><span class="lbl-long">Pending details</span><span class="lbl-short">Pending</span></span><b class="badge" id="cdBadge" hidden>0</b></a>
+      <a href="#certs" data-v="certs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M7 9h6M7 12h4"/><circle cx="16.5" cy="11.5" r="2.5"/><path d="M15 14l-1 6 2.5-1.5L19 20l-1-6"/></svg><span><span class="lbl-long">Certificates</span><span class="lbl-short">Certs</span></span><b class="badge" id="certBadge" hidden>0</b></a>
+      <a href="#docs" data-v="docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5 12 11l2.5 2.5"/></svg><span><span class="lbl-long">My documents</span><span class="lbl-short">Docs</span></span><b class="badge" id="docBadge" hidden>0</b></a>
       <div class="sep"></div>
       <a href="#notices" data-v="notices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg><span>Notices</span><b class="badge" id="noticeBadge" hidden>0</b></a>
       <a href="#news" data-v="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/></svg><span><span class="lbl-long">Maritime </span>News</span><b class="badge" id="newsBadge" hidden>0</b></a>
@@ -53,11 +55,24 @@
         <label class="f" style="min-width:190px"><span>Charts for</span><select id="dFY"></select></label></div>
       <div id="exampleBanner" hidden></div>
       <div class="hero"><div class="bridge" id="bridge"></div><div class="card nextstep" id="nextStep"></div></div>
+      <div class="card" id="alerts"></div>
       <div class="grid2">
-        <div class="card chart-card"><div class="ch"><div><h2>Years at a glance</h2><div class="small muted">Each ring is a financial year, filled with days outside India. The tick marks the NRI target.</div></div></div><div class="chart-body" id="chRings"></div></div>
-        <div class="card chart-card"><div class="ch"><div><h2>Days outside India</h2><div class="small muted">Solid = done, light = planned, dashed line = days needed.</div></div></div><div class="bars-wrap" id="chBars"></div></div>
-        <div class="card chart-card"><div class="ch"><div><h2>Sea time by ship type</h2><div class="small muted dScope"></div></div></div><div class="chart-body" id="chType"></div></div>
-        <div class="card chart-card"><div class="ch"><div><h2 id="chMixTitle">Sea time by rank</h2><div class="small muted dScope"></div></div><div class="seg" id="mixSeg" role="group" aria-label="Group sea time by"><button type="button" data-mix="rank" aria-pressed="true">Rank</button><button type="button" data-mix="company" aria-pressed="false">Company</button><button type="button" data-mix="fleet" aria-pressed="false">Fleet</button><button type="button" data-mix="flag" aria-pressed="false">Flag</button></div></div><div class="chart-body" id="chMix"></div></div>
+        <div class="card chart-card"><div class="ch"><div><h2>Years at a glance</h2><div class="small muted" id="yrsNote">Days outside India in each financial year against the NRI target.</div></div><div class="seg chartseg" id="segYears" role="group" aria-label="Chart style"><button type="button" data-m="rings" aria-pressed="false">Rings</button><button type="button" data-m="table" aria-pressed="false">Table</button></div></div><div class="chart-body" id="chRings"></div></div>
+        <div class="card chart-card"><div class="ch"><div><h2>Days outside India</h2><div class="small muted">Dashed line = days needed for NRI.</div></div><div class="seg chartseg" id="segOutside" role="group" aria-label="Chart style"><button type="button" data-m="bars" aria-pressed="false">Bars</button><button type="button" data-m="line" aria-pressed="false">Line</button><button type="button" data-m="table" aria-pressed="false">Table</button></div></div><div class="bars-wrap" id="chBars"></div></div>
+        <div class="card chart-card"><div class="ch"><div><h2>Sea time by ship type</h2><div class="small muted dScope"></div></div><div class="seg chartseg" id="segType" role="group" aria-label="Chart style"><button type="button" data-m="donut" aria-pressed="false">Donut</button><button type="button" data-m="bars" aria-pressed="false">Bars</button><button type="button" data-m="table" aria-pressed="false">Table</button></div></div><div class="chart-body" id="chType"></div></div>
+        <div class="card chart-card"><div class="ch"><div><h2 id="chMixTitle">Sea time by rank</h2><div class="small muted dScope"></div></div><div class="seg chartseg" id="segMix" role="group" aria-label="Chart style"><button type="button" data-m="donut" aria-pressed="false">Donut</button><button type="button" data-m="bars" aria-pressed="false">Bars</button><button type="button" data-m="table" aria-pressed="false">Table</button></div></div><div class="seg" id="mixSeg" role="group" aria-label="Group sea time by" style="align-self:flex-start"><button type="button" data-mix="rank" aria-pressed="true">Rank</button><button type="button" data-mix="company" aria-pressed="false">Company</button><button type="button" data-mix="fleet" aria-pressed="false">Fleet</button><button type="button" data-mix="flag" aria-pressed="false">Flag</button></div><div class="chart-body" id="chMix"></div></div>
+      </div>
+      <div class="card chart-card"><div class="ch"><div><h2>Timeline</h2><div class="small muted">Each row is a financial year (April to March). Coloured bars are your contracts on board (CDC dates); the strip below shows days outside India and at home.</div></div><label class="f" style="min-width:150px"><span>Show</span><select id="tlYears"><option value="4">Last 4 years</option><option value="6" selected>Last 6 years</option><option value="10">Last 10 years</option><option value="99">All years</option></select></label></div><div class="bars-wrap" id="chTimeline"></div></div>
+      <div class="card card-b" id="planner">
+        <div class="ch" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h2>Plan your next contract</h2><p class="small muted">Try dates before you agree them. Nothing is saved; this only shows what the dates would mean for NRI.</p></div></div>
+        <form id="planForm" class="fgrid" style="margin-top:12px" novalidate>
+          <label class="f"><span>Leave India</span><input type="date" id="pLeft"></label>
+          <label class="f"><span>Sign on</span><input type="date" id="pOn"></label>
+          <label class="f"><span>Contract length (months)</span><input type="number" id="pMonths" min="1" max="12" step="0.5" value="6" inputmode="decimal"></label>
+          <label class="f"><span>Back in India (optional)</span><input type="date" id="pArr"></label>
+          <div class="actions" style="grid-column:1/-1"><button type="submit" class="btn-primary">Check these dates</button><button type="button" class="btn-ghost" id="pClear">Clear</button></div>
+        </form>
+        <div id="planOut" style="margin-top:12px"></div>
       </div>
     </section>
 
@@ -184,6 +199,66 @@
       <datalist id="cdCompany"></datalist><datalist id="cdFleet"></datalist>
     </section>
 
+    <!-- CERTIFICATES -->
+    <section class="view" id="v-certs" data-title="Certificates" hidden>
+      <div class="vhead"><div><h1>Certificates</h1><p class="muted">Passport, CDC, CoC, endorsements and STCW courses with their expiry dates. Uploading your seafarer profile fills this in; you can add or edit any certificate here.</p></div><button type="button" class="btn-primary" id="certAdd">+ Add certificate</button></div>
+      <div class="card" id="certFormCard" hidden>
+        <div class="card-h"><h2 id="certFormTitle">Add certificate</h2><button type="button" class="btn-ghost btn-sm" id="certFormClose">Close</button></div>
+        <form id="certForm" class="card-b" novalidate>
+          <input type="hidden" id="ce_id">
+          <div class="fgrid">
+            <label class="f s2"><span>Name *</span><input id="ce_name" placeholder="e.g. Passport, Advanced Fire Fighting" autocomplete="off"></label>
+            <label class="f"><span>Type</span><select id="ce_kind"><option value="document">ID document (passport, CDC…)</option><option value="coc">Certificate of Competency</option><option value="endorsement">Endorsement</option><option value="course">STCW / course</option><option value="medical">Medical</option><option value="other">Other</option></select></label>
+            <label class="f"><span>Number</span><input id="ce_number" autocomplete="off"></label>
+            <label class="f"><span>Issued by / at</span><input id="ce_issuer" autocomplete="off"></label>
+            <label class="f"><span>Issue date</span><input type="date" id="ce_issued"></label>
+            <label class="f"><span>Expiry date</span><input type="date" id="ce_expires"></label>
+            <label class="f"><span>Notes</span><input id="ce_notes" autocomplete="off"></label>
+          </div>
+          <div class="actions" style="margin-top:14px"><button type="submit" class="btn-primary" id="ceSave">Save</button><button type="button" class="btn-ghost" id="ceCancel">Cancel</button><span class="err" id="ceErr"></span></div>
+        </form>
+      </div>
+      <div class="sumrow" id="certTiles"></div>
+      <div class="card card-b"><div class="filters">
+        <div class="f wide"><span>Type</span><div class="chips" id="certType" role="group" aria-label="Type"><button type="button" data-t="" aria-pressed="true">All</button><button type="button" data-t="document" aria-pressed="false">ID documents</button><button type="button" data-t="coc" aria-pressed="false">CoC &amp; endorsements</button><button type="button" data-t="course" aria-pressed="false">STCW courses</button><button type="button" data-t="other" aria-pressed="false">Medical &amp; other</button></div></div>
+        <div class="f wide"><span>Show</span><div class="chips" id="certShow" role="group" aria-label="Show"><button type="button" data-s="current" aria-pressed="true">Current</button><button type="button" data-s="attention" aria-pressed="false">Needs attention</button><button type="button" data-s="all" aria-pressed="false">All, including replaced &amp; hidden</button></div></div>
+        <label class="f wide"><span>Search</span><input id="certQ" placeholder="e.g. fire fighting, passport" autocomplete="off"></label>
+      </div></div>
+      <div class="card" id="certList"></div>
+    </section>
+
+    <section class="view" id="v-docs" data-title="My documents" hidden>
+      <div class="vhead"><div><h1>My documents</h1><p class="muted">Keep scans or photos of your passport, CDC, CoC, visas and certificates in one place. They're saved on this device, and in your private account when you press Sync while signed in, so your other devices get them too. Open them offline, save them to your device, or share them to WhatsApp or email.</p></div><label class="btn-primary" id="docAddLbl" for="docFile" tabindex="0">+ Add document</label></div>
+      <input type="file" id="docFile" accept="image/*,application/pdf" multiple hidden>
+      <div class="card" id="docFormCard" hidden>
+        <div class="card-h"><h2 id="docFormTitle">Add document</h2><button type="button" class="btn-ghost btn-sm" id="docFormClose">Close</button></div>
+        <form id="docForm" class="card-b" novalidate>
+          <input type="hidden" id="dc_id">
+          <div class="doc-prevs" id="docPrev"></div>
+          <label class="chk" id="dcCombineRow" hidden><input type="checkbox" id="dc_combine" checked> <span>Combine these photos into one PDF (for example front and back pages)</span></label>
+          <div class="fgrid">
+            <label class="f s2"><span>Name *</span><input id="dc_name" placeholder="e.g. Passport front and back" autocomplete="off"></label>
+            <label class="f"><span>Category</span><select id="dc_cat"><option>Passport</option><option>CDC</option><option>CoC</option><option>Endorsement</option><option>STCW course</option><option>Medical</option><option>Visa</option><option>Contract / letter</option><option>Other</option></select></label>
+            <label class="f"><span>Link to certificate (optional)</span><select id="dc_cert"></select></label>
+            <label class="f s2"><span>Notes</span><input id="dc_notes" autocomplete="off"></label>
+          </div>
+          <div class="actions" style="margin-top:14px"><button type="submit" class="btn-primary" id="dcSave">Save</button><button type="button" class="btn-ghost" id="dcCancel">Cancel</button><span class="err" id="dcErr"></span></div>
+          <p class="small muted" style="margin-top:8px">Photos are made smaller (about 0.3–0.6 MB each) so they sync quickly over ship Wi-Fi. PDFs up to 8 MB.</p>
+        </form>
+      </div>
+      <div class="sumrow" id="docTiles"></div>
+      <div class="card card-b"><div class="filters">
+        <div class="f wide"><span>Category</span><div class="chips" id="docCat" role="group" aria-label="Category"></div></div>
+        <label class="f wide"><span>Search</span><input id="docQ" placeholder="e.g. passport, visa" autocomplete="off"></label>
+      </div></div>
+      <div id="docList" class="doc-grid"></div>
+      <div class="card card-b small muted">Your documents are private: only you can open them, after signing in. On this device anyone who can open the app can see them, so keep your phone locked.</div>
+    </section>
+    <div class="viewer" id="docViewer" hidden role="dialog" aria-modal="true" aria-labelledby="dvTitle">
+      <div class="viewer-bar"><b id="dvTitle"></b><div class="row-act"><button type="button" class="btn-sm" id="dvShare">Share</button><button type="button" class="btn-sm" id="dvSave">Save to device</button><button type="button" class="btn-sm btn-primary" id="dvClose">Close</button></div></div>
+      <div class="viewer-body" id="dvBody"></div>
+    </div>
+
     <!-- NOTICES -->
     <section class="view" id="v-notices" data-title="Notices" hidden>
       <div class="vhead"><div><h1>Notices</h1><p class="muted">Updates from the author of Sea Days Ledger. New notices arrive when you press Sync.</p></div></div>
@@ -251,7 +326,18 @@
     </section>
     <!-- HELP -->
     <section class="view" id="v-help" data-title="How it works" hidden>
-      <div class="vhead"><div><h1>How it works</h1><p class="muted">The rules the app uses to decide your residential status.</p></div></div>
+      <div class="vhead"><div><h1>How it works</h1><p class="muted">How to get started, and the rules the app uses to decide your residential status.</p></div></div>
+      <div class="card card-b">
+        <h2 style="margin-bottom:12px">Getting started</h2>
+        <ol class="gs">
+          <li><div><b>Install the app.</b> Open the link while online, then add it to your Home Screen (Share → Add to Home Screen), or click Install on a PC. After that it opens without internet.</div></li>
+          <li><div><b>Create your account.</b> In Account, create an account with your email and a password, so your data is kept safe and reaches your other devices.</div><a class="btn btn-sm" href="#account">Open Account</a></li>
+          <li><div><b>Upload your seafarer profile.</b> In Upload seafarer profile, upload your most recent Seafarer Profile PDF, downloaded from the DG Shipping e-Governance portal. Your ships, sea service and certificates are filled in for you.</div><a class="btn btn-sm" href="#upload">Upload seafarer profile</a></li>
+          <li><div><b>Complete the pending details.</b> In Pending details, fill in what the profile doesn't include: passport dates, sign-on and sign-off ports, company and fleet. If you don't have your passport dates now, tap <b>Estimate passport dates</b>, and update them later when you have the actual dates.</div><a class="btn btn-sm" href="#complete">Pending details</a></li>
+          <li><div><b>Press Sync.</b> Sync saves your data to your account and brings in notices, news and app updates. Nothing changes until you press it.</div></li>
+          <li><div><b>Check your results.</b> The Dashboard shows this year's NRI position and what to do next; Year results shows every financial year and a report for your CA.</div><a class="btn btn-sm" href="#dashboard">Dashboard</a></li>
+        </ol>
+      </div>
       <div class="rules">
         <div class="r" style="--rc:var(--sea)"><h3>Day count</h3>
           <p>Days outside India come from your passport dates (left India and arrived India) when you enter them. Without passport dates, the CDC sign-on to sign-off period is used.</p>
@@ -287,6 +373,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202610301207"></script>
+<script src="app.js?v=202610301253"></script>
 </body>
 </html>

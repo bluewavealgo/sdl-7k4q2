@@ -64,23 +64,27 @@ const EXAMPLE={v:2,example:true,settings:{edge:true},fy:{},deleted:[],updatedAt:
  {id:"ex2",vessel:"LNG Example Aurora",type:"LNG Carrier",company:"Example Gas Carriers",fleet:"LNG Fleet",rank:"2nd Officer",flag:"Bahamas",on:"2025-12-06",off:"2026-05-10",left:"2025-12-05",arr:"2026-05-12",notes:"Example"},
  {id:"ex3",vessel:"MT Example Meridian",type:"Chemical Tanker",company:"Example Shipmanagement",fleet:"Tanker Fleet 2",rank:"Chief Officer",flag:"Panama",on:"2026-08-02",onIndia:true,onPort:"Mumbai (JNPT)",off:"2027-01-15",offPort:"Houston",arr:"2027-01-17",notes:"Example · sign-off planned"}]};
 let S;
-function adopt(o){S={v:2,example:false,settings:Object.assign({edge:true},o.settings||{}),fy:o.fy||{},contracts:(o.contracts||[]).map(c=>Object.assign({company:"",fleet:"",flag:"",registry:""},c)),deleted:Array.isArray(o.deleted)?o.deleted:[],updatedAt:+o.updatedAt||0};}
-function snapshot(){return {v:2,app:"sea-days-ledger",settings:S.settings,fy:S.fy,contracts:S.contracts,deleted:S.deleted||[],updatedAt:S.updatedAt||0};}
+function adopt(o){S={v:2,example:false,settings:Object.assign({edge:true},o.settings||{}),fy:o.fy||{},contracts:(o.contracts||[]).map(c=>Object.assign({company:"",fleet:"",flag:"",registry:""},c)),deleted:Array.isArray(o.deleted)?o.deleted:[],certs:Array.isArray(o.certs)?o.certs:[],docs:Array.isArray(o.docs)?o.docs:[],updatedAt:+o.updatedAt||0};}
+function snapshot(){return {v:2,app:"sea-days-ledger",settings:S.settings,fy:S.fy,contracts:S.contracts,certs:S.certs||[],docs:S.docs||[],deleted:S.deleted||[],updatedAt:S.updatedAt||0};}
 function saveLocal(){if(S.example)return;S.updatedAt=Date.now();lsSet("seaDaysLedger",JSON.stringify(snapshot()));updateSyncUI();}
 function loadLocal(){try{const o=JSON.parse(lsGet("seaDaysLedger"));if(o&&Array.isArray(o.contracts))return o;}catch(e){}return null;}
-function leaveExample(){if(S.example)S={v:2,example:false,settings:{edge:S.settings.edge!==false},fy:{},contracts:[],deleted:[],updatedAt:0};}
+function leaveExample(){if(S.example)S={v:2,example:false,settings:{edge:S.settings.edge!==false},fy:{},contracts:[],certs:[],docs:[],deleted:[],updatedAt:0};}
 /* combine another copy into S: newest edit of each contract wins, deletions carry over, nothing is wiped */
 function merge(o){
   if(S.example)leaveExample();
-  const before=JSON.stringify([S.contracts,S.fy,S.deleted]);
+  S.certs=S.certs||[];S.docs=S.docs||[];const before=JSON.stringify([S.contracts,S.fy,S.deleted,S.certs,S.docs]);
   const tomb={};(S.deleted||[]).concat(Array.isArray(o.deleted)?o.deleted:[]).forEach(d=>{if(d&&d.id)tomb[d.id]=Math.max(tomb[d.id]||0,+d.u||0);});
   const m={};S.contracts.concat((o.contracts||[]).map(c=>Object.assign({company:"",fleet:"",flag:"",registry:""},c))).forEach(c=>{if(!c||!c.id)return;const p=m[c.id];if(!p||(+c.u||0)>(+p.u||0))m[c.id]=c;});
   S.contracts=Object.values(m).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
+  const cm={};S.certs.concat(Array.isArray(o.certs)?o.certs:[]).forEach(c=>{if(!c||!c.id)return;const p=cm[c.id];if(!p||(+c.u||0)>(+p.u||0))cm[c.id]=c;});
+  S.certs=Object.values(cm).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
+  const dm={};S.docs.concat(Array.isArray(o.docs)?o.docs:[]).forEach(c=>{if(!c||!c.id)return;const p=dm[c.id];if(!p||(+c.u||0)>(+p.u||0)||((+c.u||0)===(+p.u||0)&&(c.chunks||0)>(p.chunks||0)))dm[c.id]=c;});
+  S.docs=Object.values(dm).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
   S.deleted=Object.entries(tomb).map(([id,u])=>({id,u})).slice(-500);
   const newer=(+o.updatedAt||0)>(+S.updatedAt||0);
   Object.entries(o.fy||{}).forEach(([k,v])=>{S.fy[k]=newer?Object.assign({},S.fy[k],v):Object.assign({},v,S.fy[k]);});
   if(newer&&o.settings)S.settings=Object.assign({},S.settings,o.settings);
-  return before!==JSON.stringify([S.contracts,S.fy,S.deleted]);
+  return before!==JSON.stringify([S.contracts,S.fy,S.deleted,S.certs,S.docs]);
 }
 
 /* ======================= day-count engine ======================= */
@@ -168,7 +172,7 @@ function taxLine(r){
 const actLabel=f=>f>=2026?"Income-tax Act, 2025 · Rule 8 (crew)":"Income-tax Act, 1961 · Rule 126 (crew)";
 
 /* ======================= routing ======================= */
-const VIEWS=["dashboard","years","ships","upload","complete","notices","news","account","help","about"];
+const VIEWS=["dashboard","years","ships","upload","complete","certs","docs","notices","news","account","help","about"];
 let VIEW="dashboard",noticesPrevSeen=0;
 function show(v){
   if(!VIEWS.includes(v))v="dashboard";VIEW=v;
@@ -178,6 +182,8 @@ function show(v){
   if(v==="notices"){noticesPrevSeen=+(lsGet("sdlNoticesSeen")||0);lsSet("sdlNoticesSeen",String(Date.now()));renderNotices();}
   if(v==="upload")renderUploadState();
   if(v==="complete")renderComplete(true);
+  if(v==="certs")renderCerts();
+  if(v==="docs")renderDocs();
   if(v==="news"){newsPrevSeen=+(lsGet("sdlNewsSeen")||0);lsSet("sdlNewsSeen",String(Date.now()));renderNews();}
   if(v==="account")renderAccount();
   window.scrollTo(0,0);
@@ -205,7 +211,8 @@ function render(){
   $("edgeSet").checked=S.settings.edge!==false;
   $("exampleBanner").hidden=!S.example;
   $("exampleBanner").innerHTML=S.example?`<div class="banner example"><div><b>These are example voyages.</b> Upload your seafarer profile or add a contract, and the examples disappear.</div><div class="actions"><a class="btn btn-primary btn-sm" href="#upload">Upload profile</a><a class="btn btn-sm" href="#ships" id="exAdd">Add contract</a></div></div>`:"";
-  renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();renderCdBadge();
+  if(!S.certs)S.certs=[];
+  renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();renderCdBadge();renderCertBadge();if(VIEW==="certs")renderCerts();if(!S.docs)S.docs=[];renderDocBadge();if(VIEW==="docs")renderDocs();
   fillSelect($("cdFY"),[["","All years"]].concat(fyOpts),$("cdFY").value);
   $("cdCompany").innerHTML=uniq("company").map(f=>`<option value="${esc(f)}">`).join("");$("cdFleet").innerHTML=uniq("fleet").map(f=>`<option value="${esc(f)}">`).join("");
   if(VIEW==="complete"&&!cdEditing)renderComplete();else renderCdProgress();
@@ -220,20 +227,24 @@ function renderDashboard(){
     const A=v=>Math.PI*(1-Math.min(v,r.days)/r.days),cx=150,cy=140,R=110,ang=A(out),tA=A(need);
     const valCol=out>=need?"#55d69d":(out>=need-20?"#ffc23d":"#ff6b5c"),stCol={NR:"#55d69d",RNOR:"#ffc23d",ROR:"#ff6b5c",UNK:"#9fc3d4"}[st];
     const tx=(rr)=>(cx+rr*Math.cos(tA)).toFixed(1),ty=(rr)=>(cy-rr*Math.sin(tA)).toFixed(1);
-    $("bridge").innerHTML=`<div><div class="eyebrow">This year · FY ${fyLabel(f)} · day ${r.elapsed} of ${r.days}</div><div class="big-status" style="color:${stCol}">${st==="UNK"?"—":st}</div><div class="small" style="color:var(--rail-dim)">${esc(statusName(st))}${r.outPlan?" · includes planned dates":""}</div></div>
-    <svg class="dial" viewBox="0 0 300 160" role="img" aria-label="${out} days outside India this financial year, ${need} needed">
-      <path d="${arcH(cx,cy,R,Math.PI,0)}" stroke="#ffffff1f" stroke-width="16" fill="none" stroke-linecap="round"/>
-      <path d="${arcH(cx,cy,R,Math.PI,tA)}" stroke="#ff6b5c55" stroke-width="16" fill="none"/>
-      <path d="${arcH(cx,cy,R,tA,0)}" stroke="#55d69d66" stroke-width="16" fill="none"/>
-      ${out>0?`<path d="${arcH(cx,cy,R,Math.PI,ang)}" stroke="${valCol}" stroke-width="16" fill="none" stroke-linecap="round"/>`:""}
-      <line x1="${tx(R+8)}" y1="${ty(R+8)}" x2="${tx(R-22)}" y2="${ty(R-22)}" stroke="#fff" stroke-width="2.5"/>
-      <text x="${tx(R+21)}" y="${ty(R+21)}" fill="#fff" font-size="10" text-anchor="middle">${need}</text>
-      <circle cx="${(cx+R*Math.cos(ang)).toFixed(1)}" cy="${(cy-R*Math.sin(ang)).toFixed(1)}" r="9" fill="#fff" stroke="${valCol}" stroke-width="3"/>
-      <text x="${cx}" y="${cy-22}" fill="${valCol}" font-size="38" text-anchor="middle" font-weight="500">${out}</text>
-      <text x="${cx}" y="${cy-4}" fill="#9fc3d4" font-size="9" text-anchor="middle" letter-spacing="1">DAYS OUTSIDE INDIA</text>
-      <text x="${cx-R}" y="${cy+16}" fill="#9fc3d4" font-size="9" text-anchor="middle">0</text><text x="${cx+R}" y="${cy+16}" fill="#9fc3d4" font-size="9" text-anchor="middle">${r.days}</text>
+    const zA=(cx+R*Math.cos(tA)).toFixed(1),zB=(cy-R*Math.sin(tA)).toFixed(1);
+    $("bridge").innerHTML=`<div><div class="eyebrow">This year · FY ${fyLabel(f)} · day ${r.elapsed} of ${r.days}</div><div class="big-status" style="color:${stCol}">${st==="UNK"?"—":st}</div><div class="small" style="color:#cfe2ee">${esc(statusName(st))}${r.outPlan?" · includes planned dates":""}</div></div>
+    <div class="dialwrap">
+    <svg class="dial" viewBox="0 -18 300 193" role="img" aria-label="${out} days outside India this financial year, ${need} needed">
+      <path d="${arcH(cx,cy,R,Math.PI,tA)}" stroke="#ff6b5c" stroke-opacity=".35" stroke-width="22" fill="none"/>
+      <path d="${arcH(cx,cy,R,tA,0)}" stroke="#55d69d" stroke-opacity=".35" stroke-width="22" fill="none"/>
+      ${out>0?`<path d="${arcH(cx,cy,R,Math.PI,ang)}" stroke="${valCol}" stroke-width="22" fill="none"/>`:""}
+      <line x1="${tx(R+14)}" y1="${ty(R+14)}" x2="${tx(R-14)}" y2="${ty(R-14)}" stroke="#ffffff" stroke-width="3"/>
+      <g transform="translate(${tx(R+28)},${ty(R+28)})"><rect x="-17" y="-10" width="34" height="18" rx="9" fill="#ffffff"/><text x="0" y="3.5" fill="#06182a" font-size="11" font-weight="700" text-anchor="middle">${need}</text></g>
+      <circle cx="${(cx+R*Math.cos(ang)).toFixed(1)}" cy="${(cy-R*Math.sin(ang)).toFixed(1)}" r="10" fill="#ffffff" stroke="${valCol}" stroke-width="4"/>
+      <circle cx="${cx}" cy="${cy-6}" r="58" fill="#0b2236" stroke="#ffffff22"/>
+      <text x="${cx}" y="${cy-14}" fill="${valCol}" font-size="40" text-anchor="middle" font-weight="600">${out}</text>
+      <text x="${cx}" y="${cy+4}" fill="#e6f1f7" font-size="10" text-anchor="middle" letter-spacing="1">DAYS OUTSIDE</text>
+      <text x="${cx}" y="${cy+18}" fill="#9fc3d4" font-size="10" text-anchor="middle">of ${need} needed</text>
+      <text x="${cx-R}" y="${cy+30}" fill="#e6f1f7" font-size="12" text-anchor="middle" font-weight="600">0</text><text x="${cx+R}" y="${cy+30}" fill="#e6f1f7" font-size="12" text-anchor="middle" font-weight="600">${r.days}</text>
     </svg>
-    <div class="dial-legend"><span><i style="background:#ff6b5c"></i>Below ${need}: resident risk</span><span><i style="background:#55d69d"></i>${need}+: NRI safe</span></div>
+    <div class="zone-legend"><span class="z-red">● Below ${need}: resident risk</span><span class="z-green">● ${need} or more: NRI safe</span></div>
+    </div>
     <div class="kvs"><div class="kv"><b>${need}</b><span>days outside needed</span></div><div class="kv"><b>${more}</b><span>more days outside to go</span></div><div class="kv"><b>${allow}</b><span>more India days allowed</span></div></div>`;
     const total=S.contracts.reduce((a,c)=>a+shipDaysIn(c,null),0),prop=S.contracts.reduce((a,c)=>a+(+c.propellingDays||0),0),ships=new Set(S.contracts.map(c=>c.imo||c.vessel)).size;
     const msg=more>0?`Stay outside India for <b>${more} more day${more===1?"":"s"}</b> before 31 March ${f+1} to stay NRI this year.`:`You have <b>${out} days</b> outside India this year, ${out-need} more than the ${need} needed. You're on track to stay NRI.`;
@@ -241,7 +252,7 @@ function renderDashboard(){
       <div class="tiles"><div class="tile"><b>${yrs(total)} yrs</b><span>${nf(total)} days at sea · ${approx(total)}</span></div><div class="tile"><b>${S.contracts.length}</b><span>contracts on ${ships} ship${ships===1?"":"s"}</span></div><div class="tile"><b>${nf(prop)||"—"}</b><span>propelling days</span></div><div class="tile"><b>${C.order.filter(x=>C.res[x].status==="NR").length}/${C.order.filter(x=>C.res[x].india!=null).length}</b><span>years as NRI</span></div></div>
       <div class="actions"><a class="btn btn-sm" href="#years">See every year</a><a class="btn btn-sm" href="#ships">Sea service</a></div>`;
   }
-  renderRings();renderBars();renderDonuts();
+  renderAlerts();renderRings();renderBars();renderDonuts();renderTimeline();
 }
 const P=(cx,cy,r,a)=>[cx+r*Math.sin(a),cy-r*Math.cos(a)];
 function arcP(cx,cy,r,a0,a1){if(a1-a0>=Math.PI*2-1e-4)a1=a0+Math.PI*2-1e-3;const [x0,y0]=P(cx,cy,r,a0),[x1,y1]=P(cx,cy,r,a1);return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${a1-a0>Math.PI?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;}
@@ -249,9 +260,11 @@ function sector(cx,cy,ro,ri,a0,a1){
   if(a1-a0>=Math.PI*2-1e-4)return `M${cx} ${cy-ro} A${ro} ${ro} 0 1 1 ${cx-0.01} ${cy-ro}Z M${cx} ${cy-ri} A${ri} ${ri} 0 1 0 ${cx-0.01} ${cy-ri}Z`;
   const L=a1-a0>Math.PI?1:0,[x0,y0]=P(cx,cy,ro,a0),[x1,y1]=P(cx,cy,ro,a1),[x2,y2]=P(cx,cy,ri,a1),[x3,y3]=P(cx,cy,ri,a0);
   return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${ro} ${ro} 0 ${L} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} L${x2.toFixed(2)} ${y2.toFixed(2)} A${ri} ${ri} 0 ${L} 0 ${x3.toFixed(2)} ${y3.toFixed(2)}Z`;}
+function yearsTable(fys){return `<div class="tbl-wrap" style="grid-column:1/-1"><table class="mini"><thead><tr><th>Year</th><th class="n">Outside</th><th class="n">Needed</th><th class="n">In India</th><th>Status</th></tr></thead><tbody>${fys.map(f=>{const r=C.res[f],out=r.inData?r.outside:r.days-r.india,p=fyPassIssues(f);return `<tr><td>FY ${fyLabel(f)}${p.missing||p.estimated?' <span class="estag" title="Passport dates missing or estimated">EST</span>':""}</td><td class="n">${out}</td><td class="n">${r.need}</td><td class="n">${r.india}</td><td><span class="pill ${r.status}">${r.status}</span></td></tr>`;}).join("")}</tbody></table></div>`;}
 function renderRings(){
   const fys=C.order.filter(f=>C.res[f].india!=null).slice(-6).reverse();
   if(!fys.length){$("chRings").innerHTML='<div class="empty">Add a contract to see your years.</div>';return;}
+  if(CH.years==="table"){$("chRings").innerHTML=yearsTable(C.order.filter(f=>C.res[f].india!=null).slice().reverse());return;}
   const cx=110,cy=110;let g="";const lg=[];
   fys.forEach((f,i)=>{const r=C.res[f],rad=98-i*15,need=r.need,out=r.inData?r.outside:r.days-r.india,done=r.inData?r.outside-r.outPlan:out,col=stColor(r.status);
     const aDone=done/r.days*Math.PI*2,aAll=out/r.days*Math.PI*2,aNeed=need/r.days*Math.PI*2;
@@ -265,9 +278,19 @@ function renderRings(){
   if(inner>24)g+=`<text x="${cx}" y="${cy+3}" text-anchor="middle" font-size="${inner>40?22:15}" fill="var(--ink)" font-weight="500">${nr}/${fys.length}</text><text x="${cx}" y="${cy+17}" text-anchor="middle" font-size="8" fill="var(--muted)" letter-spacing="1">NRI YEARS</text>`;
   $("chRings").innerHTML=`<svg viewBox="0 0 220 220" role="img" aria-label="Days outside India per financial year">${g}</svg><div class="lg"><div class="small muted">Outer ring = latest year · days outside / needed</div>${lg.join("")}</div>`;
 }
+function renderLine(fys){
+  const padL=34,padR=14,padT=20,padB=26,H=220,W=Math.max(460,padL+padR+fys.length*64),plotW=W-padL-padR,plotH=H-padT-padB,x=i=>padL+(fys.length<2?plotW/2:i*plotW/(fys.length-1)),y=v=>padT+plotH*(1-v/366);let g="";
+  [0,100,200,300].forEach(v=>{g+=`<line x1="${padL}" x2="${W-padR}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${padL-6}" y="${y(v)+3}" text-anchor="end" font-size="9" fill="var(--muted)">${v}</text>`;});
+  g+=`<polyline fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3" points="${fys.map((f,i)=>x(i)+","+y(C.res[f].need)).join(" ")}"/>`;
+  g+=`<polyline fill="none" stroke="var(--sea)" stroke-width="2" points="${fys.map((f,i)=>{const r=C.res[f];return x(i)+","+y(r.inData?r.outside:r.days-r.india);}).join(" ")}"/>`;
+  fys.forEach((f,i)=>{const r=C.res[f],out=r.inData?r.outside:r.days-r.india;g+=`<g class="mark" data-tip="${esc(`FY ${fyLabel(f)} · ${r.status}
+${out} days outside, ${r.need} needed`)}"><circle cx="${x(i)}" cy="${y(out)}" r="12" fill="transparent"/><circle cx="${x(i)}" cy="${y(out)}" r="5.5" fill="${stColor(r.status)}" stroke="var(--paper)" stroke-width="2"/><text x="${x(i)}" y="${y(out)-10}" text-anchor="middle" font-size="10" fill="var(--ink)" font-weight="500">${out}</text><text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${fyLabel(f)}</text></g>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:420px" role="img" aria-label="Days outside India per financial year, line">${g}</svg><div class="legend" style="margin-top:4px"><span><i style="background:var(--ok)"></i>NR</span><span><i style="background:var(--warn)"></i>RNOR</span><span><i style="background:var(--bad)"></i>ROR</span><span>– – days needed</span></div>`;}
 function renderBars(){
   const fys=C.order.filter(f=>C.res[f].india!=null).slice(-8);
   if(!fys.length){$("chBars").innerHTML='<div class="empty">No years to chart yet.</div>';return;}
+  if(CH.outside==="table"){$("chBars").innerHTML=yearsTable(fys.slice().reverse());return;}
+  if(CH.outside==="line"){$("chBars").innerHTML=renderLine(fys);return;}
   const slot=70,padL=34,padB=26,padT=18,H=220,W=Math.max(460,padL+fys.length*slot+8),plotH=H-padB-padT,y=v=>padT+plotH*(1-v/366);let g="";
   [0,100,200,300].forEach(v=>{g+=`<line x1="${padL}" x2="${W-4}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${padL-6}" y="${y(v)+3}" text-anchor="end" font-size="9" fill="var(--muted)">${v}</text>`;});
   fys.forEach((f,i)=>{const r=C.res[f],need=r.need,out=r.inData?r.outside:r.days-r.india,done=r.inData?out-r.outPlan:out,plan=out-done,x=padL+i*slot+16,bw=slot-32,col=stColor(r.status);
@@ -277,9 +300,11 @@ function renderBars(){
     g+=`<line x1="${x-6}" x2="${x+bw+6}" y1="${y(need)}" y2="${y(need)}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${x+bw/2}" y="${y(Math.max(out,need))-6}" text-anchor="middle" font-size="10" fill="var(--ink)" font-weight="500">${out}</text><text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${fyLabel(f)}</text></g>`;});
   $("chBars").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="Days outside India per financial year">${g}</svg><div class="legend" style="margin-top:4px"><span><i style="background:var(--ok)"></i>NR</span><span><i style="background:var(--warn)"></i>RNOR</span><span><i style="background:var(--bad)"></i>ROR</span><span><i style="background:var(--sea);opacity:.4"></i>Planned</span><span>– – days needed</span></div>`;
 }
-function donut(el,rows,label){
+function donut(el,rows,label,mode){
   const total=rows.reduce((s,r)=>s+r.v,0);
   if(!total){el.innerHTML='<div class="empty">No sea time for this choice.</div>';return;}
+  if(mode==="bars"){const max=Math.max(...rows.map(r=>r.v));el.innerHTML=`<div class="hbars" style="grid-column:1/-1">${rows.map(r=>`<div class="hbar mark" data-tip="${esc(r.l+"\n"+r.v+" days · "+approx(r.v))}"><span class="nm" title="${esc(r.l)}">${esc(r.l)}</span><span class="track"><i style="width:${r.v/max*100}%;background:${r.c}"></i></span><span class="v">${yrs(r.v)} yrs</span></div>`).join("")}<div class="small muted" style="margin-top:6px">Total ${yrs(total)} yrs · ${nf(total)} days</div></div>`;return;}
+  if(mode==="table"){el.innerHTML=`<div class="tbl-wrap" style="grid-column:1/-1"><table class="mini"><thead><tr><th></th><th class="n">Years</th><th class="n">Days</th><th class="n">Share</th></tr></thead><tbody>${rows.map(r=>`<tr><td><span class="tchip" style="--tc:${r.c}">${esc(r.l)}</span></td><td class="n">${yrs(r.v)}</td><td class="n">${nf(r.v)}</td><td class="n">${Math.round(r.v/total*100)}%</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${yrs(total)}</td><td class="n">${nf(total)}</td><td class="n">100%</td></tr></tfoot></table></div>`;return;}
   const cx=110,cy=110,ro=96,ri=64;let a=0,g="";
   rows.forEach(r=>{const a1=a+r.v/total*Math.PI*2;g+=`<path class="mark" d="${sector(cx,cy,ro,ri,a,a1)}" fill="${r.c}" stroke="var(--paper)" stroke-width="2" fill-rule="evenodd" data-tip="${esc(r.l+"\n"+yrs(r.v)+" yrs · "+r.v+" days · "+approx(r.v)+"\n"+Math.round(r.v/total*100)+"%")}"/>`;a=a1;});
   g+=`<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="24" fill="var(--ink)" font-weight="500">${yrs(total)}</text><text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="9" fill="var(--muted)" letter-spacing="1">YEARS AT SEA</text><text x="${cx}" y="${cy+30}" text-anchor="middle" font-size="9" fill="var(--muted)">${nf(total)} days</text>`;
@@ -290,11 +315,11 @@ function renderDonuts(){
   const fF=$("dFY").value?+$("dFY").value:null;
   document.querySelectorAll(".dScope").forEach(e=>e.textContent=fF!=null?`Days in FY ${fyLabel(fF)}`:"All time");
   const tm={};S.contracts.forEach(c=>{const d=shipDaysIn(c,fF);if(!d)return;const k=TYPE_COL[c.type]?c.type:"Other types";tm[k]=(tm[k]||0)+d;});
-  donut($("chType"),Object.entries(tm).map(([l,v])=>({l,v,c:typeColor(l)})).sort((a,b)=>b.v-a.v),"Sea time by ship type");
+  donut($("chType"),Object.entries(tm).map(([l,v])=>({l,v,c:typeColor(l)})).sort((a,b)=>b.v-a.v),"Sea time by ship type",CH.type);
   const all={};S.contracts.forEach(c=>{const k=(c[mixKey]||"").trim()||"Not set";all[k]=(all[k]||0)+shipDaysIn(c,null);});
   const top=Object.entries(all).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,7).map(e=>e[0]);
   const mm={};S.contracts.forEach(c=>{const d=shipDaysIn(c,fF);if(!d)return;let k=(c[mixKey]||"").trim()||"Not set";if(!top.includes(k))k="Other";mm[k]=(mm[k]||0)+d;});
-  donut($("chMix"),Object.entries(mm).map(([l,v])=>({l,v,c:l==="Other"?"var(--cx)":`var(--c${top.indexOf(l)})`})).sort((a,b)=>b.v-a.v),"Sea time by "+mixKey);
+  donut($("chMix"),Object.entries(mm).map(([l,v])=>({l,v,c:l==="Other"?"var(--cx)":`var(--c${top.indexOf(l)})`})).sort((a,b)=>b.v-a.v),"Sea time by "+mixKey,CH.mix);
   $("chMixTitle").textContent="Sea time by "+mixKey;
 }
 
@@ -318,6 +343,7 @@ function renderYears(){
       <div class="legend" style="margin-top:6px"><span><i style="background:var(--sea)"></i>Outside India</span><span><i style="background:var(--plan)"></i>Planned</span><span><i style="background:var(--land)"></i>In India</span></div>`:`<p class="small muted" style="margin-top:10px">${r.override!=null?"Days entered under Earlier years.":"No contracts in this year."}</p>`}
     </div>
     <div class="verdict">${passNote(f)}<b>${esc(t.h)}</b><ul>${t.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>${(r.flags||[]).map(x=>`<div class="warnline">${esc(x)}</div>`).join("")}
+      <div><button type="button" class="btn-sm" data-report="${f}">Report for your CA (PDF)</button></div>
       <div class="fyopts">
         <label><input type="checkbox" data-o="inc15" ${o.inc15?"checked":""}><span>Indian income (excluding foreign income) above ₹15 lakh</span></label>
         <label><input type="checkbox" data-o="abroadTax" ${o.abroadTax?"checked":""}><span>Tax resident of another country this year</span></label>
@@ -700,7 +726,9 @@ async function syncAll(){
         if(!u){dataMsg="Sign in again to sync your data.";}
         else{const ref=f.db.collection("users").doc(u.uid);const snap=await ref.get({source:"server"});
           if(snap.exists&&snap.data().ledger){merge(JSON.parse(snap.data().ledger));}
+          let docNote="";try{docNote=await docsUpload(f,u);}catch(e){docNote="docs";}if(docNote)notes.push(docNote==="docs"?"some documents":docNote);
           if(!S.example){S.updatedAt=Date.now();lsSet("seaDaysLedger",JSON.stringify(snapshot()));await ref.set({ledger:JSON.stringify(snapshot()),updatedAt:S.updatedAt,email:u.email||""});}
+          try{const dn2=await docsDownload(f,u);if(dn2)notes.push(dn2);}catch(e){notes.push("some documents");}
           dataMsg="Your data is synced.";}
       }catch(e){notes.push("your data");}
     }else dataMsg="Sign in under Account to sync your data between devices.";
@@ -765,6 +793,33 @@ function sdlParseProfile(text){
   return recs.filter(r=>r.on);
 }
 
+/* certificates, courses, endorsements, CoC and authorised documents (no personal details) */
+function sdlParseCerts(text){
+  const t=text.replace(/\r/g,"");
+  const iso=d=>{const m=String(d||"").match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);return m?`${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`:"";};
+  const out=[];
+  /* keys: [canonical name, regex] */
+  const grab=(chunk,keys)=>{const re=new RegExp("("+keys.map(k=>k[1]).join("|")+")\\s*:","gi");const hits=[];let m;
+    while((m=re.exec(chunk))){const k=keys.find(x=>new RegExp("^"+x[1]+"$","i").test(m[1].trim()));if(k)hits.push({name:k[0],s:m.index,e:re.lastIndex});}
+    const f={};hits.forEach((h,j)=>{if(f[h.name]!=null)return;let stop=j+1<hits.length?hits[j+1].s:chunk.length;const cut=chunk.slice(h.e,stop).search(/Report generated on|Total no of record|Page \d+ of \d+|Remarks\s*:|Suspended/i);if(cut>=0)stop=h.e+cut;f[h.name]=chunk.slice(h.e,stop).replace(/\s+/g," ").trim();});return f;};
+  const sec=(name,next)=>{const a=t.indexOf(name);if(a<0)return "";let b=t.length;next.forEach(n=>{const i=t.indexOf(n,a+name.length);if(i>=0&&i<b)b=i;});return t.slice(a,b);};
+  const split=(s,key)=>{const re=new RegExp("\\d+\\s*\\.\\s*"+key+"\\s*:","g");const idx=[];let m;while((m=re.exec(s)))idx.push(m.index);return idx.map((v,i)=>s.slice(v,i+1<idx.length?idx[i+1]:s.length));};
+  split(sec("Modular Course Details",["Sea Going Service","Post Sea Training","Certificate of Endorsement","Certificate of Competency","Authorised Documents"]),"Course Name").forEach(ch=>{
+    const f=grab(ch,[["name","Course Name"],["issuer","Training Institute"],["code","STCW Code"],["number","Certificate No\\.?"],["from","Attended From"],["to","Attended To"],["issued","Date of Issue"],["expires","Valid Upto"]]);if(!f.name)return;
+    out.push({kind:"course",name:f.name,issuer:f.issuer||"",code:f.code||"",number:f.number||"",issued:iso(f.issued),expires:iso(f.expires)});});
+  split(sec("Certificate of Endorsement",["Certificate of Competency","Authorised Documents","DECLARATION"]),"Endorsement").forEach(ch=>{
+    const f=grab(ch,[["type","Endorsement Type"],["level","Level"],["number","Certificate No\\.?"],["issuer","Issued At"],["issued","Date of Issue"],["expires","Valid Upto \\(Date\\)"]]);if(!f.type)return;
+    out.push({kind:"endorsement",name:titleCaseS(f.type)+(f.level?" · "+f.level:""),number:f.number||"",issuer:f.issuer||"",issued:iso(f.issued),expires:iso(f.expires)});});
+  split(sec("Certificate of Competency",["Authorised Documents","DECLARATION"]),"Grade").forEach(ch=>{
+    const f=grab(ch,[["grade","Grade"],["number","Certificate Number"],["ctype","Certificate Type"],["issuer","Issue At"],["country","Issuing Country"],["place","Place of Examination"],["issued","Issue Date"],["delivered","Certificate delivered"],["expires","Valid Upto \\(Date\\)"]]);if(!f.grade||!f.number)return;
+    out.push({kind:"coc",name:"CoC · "+f.grade,number:f.number,issuer:f.issuer||"",issued:iso(f.issued),expires:iso(f.expires),note:f.ctype||""});});
+  split(sec("Authorised Documents",["DECLARATION"]),"Document Type").forEach(ch=>{
+    const f=grab(ch,[["type","Document Type"],["number","Document Number"],["issued","Issued Date"],["expires","Valid Upto"],["issuer","Issued At"]]);if(!f.type)return;
+    out.push({kind:"document",name:f.type.replace(/\s*No\.?$/,""),number:f.number||"",issued:iso(f.issued),expires:iso(f.expires),issuer:f.issuer||""});});
+  const seen=new Set();return out.filter(c=>{const k=[c.kind,c.name,c.number,c.issued].join("|");if(seen.has(k))return false;seen.add(k);return true;});
+}
+function titleCaseS(v){return String(v||"").toLowerCase().replace(/(^|\s)([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\bDc\b/,"DC");}
+
 const titleCase=v=>String(v||"").toLowerCase().replace(/(^|[\s\-\/(])([a-z])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\bOf\b/g,"of").replace(/\bAnd\b/g,"and");
 function normFlag(f){let v=titleCase(f.trim());if(/^marshall island$/i.test(v))v="Marshall Islands";if(/^isle of man$/i.test(v))v="Isle of Man";return v;}
 function mapType(t){const x=String(t||"").toLowerCase();
@@ -795,6 +850,8 @@ function renderImport(){
   $("pImpGo").onclick=()=>{if(S.example)leaveExample();const now=Date.now();let added=0,updated=0;
     planImport().forEach(p=>{if(p.status==="new"){S.contracts.push(Object.assign({id:"dgs-"+(p.cand.imo||normName(p.cand.vessel))+"-"+p.cand.on,company:"",fleet:"",left:"",arr:"",onIndia:false,offIndia:false,onPort:"",offPort:"",coastal:false,notes:"From DG Shipping profile",source:"DGS profile",u:now},p.cand));added++;}
       else if(p.status==="update"){p.fill.forEach(k=>p.ex[k]=p.cand[k]);p.ex.u=now;updated++;}});
+    S.certs=S.certs||[];let certAdded=0;(PIMP.certs||[]).forEach(x=>{const id=certId(x);if(S.certs.some(y=>y.id===id))return;S.certs.push(Object.assign({id,source:"DGS profile",u:now},x));certAdded++;});
+    if(certAdded)toast(`${certAdded} certificate${certAdded===1?"":"s"} added too.`,3000);
     S.settings.rankMap=Object.assign({},S.settings.rankMap||{},PIMP.map);PIMP=null;saveLocal();render();renderImport();
     const todo=S.contracts.filter(c=>!cdState(c).done).length;
     toast(`${added} ship${added===1?"":"s"} added, ${updated} updated.${todo?` ${todo} have pending details: fill them in here.`:""} Press Sync to save to your account.`,7000);location.hash=todo?"complete":"ships";};
@@ -807,12 +864,326 @@ $("profilePdf").addEventListener("change",async e=>{
     if(!window.pdfjsLib){await loadScript("vendor/pdf.min.js");window.pdfjsLib.GlobalWorkerOptions.workerSrc="vendor/pdf.worker.min.js";}
     const pdf=await window.pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;let lines=[];
     for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const tc=await pg.getTextContent();lines=lines.concat(sdlLinesFromItems(tc.items));}
-    const recs=sdlParseProfile(lines.join("\n"));
-    if(!recs.length){body.innerHTML='<div class="err">No sea-service records were found. Use the “Seafarer Profile” PDF from the DG Shipping e-Governance portal; scanned or photographed copies can\'t be read.</div>';return;}
+    const recs=sdlParseProfile(lines.join("\n")),certs=sdlParseCerts(lines.join("\n"));
+    if(!recs.length&&!certs.length){body.innerHTML='<div class="err">No sea-service records were found. Use the “Seafarer Profile” PDF from the DG Shipping e-Governance portal; scanned or photographed copies can\'t be read.</div>';return;}
     const map={},saved=S.settings.rankMap||{};recs.forEach(r=>{if(r.rank&&map[r.rank]==null&&saved[r.rank]!=null)map[r.rank]=saved[r.rank];});
-    PIMP={name:file.name,recs,map};renderImport();
+    PIMP={name:file.name,recs,map,certs};renderImport();
   }catch(err){body.innerHTML='<div class="err">This file couldn\'t be read. Check that it is the DG Shipping Seafarer Profile PDF and that you\'re online.</div>';}
 });
+
+
+/* ======================= chart style choices ======================= */
+const CH=Object.assign({years:"rings",outside:"bars",type:"donut",mix:"donut"},lsJSON("sdlCharts",{}));
+function syncSegs(){[["segYears","years"],["segOutside","outside"],["segType","type"],["segMix","mix"]].forEach(([id,k])=>$(id).querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===CH[k]))));}
+[["segYears","years"],["segOutside","outside"],["segType","type"],["segMix","mix"]].forEach(([id,k])=>$(id).addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b)return;CH[k]=b.dataset.m;lsSet("sdlCharts",JSON.stringify(CH));syncSegs();renderRings();renderBars();renderDonuts();}));
+
+/* ======================= things to check ======================= */
+function leaveByInfo(){
+  const f=fyOf(TODAY),r=C.res[f];if(!r||r.india==null)return null;
+  const more=Math.max(0,r.need-r.outside),edge=S.settings.edge!==false,e=fyEnd(f);
+  const todayOutside=r.cells[TODAY-r.s]==="o";
+  if(!more)return {kind:"ok",f,text:`NRI target met for FY ${fyLabel(f)}: ${r.outside} days outside India (${r.need} needed).`};
+  if(todayOutside){const until=TODAY+more;return until<=e?{kind:"warn",f,text:`Stay outside India until at least <b>${fmt(until)}</b> to reach ${r.need} days outside in FY ${fyLabel(f)} (${more} more days).`}:{kind:"bad",f,text:`FY ${fyLabel(f)} can no longer reach ${r.need} days outside India.`};}
+  const L=e-more+(edge?0:1);
+  if(L>=TODAY)return {kind:"warn",f,text:`To stay NRI in FY ${fyLabel(f)}, leave India by <b>${fmt(L)}</b> and stay outside until 31 March ${f+1} (${more} more days outside needed).`};
+  return {kind:"bad",f,text:`Not enough days left to reach ${r.need} days outside India in FY ${fyLabel(f)}. This year will count as resident unless your dates change.`};
+}
+function renderAlerts(){
+  const items=[];
+  if(S.example){$("alerts").innerHTML=`<div class="alerts-h"><h2>Things to check</h2></div><div class="alert info"><span class="ai">i</span><p>Upload your seafarer profile to replace the example voyages with your own.</p><a class="btn btn-sm" href="#upload">Upload</a></div>`;return;}
+  const lb=leaveByInfo();if(lb)items.push({k:lb.kind,t:lb.text,a:["#years","Year results"]});
+  const miss=S.contracts.filter(c=>passIssue(c)==="missing").length,est=S.contracts.filter(c=>passIssue(c)==="estimated").length;
+  if(miss)items.push({k:"warn",t:`${miss} contract${miss===1?" has":"s have"} no passport dates. NRI days are estimated from CDC dates until you add them.`,a:["#complete","Pending details"]});
+  if(est)items.push({k:"info",t:`${est} contract${est===1?" uses":"s use"} estimated passport dates. Replace them with the real dates when you can.`,a:["#complete","Pending details"]});
+  const pend=S.contracts.filter(c=>!cdState(c).done).length-est;if(pend>0&&!miss)items.push({k:"info",t:`${pend} contract${pend===1?" has":"s have"} other pending details (ports, company or fleet).`,a:["#complete","Pending details"]});
+  const ca=certAttention();if(ca.expired)items.push({k:"bad",t:`${ca.expired} important certificate${ca.expired===1?" has":"s have"} expired.`,a:["#certs","Certificates"]});
+  if(ca.soon)items.push({k:"warn",t:`${ca.soon} important certificate${ca.soon===1?" expires":"s expire"} within 6 months.`,a:["#certs","Certificates"]});
+  const last=+(lsGet("sdlSynced")||0);if((+S.updatedAt||0)>last)items.push({k:"info",t:savedUser()?"You have changes that aren't in your account yet. Press Sync when you're online.":"Your data is only on this device. Create an account and press Sync to keep it safe.",a:savedUser()?null:["#account","Account"]});
+  $("alerts").innerHTML=`<div class="alerts-h"><h2>Things to check</h2><span class="small muted">${items.filter(i=>i.k!=="ok").length||"All clear"}${items.filter(i=>i.k!=="ok").length?" to look at":""}</span></div>`+(items.length?items.map(i=>`<div class="alert ${i.k}"><span class="ai">${i.k==="ok"?"✓":i.k==="bad"?"!":i.k==="warn"?"!":"i"}</span><p>${i.t}</p>${i.a?`<a class="btn btn-sm" href="${i.a[0]}">${i.a[1]}</a>`:"<span></span>"}</div>`).join(""):`<div class="alert ok"><span class="ai">✓</span><p>Nothing needs your attention right now.</p><span></span></div>`);
+}
+
+/* ======================= timeline ======================= */
+function renderTimeline(){
+  const n=+$("tlYears").value||6,fys=C.order.filter(f=>C.res[f].inData).slice(-n).reverse();
+  if(!fys.length){$("chTimeline").innerHTML='<div class="empty">Add a contract to see your timeline.</div>';return;}
+  const padL=70,padR=10,rowH=46,W=Math.max(640,padL+padR+365*1.6),dw=(W-padL-padR)/366,H=fys.length*rowH+30;let g="";
+  "AMJJASONDJFM".split("").forEach((m,i)=>{const d=[0,30,61,91,122,153,183,214,244,275,306,334][i],x=padL+d*dw;g+=`<line x1="${x}" x2="${x}" y1="4" y2="${H-24}" stroke="var(--line)"/><text x="${x+3}" y="${H-10}" font-size="9" fill="var(--muted)">${"Apr May Jun Jul Aug Sep Oct Nov Dec Jan Feb Mar".split(" ")[i]}</text>`;});
+  fys.forEach((f,i)=>{const r=C.res[f],y0=8+i*rowH;
+    g+=`<g class="tl-row"><text x="${padL-8}" y="${y0+16}" text-anchor="end" font-size="11" fill="var(--ink)" font-weight="500">${fyLabel(f)}</text><text x="${padL-8}" y="${y0+30}" text-anchor="end" font-size="9" fill="${stColor(r.status)}">${r.status} · ${r.outside}d</text>`;
+    let run=null;const flush=(end)=>{if(run){const col=run.c==="o"?"var(--sea)":run.c==="p"?"var(--plan)":run.c==="l"?"var(--land)":"var(--unk-bg)";g+=`<rect x="${padL+run.s*dw}" y="${y0+24}" width="${Math.max(1,(end-run.s)*dw)}" height="9" fill="${col}"/>`;}};
+    r.cells.forEach((c,d)=>{if(!run||run.c!==c){flush(d);run={c,s:d};}});flush(r.cells.length);
+    S.contracts.forEach(c=>{const sp=shipSpan(c);if(!sp)return;const a=Math.max(sp[0],r.s),b=Math.min(sp[1],r.e);if(b<a)return;const x=padL+(a-r.s)*dw,w=Math.max(2,(b-a+1)*dw);
+      g+=`<g class="mark" data-tip="${esc(`${c.vessel} · ${c.rank||""}\nCDC ${fmt(dn(c.on))} → ${c.off?fmt(dn(c.off)):"onboard"}\n${b-a+1} days in this year`)}"><rect x="${x}" y="${y0+6}" width="${w}" height="14" rx="3" fill="${typeColor(c.type)}"/>${w>70?`<text x="${x+4}" y="${y0+16}" font-size="9" fill="#fff">${esc(String(c.vessel).slice(0,Math.floor(w/6)))}</text>`:""}</g>`;});
+    g+=`</g>`;});
+  const T=TODAY;fys.forEach((f,i)=>{const r=C.res[f];if(T>=r.s&&T<=r.e){const x=padL+(T-r.s)*dw;g+=`<line x1="${x}" x2="${x}" y1="${8+i*rowH}" y2="${8+i*rowH+36}" stroke="var(--accent)" stroke-width="2"/><text x="${x+3}" y="${8+i*rowH+4}" font-size="8.5" fill="var(--accent)">today</text>`;}});
+  $("chTimeline").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:600px" role="img" aria-label="Timeline of contracts by financial year">${g}</svg><div class="legend" style="margin-top:6px"><span><i style="background:var(--sea)"></i>Outside India</span><span><i style="background:var(--plan)"></i>Planned outside</span><span><i style="background:var(--land)"></i>In India</span><span>Bars above = contracts, coloured by ship type</span></div>`;
+}
+$("tlYears").addEventListener("change",renderTimeline);
+
+/* ======================= next-contract planner ======================= */
+function planDefaults(){if(!$("pLeft").value){const d=TODAY+30,x=new Date(d*DAY);$("pLeft").value=x.getUTCFullYear()+"-"+pad(x.getUTCMonth()+1)+"-"+pad(x.getUTCDate());}}
+$("pLeft").addEventListener("change",()=>{if($("pLeft").value&&!$("pOn").value)$("pOn").value=addDays($("pLeft").value,1);});
+$("planForm").addEventListener("submit",e=>{e.preventDefault();
+  const L=$("pLeft").value,On=$("pOn").value||(L?addDays(L,1):""),mo=+$("pMonths").value||0;
+  if(!L||!On||!mo){$("planOut").innerHTML='<div class="err">Enter the date you leave India, the sign-on date and the contract length.</div>';return;}
+  if(dn(On)<dn(L)){$("planOut").innerHTML='<div class="err">Sign-on can\'t be before you leave India.</div>';return;}
+  const Off=addDays(On,Math.round(mo*30.44)-1),Arr=$("pArr").value||addDays(Off,1);
+  if(dn(Arr)<dn(Off)){$("planOut").innerHTML='<div class="err">Back in India can\'t be before sign-off.</div>';return;}
+  const before=C,tmp={id:"__plan",vessel:"Planned contract",type:"Offshore / Other",rank:"",on:On,off:Off,left:L,arr:Arr};
+  S.contracts.push(tmp);let P;try{P=compute();}finally{S.contracts=S.contracts.filter(x=>x.id!=="__plan");}
+  const fys=[...new Set([fyOf(dn(L)),fyOf(dn(Arr))])].sort();
+  $("planOut").innerHTML=`<div class="plan-res"><div class="small muted">Leave India ${fmt(dn(L))} · sign on ${fmt(dn(On))} · sign off about ${fmt(dn(Off))} · back in India ${fmt(dn(Arr))}</div>${fys.map(f=>{const r=P.res[f];if(!r)return "";const diff=r.outside-r.need;
+    return `<div class="pr"><div><b>FY ${fyLabel(f)}</b> · ${r.outside} days outside India (${r.need} needed)<div class="small muted">${diff>=0?`${diff} day${diff===1?"":"s"} to spare`:`${-diff} day${diff===-1?"":"s"} short`}</div></div><span class="pill ${r.status}">${r.status==="NR"?"NRI ✓":r.status}</span></div>`;}).join("")}<div class="small muted">Assumes you stay outside India from leaving until you're back, and that you're in India for the rest of each year unless other contracts are already entered. Change the dates and check again.</div></div>`;
+});
+$("pClear").addEventListener("click",()=>{["pLeft","pOn","pArr"].forEach(id=>$(id).value="");$("pMonths").value="6";$("planOut").innerHTML="";});
+
+/* ======================= certificates ======================= */
+const CERT_KIND={document:"ID document",coc:"CoC",endorsement:"Endorsement",course:"STCW course",medical:"Medical",other:"Other"};
+const FAMILY=[["pst",/personal survival|\bpst\b/i],["fpff",/fire prevention|\bfpff\b/i],["aff",/advanced (training in )?fire fighting|\baff\b/i],["mfa",/medical first aid|\bmfa\b/i],["mc",/medical care/i],["pscrb",/survival craft|\bpscrb\b/i],["engref",/refresher and updating/i],["pssr",/personal safety/i],["efa",/elementary first aid/i]];
+const KEY_FAMILIES=new Set(["pst","fpff","aff","mfa","mc","pscrb","engref","passport","cdc","coc"]);
+function certFamily(c){const n=String(c.name||"");if(c.kind==="document")return n.toLowerCase().replace(/[^a-z]/g,"");if(c.kind==="coc")return "coc";if(c.kind==="endorsement")return "end-"+(n.split("·")[1]||"").trim().toLowerCase();if(c.kind==="medical")return "medical";const hit=FAMILY.find(([,re])=>re.test(n));return hit?hit[0]:n.toLowerCase();}
+function certStatus(c){
+  if(c.hidden)return "hiddenc";
+  const fam=certFamily(c),newer=(S.certs||[]).some(x=>x!==c&&!x.hidden&&certFamily(x)===fam&&(x.issued||"")>(c.issued||""));
+  if(newer)return "replaced";
+  if(!c.expires)return "noexp";const d=dn(c.expires)-TODAY;return d<0?"expired":d<=183?"soon":"valid";}
+function isKeyCert(c){const f=certFamily(c);return KEY_FAMILIES.has(f)||c.kind==="endorsement"||c.kind==="medical";}
+function certAttention(){let expired=0,soon=0;(S.certs||[]).forEach(c=>{if(!isKeyCert(c))return;const s=certStatus(c);if(s==="expired")expired++;else if(s==="soon")soon++;});return {expired,soon};}
+function renderCertBadge(){const a=S.example?{expired:0,soon:0}:certAttention(),n=a.expired+a.soon;$("certBadge").hidden=!n;$("certBadge").textContent=n;}
+let certType="",certShow="current";
+const STLBL={valid:"Valid",soon:"Expires soon",expired:"Expired",noexp:"No expiry date",replaced:"Replaced by newer",hiddenc:"Hidden"};
+function relDays(d){const n=d-TODAY,a=Math.abs(n);const t=a<45?a+" day"+(a===1?"":"s"):a<730?Math.round(a/30.44)+" months":(a/365).toFixed(1)+" years";return n>=0?"in "+t:t+" ago";}
+function maskNo(n){n=String(n||"");return n.length>4?"•••• "+n.slice(-4):n;}
+function renderCerts(){
+  const all=S.example?[]:(S.certs||[]);const cnt={valid:0,soon:0,expired:0,noexp:0};all.forEach(c=>{const s=certStatus(c);if(cnt[s]!=null)cnt[s]++;});
+  $("certTiles").innerHTML=`<div class="tile"><b style="color:var(--ok)">${cnt.valid}</b><span>valid</span></div><div class="tile"><b style="color:var(--warn)">${cnt.soon}</b><span>expire within 6 months</span></div><div class="tile"><b style="color:var(--bad)">${cnt.expired}</b><span>expired</span></div><div class="tile"><b>${cnt.noexp}</b><span>no expiry date</span></div>`;
+  $("certType").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.t===certType)));$("certShow").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.s===certShow)));
+  const q=$("certQ").value.trim().toLowerCase();
+  const list=all.filter(c=>{const s=certStatus(c);
+    if(certType==="coc"&&!(c.kind==="coc"||c.kind==="endorsement"))return false;if(certType==="other"&&!(c.kind==="medical"||c.kind==="other"))return false;if(certType&&certType!=="coc"&&certType!=="other"&&c.kind!==certType)return false;
+    if(certShow==="current"&&(s==="replaced"||s==="hiddenc"))return false;if(certShow==="attention"&&!(s==="expired"||s==="soon"))return false;
+    if(q&&!(String(c.name)+" "+String(c.issuer||"")+" "+String(c.number||"")).toLowerCase().includes(q))return false;return true;})
+   .sort((a,b)=>{const o={expired:0,soon:1,valid:2,noexp:3,replaced:4,hiddenc:5};const sa=o[certStatus(a)],sb=o[certStatus(b)];return sa-sb||String(a.expires||"9").localeCompare(String(b.expires||"9"))||String(a.name).localeCompare(String(b.name));});
+  if(!all.length){$("certList").innerHTML='<div class="empty">No certificates yet. Upload your seafarer profile or add one.</div>';return;}
+  if(!list.length){$("certList").innerHTML=`<div class="empty">${certShow==="attention"?"Nothing has expired or is expiring soon.":"No certificates match these filters."}</div>`;return;}
+  $("certList").innerHTML=list.map(c=>{const s=certStatus(c),e=dn(c.expires);
+    return `<div class="cert ${s}" data-id="${esc(c.id)}"><span class="stripe"></span><div><div class="cn">${esc(c.name)}</div>
+      <div class="meta"><span class="tchip" style="--tc:${{document:"var(--c0)",coc:"var(--c6)",endorsement:"var(--c6)",course:"var(--c2)",medical:"var(--c7)",other:"var(--cx)"}[c.kind]||"var(--cx)"}">${esc(CERT_KIND[c.kind]||"Other")}</span>${c.number?`<span>No. <span class="num" data-num="${esc(c.number)}">${esc(c.kind==="document"?maskNo(c.number):c.number)}</span>${c.kind==="document"&&String(c.number).length>4?'<button type="button" class="reveal" data-reveal>Show</button>':""}</span>`:""}${c.issuer?`<span>${esc(c.issuer)}</span>`:""}${c.issued?`<span>Issued ${fmt(dn(c.issued))}</span>`:""}</div>${c.notes?`<div class="small muted" style="margin-top:3px">${esc(c.notes)}</div>`:""}</div>
+      <div class="right"><span class="pill ${{valid:"NR",soon:"RNOR",expired:"ROR"}[s]||"UNK"}">${STLBL[s]}</span>${e!=null?`<span class="exp">${s==="expired"?"Expired":"Expires"} ${fmt(e)}<br><span class="muted">${relDays(e)}</span></span>`:""}
+      <div class="row-act">${(S.docs||[]).some(d=>d.cert===c.id)?'<button type="button" class="btn-sm scan" data-cscan>View scan</button>':""}<button type="button" class="btn-sm" data-cedit>Edit</button><button type="button" class="btn-sm" data-chide>${c.hidden?"Unhide":"Hide"}</button><button type="button" class="btn-sm btn-danger" data-cdel>Delete</button></div></div></div>`;}).join("");
+}
+function certId(c){const s=[c.kind,c.name,c.number||"",c.issued||""].join("|");let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return "cert-"+(h>>>0).toString(36);}
+function openCertForm(c){$("certForm").reset();$("ceErr").textContent="";$("ce_id").value=c?c.id:"";["name","kind","number","issuer","issued","expires","notes"].forEach(k=>{if(c)$("ce_"+k).value=c[k]||(k==="kind"?"other":"");});
+  $("certFormTitle").textContent=c?"Edit certificate":"Add certificate";$("certFormCard").hidden=false;$("certFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});$("ce_name").focus({preventScroll:true});}
+$("certAdd").addEventListener("click",()=>openCertForm(null));$("certFormClose").addEventListener("click",()=>$("certFormCard").hidden=true);$("ceCancel").addEventListener("click",()=>$("certFormCard").hidden=true);
+$("certForm").addEventListener("submit",e=>{e.preventDefault();const name=$("ce_name").value.trim();if(!name){$("ceErr").textContent="Enter the certificate name.";return;}
+  const iss=$("ce_issued").value,exp=$("ce_expires").value;if(iss&&exp&&exp<iss){$("ceErr").textContent="Expiry can't be before the issue date.";return;}
+  if(S.example)leaveExample();S.certs=S.certs||[];const id=$("ce_id").value,ex=S.certs.find(x=>x.id===id);
+  const c=Object.assign(ex||{source:"manual"},{name,kind:$("ce_kind").value,number:$("ce_number").value.trim(),issuer:$("ce_issuer").value.trim(),issued:iss,expires:exp,notes:$("ce_notes").value.trim(),u:Date.now()});
+  if(!ex){c.id="cert-m"+uid();S.certs.push(c);}saveLocal();$("certFormCard").hidden=true;render();renderCerts();toast(ex?"Certificate updated":"Certificate added");});
+let pendingCDel=null;
+$("certList").addEventListener("click",e=>{const row=e.target.closest(".cert");if(!row)return;const c=(S.certs||[]).find(x=>x.id===row.dataset.id);if(!c)return;
+  if(e.target.closest("[data-reveal]")){const n=row.querySelector("[data-num]"),b=e.target.closest("[data-reveal]");const shown=b.textContent==="Hide";n.textContent=shown?maskNo(n.dataset.num):n.dataset.num;b.textContent=shown?"Show":"Hide";return;}
+  if(e.target.closest("[data-cedit]")){openCertForm(c);return;}
+  if(e.target.closest("[data-cscan]")){const d=S.docs.find(x=>x.cert===c.id);if(d)openDoc(d);return;}
+  if(e.target.closest("[data-chide]")){c.hidden=!c.hidden;c.u=Date.now();saveLocal();render();renderCerts();return;}
+  const d=e.target.closest("[data-cdel]");if(d){if(pendingCDel!==c.id){pendingCDel=c.id;d.textContent="Tap again to delete";setTimeout(()=>{if(pendingCDel===c.id){pendingCDel=null;d.textContent="Delete";}},4000);return;}
+    pendingCDel=null;S.certs=S.certs.filter(x=>x.id!==c.id);(S.deleted=S.deleted||[]).push({id:c.id,u:Date.now()});saveLocal();render();renderCerts();toast("Certificate deleted");}});
+$("certType").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(!b)return;certType=b.dataset.t;renderCerts();});
+$("certShow").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(!b)return;certShow=b.dataset.s;renderCerts();});
+$("certQ").addEventListener("input",renderCerts);
+
+
+/* ======================= my documents (scans) ======================= */
+/* files live in IndexedDB on the device; metadata travels with the ledger; the file itself is stored in the
+   user's private Firestore area in pieces of up to 700 KB (users/{uid}/files/{docId}_{n}) when Sync is pressed */
+const DOC_CATS=["Passport","CDC","CoC","Endorsement","STCW course","Medical","Visa","Contract / letter","Other"];
+const CHUNK=700000,PDF_MAX=8*1024*1024;
+let idbP=null;
+function idb(){if(!idbP)idbP=new Promise((res,rej)=>{const q=indexedDB.open("sdl-docs",1);q.onupgradeneeded=()=>q.result.createObjectStore("files");q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});return idbP;}
+async function idbDo(mode,fn){const db=await idb();return new Promise((res,rej)=>{const tx=db.transaction("files",mode),st=tx.objectStore("files");const q=fn(st);tx.oncomplete=()=>res(q&&q.result);tx.onerror=()=>rej(tx.error);});}
+const blobGet=id=>idbDo("readonly",st=>st.get(id)),blobPut=(id,b)=>idbDo("readwrite",st=>st.put(b,id)),blobDel=id=>idbDo("readwrite",st=>st.delete(id)),blobKeys=()=>idbDo("readonly",st=>st.getAllKeys());
+let LOCAL=new Set();async function refreshLocal(){try{LOCAL=new Set(await blobKeys());}catch(e){LOCAL=new Set();}}
+const mb=n=>n>=1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB";
+function renderDocBadge(){const n=S.example?0:(S.docs||[]).filter(d=>!d.chunks).length;$("docBadge").hidden=!n||!savedUser();$("docBadge").textContent=n;$("docBadge").title="Waiting to sync";}
+async function imgToJpeg(file,max){
+  const url=URL.createObjectURL(file);try{const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
+    const k=Math.min(1,(max||2000)/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k);
+    const cv=document.createElement("canvas");cv.width=w;cv.height=h;const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,w,h);cx.drawImage(im,0,0,w,h);
+    let q=.82,b;do{b=await new Promise(r=>cv.toBlob(r,"image/jpeg",q));q-=.12;}while(b&&b.size>650000&&q>.4);return {blob:b,w,h};}
+  finally{URL.revokeObjectURL(url);}
+}
+let PEND=[];
+const docCertOpts=sel=>`<option value="">— none —</option>`+(S.certs||[]).filter(c=>!c.hidden).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(c=>`<option value="${esc(c.id)}" ${c.id===sel?"selected":""}>${esc(c.name)}${c.expires?" · exp "+fmt(dn(c.expires)):""}</option>`).join("");
+function guessCat(n){n=n.toLowerCase();return /passport/.test(n)?"Passport":/cdc|discharge/.test(n)?"CDC":/coc|competency/.test(n)?"CoC":/endorse/.test(n)?"Endorsement":/medical|fitness/.test(n)?"Medical":/visa/.test(n)?"Visa":/stcw|course|fire|survival|first aid/.test(n)?"STCW course":"Other";}
+$("docAddLbl").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("docFile").click();}});
+$("docFile").addEventListener("change",async()=>{
+  const files=[...$("docFile").files];$("docFile").value="";if(!files.length)return;
+  const bad=files.filter(f=>!(/^image\//.test(f.type)||f.type==="application/pdf"));if(bad.length){toast("Only photos and PDF files can be added.");return;}
+  const big=files.find(f=>f.type==="application/pdf"&&f.size>PDF_MAX);if(big){toast(`${big.name} is larger than 8 MB. Please use a smaller PDF.`,5000);return;}
+  PEND=files;$("docForm").reset();$("dc_id").value="";$("dcErr").textContent="";$("docFormTitle").textContent=files.length>1?`Add ${files.length} files`:"Add document";
+  const imgs=files.filter(f=>/^image\//.test(f.type));$("dcCombineRow").hidden=!(imgs.length>1&&imgs.length===files.length);
+  const base=files[0].name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim();$("dc_name").value=files.length>1&&$("dcCombineRow").hidden?"":base;$("dc_cat").value=guessCat(base);$("dc_cert").innerHTML=docCertOpts("");
+  $("docPrev").innerHTML=files.map((f,i)=>`<div class="pv" data-i="${i}">${/^image\//.test(f.type)?"":"PDF<br>"+esc(f.name.slice(0,24))}</div>`).join("");
+  files.forEach((f,i)=>{if(/^image\//.test(f.type)){const u=URL.createObjectURL(f),im=new Image();im.onload=()=>setTimeout(()=>URL.revokeObjectURL(u),1000);im.src=u;$("docPrev").querySelector(`[data-i="${i}"]`).appendChild(im);}});
+  $("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});
+});
+function openDocForm(d){PEND=[];$("docForm").reset();$("dcErr").textContent="";$("dc_id").value=d.id;$("docFormTitle").textContent="Edit document";$("dcCombineRow").hidden=true;$("docPrev").innerHTML="";
+  $("dc_name").value=d.name;$("dc_cat").value=d.cat||"Other";$("dc_cert").innerHTML=docCertOpts(d.cert||"");$("dc_notes").value=d.notes||"";$("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});}
+const closeDocForm=()=>{$("docFormCard").hidden=true;PEND=[];};
+$("docFormClose").addEventListener("click",closeDocForm);$("dcCancel").addEventListener("click",closeDocForm);
+$("docForm").addEventListener("submit",async e=>{e.preventDefault();
+  const name=$("dc_name").value.trim(),meta={cat:$("dc_cat").value,cert:$("dc_cert").value,notes:$("dc_notes").value.trim()};
+  if(!name&&!(PEND.length>1&&$("dcCombineRow").hidden)){$("dcErr").textContent="Enter a name for the document.";return;}
+  const id=$("dc_id").value;
+  if(id){const d=S.docs.find(x=>x.id===id);if(d){Object.assign(d,meta,{name,u:Date.now()});saveLocal();render();renderDocs();}closeDocForm();toast("Document updated");return;}
+  $("dcSave").disabled=true;$("dcSave").textContent="Saving…";
+  try{
+    if(S.example)leaveExample();S.docs=S.docs||[];
+    let items=[];
+    if(PEND.length>1&&!$("dcCombineRow").hidden&&$("dc_combine").checked){
+      if(!window.jspdf)await loadScript("vendor/jspdf.umd.min.js");
+      const {jsPDF}=window.jspdf;let pdf=null;
+      for(const f of PEND){const {blob,w,h}=await imgToJpeg(f,1700);const data=new Uint8Array(await blob.arrayBuffer());const o=w>h?"l":"p";
+        if(!pdf)pdf=new jsPDF({unit:"px",format:[w,h],orientation:o,hotfixes:["px_scaling"]});else pdf.addPage([w,h],o);pdf.addImage(data,"JPEG",0,0,w,h);}
+      items.push({name,blob:pdf.output("blob"),type:"application/pdf",pages:PEND.length});
+    }else{
+      for(let i=0;i<PEND.length;i++){const f=PEND[i];const nm=name?(PEND.length>1?`${name} (${i+1})`:name):f.name.replace(/\.[^.]+$/,"");
+        if(/^image\//.test(f.type)){const {blob}=await imgToJpeg(f,2000);items.push({name:nm,blob,type:"image/jpeg"});}
+        else items.push({name:nm,blob:f,type:"application/pdf"});}
+    }
+    for(const it of items){const d=Object.assign({id:"doc-"+uid(),name:it.name,type:it.type,size:it.blob.size,added:new Date().toISOString().slice(0,10),u:Date.now(),chunks:0},meta);if(it.pages)d.pages=it.pages;
+      await blobPut(d.id,it.blob);LOCAL.add(d.id);S.docs.push(d);}
+    saveLocal();closeDocForm();render();renderDocs();
+    toast(items.length===1?"Document saved on this device."+(savedUser()?" Press Sync to keep it in your account.":""):`${items.length} documents saved.`,4000);
+  }catch(err){$("dcErr").textContent="Couldn't save this file. "+(err&&err.name==="QuotaExceededError"?"This device is out of storage.":"Please try again.");}
+  finally{$("dcSave").disabled=false;$("dcSave").textContent="Save";}
+});
+let docCat="",THUMBS={};
+async function thumbFor(d){
+  if(THUMBS[d.id])return THUMBS[d.id];const b=await blobGet(d.id);if(!b)return null;
+  if(d.type!=="application/pdf"){THUMBS[d.id]=URL.createObjectURL(b);return THUMBS[d.id];}
+  try{if(!window.pdfjsLib){await loadScript("vendor/pdf.min.js");window.pdfjsLib.GlobalWorkerOptions.workerSrc="vendor/pdf.worker.min.js";}
+    const pdf=await window.pdfjsLib.getDocument({data:new Uint8Array(await b.arrayBuffer())}).promise,pg=await pdf.getPage(1),vp0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:320/vp0.width});
+    const cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;if(!d.pages){d.pages=pdf.numPages;}
+    THUMBS[d.id]=cv.toDataURL("image/jpeg",.7);pdf.destroy&&pdf.destroy();return THUMBS[d.id];}catch(e){return null;}
+}
+async function renderDocs(){
+  await refreshLocal();
+  const all=S.example?[]:(S.docs||[]),total=all.reduce((a,d)=>a+(d.size||0),0),waiting=all.filter(d=>!d.chunks).length,away=all.filter(d=>!LOCAL.has(d.id)).length;
+  $("docTiles").innerHTML=`<div class="tile"><b>${all.length}</b><span>documents</span></div><div class="tile"><b>${mb(total)}</b><span>total size</span></div><div class="tile"><b style="color:${waiting?"var(--warn)":"var(--ok)"}">${savedUser()?waiting:"—"}</b><span>${savedUser()?"waiting to sync":"sign in to back up"}</span></div>${away?`<div class="tile"><b>${away}</b><span>in your account, not on this device yet</span></div>`:""}`;
+  const cats=DOC_CATS.filter(c=>all.some(d=>d.cat===c));if(docCat&&!cats.includes(docCat))docCat="";
+  $("docCat").innerHTML=`<button type="button" data-c="" aria-pressed="${!docCat}">All</button>`+cats.map(c=>`<button type="button" data-c="${esc(c)}" aria-pressed="${docCat===c}">${esc(c)}</button>`).join("");
+  const q=$("docQ").value.trim().toLowerCase();
+  const list=all.filter(d=>(!docCat||d.cat===docCat)&&(!q||(d.name+" "+d.cat+" "+(d.notes||"")).toLowerCase().includes(q))).sort((a,b)=>DOC_CATS.indexOf(a.cat)-DOC_CATS.indexOf(b.cat)||String(a.name).localeCompare(String(b.name)));
+  if(!all.length){$("docList").innerHTML='<div class="card empty" style="grid-column:1/-1">No documents yet. Tap <b>+ Add document</b> to take a photo or choose a scan or PDF.</div>';renderDocBadge();return;}
+  if(!list.length){$("docList").innerHTML='<div class="card empty" style="grid-column:1/-1">No documents match.</div>';return;}
+  $("docList").innerHTML=list.map(d=>{const here=LOCAL.has(d.id),cert=d.cert&&(S.certs||[]).find(c=>c.id===d.cert),cs=!here?["away","In account · download on Sync"]:d.chunks?["ok","✓ In your account"]:savedUser()?["wait","Waiting to sync"]:["away","On this device only"];
+    return `<div class="doc" data-id="${esc(d.id)}"><button type="button" class="thumb" data-open aria-label="Open ${esc(d.name)}"><span class="ph">${here?"…":"Not on this device yet"}</span></button>
+    <div class="db"><div class="dn">${esc(d.name)}</div><div class="dm"><span class="ftype">${d.type==="application/pdf"?"PDF":"JPG"}</span><span>${esc(d.cat||"Other")}</span><span>${mb(d.size||0)}</span>${d.pages>1?`<span>${d.pages} pages</span>`:""}</div>
+    ${cert?`<div class="dm">Linked: ${esc(cert.name)}${cert.expires?" · exp "+fmt(dn(cert.expires)):""}</div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
+    <div class="dm"><span class="cs ${cs[0]}">${cs[1]}</span></div>
+    <div class="row-act">${here?'<button type="button" class="btn-sm" data-share>Share</button><button type="button" class="btn-sm" data-save>Save</button>':""}<button type="button" class="btn-sm" data-dedit>Edit</button><button type="button" class="btn-sm btn-danger" data-ddel>Delete</button></div></div></div>`;}).join("");
+  renderDocBadge();
+  for(const d of list){if(!LOCAL.has(d.id))continue;const t=await thumbFor(d);const el=$("docList").querySelector(`.doc[data-id="${CSS.escape(d.id)}"] .thumb`);if(el)el.innerHTML=t?`<img src="${t}" alt="">`:'<span class="ph">PDF</span>';}
+}
+$("docCat").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;docCat=b.dataset.c;renderDocs();});
+$("docQ").addEventListener("input",renderDocs);
+function fileName(d){const ext=d.type==="application/pdf"?".pdf":".jpg";return (String(d.name).replace(/[\\/:*?"<>|]+/g," ").trim()||"document")+ext;}
+async function docFile(d){const b=await blobGet(d.id);if(!b)throw new Error("missing");return new File([b],fileName(d),{type:d.type});}
+async function shareDoc(d){
+  let f;try{f=await docFile(d);}catch(e){toast("This file isn't on this device yet. Press Sync while online.");return;}
+  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:d.name});}catch(e){if(!(e&&e.name==="AbortError"))saveDoc(d,f);}return;}
+  saveDoc(d,f,true);
+}
+async function saveDoc(d,f,fromShare){
+  try{f=f||await docFile(d);}catch(e){toast("This file isn't on this device yet. Press Sync while online.");return;}
+  const url=URL.createObjectURL(f),a=document.createElement("a");a.href=url;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),8000);
+  toast(fromShare?`This browser can't share files directly, so ${f.name} was saved. Attach it in WhatsApp or your email.`:`Saved: ${f.name}`,6000);
+}
+let VIEWING=null;
+async function openDoc(d){
+  const b=await blobGet(d.id);if(!b){toast("This file isn't on this device yet. Press Sync while online.");return;}
+  VIEWING=d;$("dvTitle").textContent=d.name;$("dvBody").innerHTML='<div class="empty" style="color:#fff">Opening…</div>';$("docViewer").hidden=false;document.body.style.overflow="hidden";$("dvClose").focus();
+  if(d.type!=="application/pdf"){const u=URL.createObjectURL(b);$("dvBody").innerHTML=`<img src="${u}" alt="${esc(d.name)}">`;return;}
+  try{if(!window.pdfjsLib){await loadScript("vendor/pdf.min.js");window.pdfjsLib.GlobalWorkerOptions.workerSrc="vendor/pdf.worker.min.js";}
+    const pdf=await window.pdfjsLib.getDocument({data:new Uint8Array(await b.arrayBuffer())}).promise,wrap=document.createElement("div");wrap.className="pg";$("dvBody").innerHTML="";$("dvBody").appendChild(wrap);
+    const W=Math.min(900,$("dvBody").clientWidth-20)*(devicePixelRatio||1);
+    for(let i=1;i<=pdf.numPages&&VIEWING===d;i++){const pg=await pdf.getPage(i),v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:W/v0.width}),cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;wrap.appendChild(cv);await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise;}
+  }catch(e){$("dvBody").innerHTML='<div class="empty" style="color:#fff">Couldn\'t show this PDF here. Use Save to device to open it.</div>';}
+}
+function closeViewer(){$("docViewer").hidden=true;document.body.style.overflow="";$("dvBody").querySelectorAll("img").forEach(i=>URL.revokeObjectURL(i.src));$("dvBody").innerHTML="";VIEWING=null;}
+$("dvClose").addEventListener("click",closeViewer);$("dvShare").addEventListener("click",()=>VIEWING&&shareDoc(VIEWING));$("dvSave").addEventListener("click",()=>VIEWING&&saveDoc(VIEWING));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("docViewer").hidden)closeViewer();});
+let pendingDDel=null;
+$("docList").addEventListener("click",async e=>{const card=e.target.closest(".doc");if(!card)return;const d=(S.docs||[]).find(x=>x.id===card.dataset.id);if(!d)return;
+  if(e.target.closest("[data-open]")){openDoc(d);return;}
+  if(e.target.closest("[data-share]")){shareDoc(d);return;}
+  if(e.target.closest("[data-save]")){saveDoc(d);return;}
+  if(e.target.closest("[data-dedit]")){openDocForm(d);return;}
+  const b=e.target.closest("[data-ddel]");if(b){if(pendingDDel!==d.id){pendingDDel=d.id;b.textContent="Tap again to delete";setTimeout(()=>{if(pendingDDel===d.id){pendingDDel=null;b.textContent="Delete";}},4000);return;}
+    pendingDDel=null;S.docs=S.docs.filter(x=>x.id!==d.id);(S.deleted=S.deleted||[]).push({id:d.id,u:Date.now(),n:d.chunks||0});try{await blobDel(d.id);}catch(err){}if(THUMBS[d.id]&&THUMBS[d.id].startsWith("blob:"))URL.revokeObjectURL(THUMBS[d.id]);delete THUMBS[d.id];
+    saveLocal();render();renderDocs();toast(d.chunks?"Document deleted. It will be removed from your account on the next Sync.":"Document deleted");}});
+function b64(buf){let s="";const a=new Uint8Array(buf);for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(s);}
+function unb64(s){const bin=atob(s),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
+/* during Sync: send new files, remove deleted ones */
+async function docsUpload(f,u){
+  const col=f.db.collection("users").doc(u.uid).collection("files");let failed=0;
+  for(const d of (S.docs||[])){if(d.chunks)continue;const b=await blobGet(d.id);if(!b)continue;
+    try{const buf=await b.arrayBuffer(),n=Math.max(1,Math.ceil(buf.byteLength/CHUNK));
+      for(let i=0;i<n;i++)await col.doc(d.id+"_"+i).set({d:b64(buf.slice(i*CHUNK,(i+1)*CHUNK)),i,n,type:d.type});
+      d.chunks=n;}catch(e){failed++;}}
+  const done=new Set(lsJSON("sdlDocPurged",[]));
+  for(const t of (S.deleted||[])){if(!String(t.id).startsWith("doc-")||!t.n||done.has(t.id))continue;
+    try{for(let i=0;i<t.n;i++)await col.doc(t.id+"_"+i).delete();done.add(t.id);}catch(e){}}
+  lsSet("sdlDocPurged",JSON.stringify([...done]));
+  if(failed)return failed===1?"one document":failed+" documents";return "";
+}
+/* during Sync: fetch files added on other devices; tidy files deleted elsewhere */
+async function docsDownload(f,u){
+  await refreshLocal();const col=f.db.collection("users").doc(u.uid).collection("files"),ids=new Set((S.docs||[]).map(d=>d.id));let failed=0;
+  for(const k of LOCAL){if(!ids.has(k)){try{await blobDel(k);}catch(e){}}}
+  for(const d of (S.docs||[])){if(LOCAL.has(d.id)||!d.chunks)continue;
+    try{const parts=[];for(let i=0;i<d.chunks;i++){const sn=await col.doc(d.id+"_"+i).get();if(!sn.exists)throw new Error("part");parts.push(unb64(sn.data().d));}
+      await blobPut(d.id,new Blob(parts,{type:d.type}));LOCAL.add(d.id);}catch(e){failed++;}}
+  if(VIEW==="docs")renderDocs();
+  return failed?(failed===1?"one document":failed+" documents"):"";
+}
+
+/* ======================= report for your CA (PDF) ======================= */
+async function makeReport(f){
+  try{
+    if(!window.jspdf)await loadScript("vendor/jspdf.umd.min.js");
+    const {jsPDF}=window.jspdf,doc=new jsPDF({unit:"mm",format:"a4"}),r=C.res[f],W=210,M=16;let y=18;
+    const line=(t,size,style,col)=>{doc.setFont("helvetica",style||"normal");doc.setFontSize(size||10);doc.setTextColor(...(col||[20,32,50]));const parts=doc.splitTextToSize(String(t),W-2*M);parts.forEach(p=>{if(y>282){doc.addPage();y=18;}doc.text(p,M,y);y+=size?size*0.45+1.5:6;});};
+    const yearLbl=f>=2026?`Tax year ${fyLabel(f)}`:`Financial year ${fyLabel(f)} (assessment year ${f+1}-${String((f+2)%100).padStart(2,"0")})`;
+    doc.setFillColor(6,24,42);doc.rect(0,0,W,30,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(16);doc.text("Residential status summary",M,14);doc.setFont("helvetica","normal");doc.setFontSize(10);doc.text(`${yearLbl} · 1 Apr ${f} to 31 Mar ${f+1}`,M,22);y=40;
+    if(S.settings.reportName)line("Seafarer: "+S.settings.reportName,11,"bold");
+    const p=fyPassIssues(f),stName={NR:"Non-resident (NRI)",RNOR:"Resident but not ordinarily resident (RNOR)",ROR:"Resident and ordinarily resident (ROR)"}[r.status]||"Not enough data";
+    const rows=[["Days in the year",String(r.days)],["Days outside India",String(r.outside)],["Days in India",String(r.india)],["Days outside India needed to stay NRI",`${r.need} (182+ days in India makes you resident)`],["Residential status",stName]];
+    doc.setFontSize(10);rows.forEach(([k,v],i)=>{if(i%2===0){doc.setFillColor(237,242,246);doc.rect(M,y-4.5,W-2*M,7,"F");}doc.setFont("helvetica","normal");doc.setTextColor(80,95,110);doc.text(k,M+2,y);doc.setFont("helvetica","bold");doc.setTextColor(20,32,50);doc.text(v,M+92,y);y+=7;});
+    y+=3;
+    line(p.missing||p.estimated?`Basis: passport dates where entered; ${p.missing?p.missing+" contract(s) without passport dates were counted from CDC dates":""}${p.missing&&p.estimated?"; ":""}${p.estimated?p.estimated+" contract(s) use estimated passport dates":""}.`:"Basis: days outside India counted from passport exit and entry dates.",9,"normal",[80,95,110]);
+    const o=S.fy[f]||{};if(o.inc15||o.abroadTax||o.leftEmp)line(`Also noted: ${[o.inc15?"Indian income (excluding foreign income) above Rs 15 lakh":"",o.abroadTax?"tax resident of another country":"",o.leftEmp?"first year leaving India for employment":""].filter(Boolean).join("; ")}.`,9,"normal",[80,95,110]);
+    y+=3;line("Contracts in this year",12,"bold");y+=1;
+    const cs=S.contracts.filter(c=>shipDaysIn(c,f)).sort((a,b)=>(dn(a.on)||0)-(dn(b.on)||0));
+    const cols=[["Vessel / rank",M,46],["CDC sign-on",M+48,28],["CDC sign-off",M+78,28],["Left India",M+108,24],["Arrived India",M+134,24],["Days",M+160,18]];
+    doc.setFillColor(6,24,42);doc.rect(M,y-4.5,W-2*M,7,"F");doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(8.5);cols.forEach(([t,x])=>doc.text(t,x+1,y));y+=7;
+    doc.setFont("helvetica","normal");
+    cs.forEach((c,i)=>{if(y>270){doc.addPage();y=18;}const ch=chainOf(c),est=c.passEst||{};
+      const cell=[[c.vessel+(c.imo?" ("+c.imo+")":""),c.rank||""],[fmt(dn(c.on)),ch.prev?"Onboard – promoted":(c.onIndia?"Indian port":"Abroad")+(c.onPort?", "+c.onPort:"")],[c.off?fmt(dn(c.off)):"onboard",c.off?(ch.next?"Onboard – promoted":(c.offIndia?"Indian port":"Abroad")+(c.offPort?", "+c.offPort:"")):""],[ch.prev?"same stay":c.left?fmt(dn(c.left)):"not entered",est.left&&!ch.prev?"estimated":""],[ch.next?"stay continues":c.arr?fmt(dn(c.arr)):"not entered",est.arr&&!ch.next?"estimated":""],[String(shipDaysIn(c,f)),"on ship"]];
+      if(i%2===0){doc.setFillColor(237,242,246);doc.rect(M,y-4.2,W-2*M,10,"F");}
+      cell.forEach(([a,b],j)=>{const x=cols[j][1]+1,w=cols[j][2]-1;doc.setTextColor(20,32,50);doc.setFontSize(8.5);doc.text(doc.splitTextToSize(a,w)[0],x,y);doc.setTextColor(100,115,130);doc.setFontSize(7.5);if(b)doc.text(doc.splitTextToSize(b,w)[0],x,y+4);});y+=10;});
+    if(!cs.length)line("No contracts in this year.",9);
+    y+=4;line("How the days are counted",11,"bold");
+    line("Days outside India are counted from passport exit and entry dates. For a voyage that starts or ends at an Indian port, the period from CDC sign-on to sign-off is excluded from the stay in India (Rule 126 of the Income-tax Rules, 1962, and Rule 8 of the Income-tax Rules, 2026). An Indian citizen leaving India for employment, or as a member of the crew of an Indian ship, is resident only if in India for 182 days or more in the year.",8.5,"normal",[80,95,110]);
+    y+=3;line(`Prepared with Sea Days Ledger by BlueWave Algo on ${fmt(TODAY)}. Figures are calculated from the dates entered by the seafarer; please verify them against the passport and CDC. This summary is not tax advice.`,8,"italic",[110,120,130]);
+    const name=`Sea-Days-${fyLabel(f)}-residential-status.pdf`,blob=doc.output("blob"),file=new File([blob],name,{type:"application/pdf"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:`Residential status FY ${fyLabel(f)}`});return;}catch(e){if(e&&e.name==="AbortError")return;}}
+    const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);toast("Report saved: "+name,4000);
+  }catch(e){toast(navigator.onLine===false&&!window.jspdf?"The report maker needs internet the first time. Connect once and try again.":"Couldn't make the report. Please try again.",5000);}
+}
+$("fyList").addEventListener("click",e=>{const b=e.target.closest("[data-report]");if(b)makeReport(+b.dataset.report);});
 
 /* ======================= tooltip ======================= */
 const tip=document.createElement("div");tip.id="tip";tip.hidden=true;document.body.appendChild(tip);
@@ -832,7 +1203,7 @@ function takeCarry(){
 /* ======================= start ======================= */
 const local=loadLocal();if(local)adopt(local);else S=JSON.parse(JSON.stringify(EXAMPLE));
 takeCarry();
-applyTheme();render();renderAccount();renderUploadState();
+applyTheme();syncSegs();render();renderAccount();renderUploadState();planDefaults();
 show(location.hash.slice(1)||"dashboard");
 if(APP_V){const t="Version "+APP_V.slice(0,8)+"."+APP_V.slice(8);if($("appVer"))$("appVer").textContent="App "+t;if($("railVer"))$("railVer").textContent=t;}
 if(/[?&]v=/.test(location.search))history.replaceState(null,"",location.pathname+location.hash);
