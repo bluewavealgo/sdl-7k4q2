@@ -1,8 +1,68 @@
 {
- "updatedAt": 1793409570432,
+ "updatedAt": 1793430824394,
  "feedsOk": 7,
  "keepDays": 60,
  "items": [
+  {
+   "title": "Asia-US container rates mixed as capacity tightens, import demand slows; tanker rates mostly higher",
+   "source": "ICIS",
+   "url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxOLU5ORVR4aDNXaUZ6aE1rZWtsSE9BTFEtOUY5d3cyN3JGOGFGUG4xSENaNGhpd1AyTU5EZmkzSHhiNTVRMzNYejhfN1FQQk9GVzVxM05Jak04aURBTU91NE5yUkNGYk1mZFByOHNObmwyQXhQcHBzY1RaZ0tRWG83VU8yMWNkZGxNNkIzeFRDVWtOSkVLcG5SOVFNOTE2b2hBNHpkTFhkeThtb093dl9xUGYzTmlVV3hBRkhtZUtjejhQUmNndTNSV1pib2VWQ2ZuaEF5d3R4X0pZU2hIT3FMSXYzYUNJMGF3amQ2LTVKM3ZFVzg?oc=5",
+   "ts": 1793422379000,
+   "date": "2026-10-31",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793430824394
+  },
+  {
+   "title": "Limpet mines hit tanker with 27 Indians onboard in Strait of Hormuz; all crew safe | Know what limpet mines are",
+   "source": "PTC News",
+   "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNYlBheTdKRWhHcldGSXdhUFFWMGVYVnNobm45RUh2NERoT3czd1Y4a00ya251eEJTTU5SY2RNbmV1ZWZSR2lBM2dmM2NaZEdJTmVZMzZQbXhHdWxEckhScTdDUUZkcXQyX1hjV0E2SmJUUWhpUV9VSG5SQ3p3c1hWUkxiNDRobVZkNXY4SGxBcks0SzdsVE54SkZxYjJFQlotVFRLTDFzMG4tUE9t0gGsAUFVX3lxTE1iUGF5N0pFaEdyV0ZJd2FQUVYwZVhWc2hubjlFSHY0RGhPdzN3VjhrTTJrbnV4QlNNTlJjZE1uZXVlZlJHaUEzZ2YzY1pkR0lOZVkzNlBteEd1bERySFJxN0NRRmRxdDJfWGNXQTZKYlRRaGlRX1VIblJDendzWFZSTGI0NGhtVmQ1djhIbEFySzRLN2xUTnhKRnFiMkVCWi1UVEtMMXMwbi1QT20?oc=5",
+   "ts": 1793422265000,
+   "date": "2026-10-31",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793430824394
+  },
+  {
+   "title": "Oil tanker carrying 27 Indian seafarers struck by limpet mines in Hormuz, engine catches fire",
+   "source": "WION",
+   "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOd0YwVFY2OHZsQTZvdjduZDVvcWs1VWZ4UkVGUXh5QTJtUkstMFNRYVpnbnlfa2t4RkhSQndXd2hzSFJiM1E5djU3SnhPc0JXbzA5UWdwVDFoQzZMemtuajdHSHdUeWhqaEpxVnBaaW9NM0UzLVdSZEFxdHUzY2dmdmxZay1FWmJNaThBTzMxWXJ1RFVqMUkyclJfOFI0U2ZoTTBsdEszeVlJbXdLSUlHMVZaY01rSVdTeTV2SENaLXRjZjRXWFJqang2bkFxTjdrY0HSAdcBQVVfeXFMTld3UHh0ZzkyamstdTJNLU5lc1Jsc21kblk5YktDQWkza1ZOSWZ0akRxZlJQZDNfOHlpNXZsTlJFN2NRU3ZNbkJockJ3RE9UeXh6TjdOYkEtRnJRcDNkNy0zelktNFJfQnJKNWZScmZ1VDFJMFhoVHdlYWZUZlpBMGJEZEhPeVd0QUdKSU9DWjRWN1AxSUZFZmNUbkcxaG5fenVmRUdFbnBmNXROMEwzX3ZiWndQRGs2UFd6OHBoeEVkanhob1F4ZzdaV3N2TW5oODh4WS1Kb3M?oc=5",
+   "ts": 1793420460000,
+   "date": "2026-10-31",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793430824394
+  },
+  {
+   "title": "Oman rescues 25 from burning oil tanker in Strait of Hormuz",
+   "source": "Al Jazeera",
+   "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQSmtrMGdTY1l0TXhmX2xJcFdJRllzTXpsT0lSSFhhbWQ2Y3NPbUhLSTByYVdFaU1MdmJuVTA0UWRoNjF2TlBYWjBNWk1fYmhhV0dMRzg2b2RJblNabTVXREhvVkFXaFRtYzJ3T0ZaNU4zNWNkQ3ZRRVU2THhmeEE1OEJ6bE4zU3o0MXQtekFiNXg2andqVnFEWTFRLVhYX2xHVGp30gGoAUFVX3lxTE9GV3BYaG9nbDM0LWQyOWduOXZIeV9nWVl6NGR6cVlqLTB4cHdFWkV3U2NQTjRhNGpkSnF5QWQ4RFhVV0JvRTNVRUo4SmVWZHI1Vll3emlOTWRkQUd4bHdpNmZubGg4WEhRYzloYXNQUVZ4ZVFtTHVhbW9JMlNLOV9ncFRZNGlSdmVvWEhMTkN6emJ0QlEzYU13bzFqSHYwOHBDSHRUZUxjcw?oc=5",
+   "ts": 1793419898000,
+   "date": "2026-10-31",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793430824394
+  },
+  {
+   "title": "Hormuz Tanker Attack: 27 Indian Seafarers Safe After Fire on Louise 1",
+   "source": "Maritime Gateway",
+   "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxORWhuMXB1SDhfVlNOLXlMOUV6TXBnT05TVURidUJhZWFnQ2dDR1MtY1dUZ0FpYV9WWDlyT3YwNkQxRDlnQnR1ejNGbWpIRnZhTEU4YUVmdnh6dmFwblAyU2t5Sk1qQ1cxNDBkcnNFZjktbHljR3hHaldnMFVHWEg0RThkczFLSm1KeXYtdVRlcW8teXR1Z0dLS3phZFFFN2hTa29N?oc=5",
+   "ts": 1793418702000,
+   "date": "2026-10-31",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793430824394
+  },
+  {
+   "title": "Oil Tanker Hit by Limpet Mines in Hormuz, 27 Indian Sailors Safe",
+   "source": "Deccan Chronicle",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOUnpXNW1pMmdvdFdMZWttR21BYkJSbkJtV01MdGswNUFWVlk0Y3YwQWxGRHdkcFVXdTRYNXRVZjhMRXdWZDZRWllnSlNSaF9TemhkMjI3cm1UYnpYUmFUem5ZaElQSGIxM2RpSnk5WEFRMllZV3BBek9SMHFudWZIUk00MXA5dHA0a1dmVkV1bzdhcUVJY1B5ZENrM05XcmpHT09idW9DdzJKTTI5N2VmQm56VdIBuAFBVV95cUxNOEZVd3dEZjViMWQtdDBKamRjX1VIbUxZVXpPczVQeVpzUENGeXQxa3RLY2drdm4zd3MzRUtHcTMtc1ZLdUVxQVVlR29lRTJ4Mnl1ODJqR2N5S3ljcnMzU2x3NVgyUnJSWGpHOEVXazBYUnZINUJ5R3VvYmxFQ2x5WWtNeGJHVkE2N1Fhb29nOUtGQ2RxbFlRTFl1TC1jaHQ5dFo3TEhBWllVVFhSVVNEUVN5REVoNmdU?oc=5",
+   "ts": 1793408980000,
+   "date": "2026-10-31",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793430824394
+  },
   {
    "title": "Ramble On: Who Pays the Freight?",
    "source": "Hellenic Shipping News",
@@ -234,6 +294,16 @@
    "addedAt": 1793386976072
   },
   {
+   "title": "Tanker Carrying 27 Indians Attacked With Limpet Mines In Strait Of Hormuz",
+   "source": "NDTV",
+   "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOd1FwRkh2alhJWFY5REJMNF9LMlJrd2VHV2UyMFd4NjBqX3VDS05uX0hfRmVRMUhXUE1aazc0LU84T19fR0V3cHdRN0hmRTFhemV2eUF5UTB3SjVOalJCNm1kUU41LTFsN3JtZHVBYVNlZkRWaDJrUFVDaFNhaEVfckRhd2dvY1FEeGJ4UW5DUnJ4WVJNMTk3YzE3M3M4dnhkcjFVTFN1SVhsa1ZaR3JydDFiWEXSAbwBQVVfeXFMTXk0N012YTRJX0l2OXZjcVl5MlJvcHBmVkRIWWFCN3RvRXF0a2N4UW1kQzVBbkt2eGQ3blZpczdCc1hEX0RNOS1UbE5md09yUkEwbnQ1N0o1M204dW1oc3JqbElXYVUxMDl2Qy1QXzhHdWZwM2RmcVVWR1o2M3dlejNqVzFvWHB2ZEdnc0hxOHZLUmZEWjdWQlpFWERoWkd2Y0RmUUFjVFM5UUoxbmhGMG9rZ2lrTm5QZ0JtQmg?oc=5",
+   "ts": 1793385470000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793430824394
+  },
+  {
    "title": "Natalia Margioli takes the helm at the Institute of Chartered Shipbrokers",
    "source": "Hellenic Shipping News",
    "url": "https://www.hellenicshippingnews.com/natalia-margioli-takes-the-helm-at-the-institute-of-chartered-shipbrokers/",
@@ -342,6 +412,16 @@
    "summary": "",
    "topic": "Safety & Security",
    "addedAt": 1793386976072
+  },
+  {
+   "title": "Hormuz tanker traffic holds up as war risks drive shipping costs higher",
+   "source": "Traders Union",
+   "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOeTBSQUtXamdnSUVkb2NtcUw5ZzJuNzVreGlBdUJVQ08yX1g1cnNhYXk5YU5QZTZsU1F3WER5OHB6dFNRUDNMQm9CVlVnVXB5RHNBcjR0OG1hTlpTV0twSXBGLVA3RFlOeUNmWTRhQzJLdmJnSHhxQ1NhZ2REMG9tdlpXT1hzQTNuaW5Fbjk2WWhfREktdEdNUDhnS18?oc=5",
+   "ts": 1793382098000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793430824394
   },
   {
    "title": "How MARAD Cut Years Off Deepwater Port Reviews Without Changing Environmental Standards",
@@ -2324,6 +2404,16 @@
    "addedAt": 1793352595421
   },
   {
+   "title": "All 21 Indian Seafarers Safe After Kuwait-Flagged Tanker Hit in Strait of Hormuz",
+   "source": "www.nationpathindia.com",
+   "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPZG5pOUZadGxaRElHYm9ibm5zMVdSXzhWd05qYUdOWTVlR25ONmFMVDhtajdVX0preGNEb3BXZGNTY3FDX3BKanZqTjBmWlNYbTZwemExdDRKVERaMEp1MGduMHk0OWtMWWlEZDcxbGtrbVNudjR2SW5vSFZWYW5hY2U3QkQ4S1BuY3JIcXNIblRrVjQ?oc=5",
+   "ts": 1792652400000,
+   "date": "2026-10-22",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793430824394
+  },
+  {
    "title": "Kuwait-flagged oil tanker carrying 21 Indian seafarers struck by unknown projectile in Strait of Hormuz",
    "source": "Telangana Today",
    "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOdGRodHE0VnkzWjdQTHYtUnBoVlBCVHpEU0lFUFJXLWpLRTJQMk1rX3AxTVR0MV9ubXdCRTl6Y3AzSXFtNjdMalhjb01tazNaanl5Tkk2SEJ2OE5rTmduczhMbzRqRzVkYTZ4NVduekJjU0g4R0xGdW1xSlljeENmdGdZM3hEWU9neDhvWUFYOFVHY1o0bkJQYnhiRjI2a2dqUkI2ZmdHN0VuRWNONlhYaFRvUWdFcFo5MzFjcW4yN0JsN2gyUnVZREZB?oc=5",
@@ -2414,6 +2504,16 @@
    "addedAt": 1793352595421
   },
   {
+   "title": "Drone-hit tanker carrying 9 Indian seafarers reaches Romanian port, all safe",
+   "source": "ET Infra",
+   "url": "https://news.google.com/rss/articles/CBMi4AFBVV95cUxQcmtySHVSWnIxRUVERWltQnVOc0NJc24tQ1dURUZTaVBNbWMtQU5JR2k5SGk3ZGxlTE5YUFczalpRRlpmY1h1c045QW5EeTlFc2VqQ1lIMXJHTkVuQXdtTE9qd3BHYlNCSlJoY3hqSWI3cV9ZOC1zaEJUNVM2X3VZSEgwdEQ0WFR0Nllvb0p2TzVDVDdFOHN0dnhHUnlDWW5JTDNNdEdnQ0RtMXM2cXVKUWZySE01dnp1OC1OVW9ncjBRRkFyM1loR2I4bDQ3bGpoZlZycEFSam1DZHU5RlBPYtIB5gFBVV95cUxONm9kdkl2enBuUkltY0xLSU5wREx4ZU5hV0E4TDlHWlN1NHRORkhGS0x3RzZkMXRoMWtvV3pXVjUxbk5xWHR4U2x6LTNHMUlVZnZxb1lLcThGUm5EZ3BSSUNWelZYc1F6N0lQbmlHaENCYl9OSW85OEJveEx6U09vSjhnNGhMLUROMHJ1aHREclh1UWg2ZllIRE9hWVIwTldrZzlXQ3lHNGg4WDlrTlNhSnZQY3k2cG4zeUVQZDRNZTRVb3pmYW1SU2xrM0xjaGpIMFRJQTY0UktCUnpReHVWbnpVNFViZw?oc=5",
+   "ts": 1792393200000,
+   "date": "2026-10-19",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793430824394
+  },
+  {
    "title": "‘I celebrate 2 birthdays’: How an Indian seafarer survived 4 years in Somali captivity",
    "source": "The Indian Express",
    "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNcmprVmFWWGY5T204Wll4emQ3WkhzTnRZQTRMaGxPM000Qmo0Znh6VnB5MGdPcWFqelZvQ0tzOWJTcUF6OTk1c2tIME9nMFpRVWVLRjJwekxMQlBfa3pfWE53TXBHSFRxU2F2ZkpsMzlRRnR6QWlXWXhKZklpNmF1WGw4Uk05ZDc0RzlZekd3Mm1iZzlSd2hmUW1OazZ4a2ZESzBNc1lINXpwcTVPRGhVSlM1aDByaG8wYzBENnFtZ2hBQdIByAFBVV95cUxOSDZEQlZaY3VCV0JCRVp1YTdTYTJVeE5rUFJwZDhraXBQekNQOWNrdHhtUHM4WlFxempPWktSX01BTk1Ga0lTdnNWOVZDWDl6bU9OQ01RTnNaSGFYTk9icDFVUmp6T3lQcGZlTmJrTC1zUVNwUHltSHFnWE12ZTd4TWpPMWZ0Z0JDZ0trM2RTTUZTU3VGdHRma0ZLU3RFcmJDdXBfUDhlN081ZWQyS1FZU0l5ZG51cWhuaE82Z09abXdYQ1duY1Fnag?oc=5",
@@ -2422,6 +2522,16 @@
    "summary": "",
    "topic": "India & Seafarers",
    "addedAt": 1793352595421
+  },
+  {
+   "title": "9 Indians safe as drone-hit tanker docks at Romania's Constanta port",
+   "source": "India Today",
+   "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxNZk1fMEdwUUlzM1Y4aTJCRTVXZDQ5NXdTZEFaaXdic2xLYkdkTko0alBoMEZHdGdLakdNV0RIUlpZeVVPVDU4QW0wZXVkeWFxNUttTWdqcnR1M0g5S0hmYjBfOVgycGlvUDhtTEZ3M0ZUVnI4UXFRcGZzYTVlN1pUZWRmUFVMNEFJcHB2TjJmTnFiTDV2em9jTWhoWFV5d0lydVg3UWk1Z0hucV91UTlaYW53dXM0ZVY5SGF2bXBiS01vaVhL0gHKAUFVX3lxTE1YZHo4ck9nQmtxZURLZlJDR1ctRWdhbnRJQ3VMdFhDdmJ3YWNGWndQNDBWNDRITXh0OVZ4RkdNVnZkcGQzYVRaZVAzWVg4MV9UTi1LN0pKOTRuNUxtYzV3LU1jUWJZbThVR1V6bkRrZ2lqN1RtbFFlUF9wcFY0eTUwVFh0MDRfdlN0Tm9tUlB1UkktM21SY1U5WFhTc1ZKbXNjMFJocHhiM1h1bm8tVW5lbWd4N2pGMEVNR1pVQTlINHM1MWpHN3VoVmc?oc=5",
+   "ts": 1792243348000,
+   "date": "2026-10-17",
+   "summary": "",
+   "topic": "Tankers",
+   "addedAt": 1793430824394
   },
   {
    "title": "24 Indian Seafarers Safe After Tankers Attacked In Hormuz, Romania",
