@@ -1,8 +1,68 @@
 {
- "updatedAt": 1793538541281,
+ "updatedAt": 1793559617808,
  "feedsOk": 7,
  "keepDays": 60,
  "items": [
+  {
+   "title": "EU Retreats From Arctic Oil Ban Language In Strategy Draft",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/eu-retreats-from-arctic-oil-ban-language-in-strategy-draft/",
+   "ts": 1793549709000,
+   "date": "2026-11-01",
+   "summary": "By Heidi Taksdal Skjeseth and Alberto Nardelli Oct 19, 2026 (Bloomberg) –The European Union looks to be relaxing its opposition to oil and gas production in polar areas,…",
+   "topic": "General",
+   "addedAt": 1793559617808
+  },
+  {
+   "title": "Indian Navy’s INS Kesari Reports Water Ingress At Visakhapatnam Naval Dockyard",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/indian-navys-ins-kesari-reports-water-ingress-at-visakhapatnam-naval-dockyard/?utm_source=rss&utm_medium=rss&utm_campaign=indian-navys-ins-kesari-reports-water-ingress-at-visakhapatnam-naval-dockyard",
+   "ts": 1793548932000,
+   "date": "2026-11-01",
+   "summary": "The Indian Navy tank landing ship INS Kesari suffered water ingress while berthed at the Naval Dockyard in Visakhapatnam, India, the Navy said.",
+   "topic": "India & Seafarers",
+   "addedAt": 1793559617808
+  },
+  {
+   "title": "Venture Global Begins Supplying Plaquemines Customers Under Long-Term LNG Contracts",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/venture-global-begins-supplying-plaquemines-customers-under-long-term-lng-contracts/",
+   "ts": 1793546861000,
+   "date": "2026-11-01",
+   "summary": "By Curtis Williams HOUSTON, Nov 1 (Reuters) – Energy major Shell SHEL.L was the first customer to receive LNG under a long-term sales contract from Venture Global’s VG.N…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793559617808
+  },
+  {
+   "title": "Somali piracy resurges as Iranian vessel seized carrying 23 crew",
+   "source": "South China Morning Post",
+   "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxOSmN1NUNhYlhMZmx2aWgyX05Gcl90Q0dzRFZxZ2VGclVEdlFpU2YxQXBLNE1NTUF6cmYtU0NXaEROd3RlSUJfZlpULWtrQl9zMHphX1hRX2JuZ095NzlwSldJdjBpMzAtZVQ1VHJyeDhDZHI2QTNoSFlnR1gybFVpdEMtSF9uTGwzOWdVS0NTQ0Joakc5V3VPTmRwM2lGdmsxNnkteHdOVVhtSnhudWdEVk9aVlZkOGPSAbcBQVVfeXFMTXNxNG5SYlVrVzlhckwwNmFGN2h4QTJFdDM3SXV1Smo2X2VnQUVIMzBna2pqYVBNdFFCUXNKM3Z6d1Ria0NqQVRuMVVTY0lDc05EVUpiSTJxWTM4QmtPSnFsNWZWMm9TVmxhcm1zQWpCSXBOcWNGR1pMNjBpcWFyQThacGNINThfU1h3ZlFvNXJQTnVUSm5NeFR0SGZQX29aNUNVeTlTSGM5bVdlV2d4UU9lXzJzQVhN?oc=5",
+   "ts": 1793544840000,
+   "date": "2026-11-01",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793559617808
+  },
+  {
+   "title": "Somali piracy fears rise after Iranian vessel seized",
+   "source": "Egyptian Gazette",
+   "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNVU0taHRSX0ctbFlBTV8zblA0czNQY05KaTVRbnJlT0l3dkZXQnNBVWo2blc4NXU2dU5uY3JpMVU5Tk1fMUpvVjNIeE9KcDJTMzRELWFyQm1aTGE3TnBfWGZCTDVvd05LQW0zcndOQjdwVWwtUVRaWXFKZ1FQNGJscWljSDVJc0hRVER4QXU0cUczdw?oc=5",
+   "ts": 1793538347000,
+   "date": "2026-11-01",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793559617808
+  },
+  {
+   "title": "Qatari LNG Carrier Hit Amid Surge In Gulf Shipping Attacks, Rising Insurance Costs",
+   "source": "Forbes Middle East",
+   "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxQYkUzM0hSMnRiT3FKaWNQeTllYjhJLUZXMjJoN2F0b0RQc0JZNFEzVWNPNnVWc1pYOWxJbUFxT0oxY3Q5bVR6dEJDcWxfRzN0ZEZlN2c3b2o3UnJUT3AxeWU5TnpzaGozQWZkVXJpTzNjM0VCLVh0MlNMdUFsS1d6V1dsSnJhQzlKdy13QloyM0xvelVHMEhGZTlOUHhBVGgwUXZWU3RtVTdmUDVtT05uM1BfcEZkYXQ5dlNDcy1yQ3pObjdtRWVxOU5TUFZZVnNwZnc?oc=5",
+   "ts": 1793533860000,
+   "date": "2026-11-01",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793559617808
+  },
   {
    "title": "14 Filipino seafarers survive drone attack, ship sinking off Bulgaria; set to return home Nov. 2",
    "source": "The Filipino Times",
@@ -12,6 +72,16 @@
    "summary": "",
    "topic": "India & Seafarers",
    "addedAt": 1793538541281
+  },
+  {
+   "title": "Qatar LNG tanker hit in Gulf; crew safe, no oil spill reported",
+   "source": "Gulf News",
+   "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNSlBScTFTOUtfbWZaYWlZWVBYTWtpbHBCV2NzZnpVOTVkSVVWc0xoZEk5MXNfaFdRSEh3dDJvVm1BcFBMRVRBMWZ6Rll5MmVlMnkwcGVPREQ5WGxaWnR1T3VPZmVXUGU4YVVrdTh6aHNleURxa0JSN21CLTNZRXFBQmdEMlNXMDE3eUpVcDFEcldIZjB2cmF6cVp4OFBBMnU0RXVMRXFXY0Fvdi1lTnlF0gHEAUFVX3lxTE1kNTVrdHJubmdqTDZuYTNYWTlUYTdKWFdITDBGUlA3V3ZIRWczbkg5SW4wcEp3b01BRVZFSlpFVDdPdm5uOHJQM19DU21IVE9VMmhIOHAxcHlGcnp4em96QkIwTmk2N2gwUHduRDRmU1BnUk1qQ0cyNTA5WkFGRXM5X29ZaGhpcUF4R2pFeVZpYmtvNXZrRlp4eXFEeC1QTWN4bFF3ZEVvRERySHJsazJPakNPYW5CR1VsMnZqQzJOT1I5M3E?oc=5",
+   "ts": 1793529441000,
+   "date": "2026-11-01",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793559617808
   },
   {
    "title": "Qatar LNG carrier struck by ‘unidentified objects’ in Gulf",
@@ -1244,6 +1314,16 @@
    "addedAt": 1793352595421
   },
   {
+   "title": "Tanker fires warning shots at approaching craft north of Yemen’s Socotra | Piracy news",
+   "source": "Shipping Telegraph",
+   "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQS3JWR0hNZnNfVmRUeDltOWpHOEctT01XOU5hLWR6MDZ3NnlRWnhpLWlxTHRHcjRRX1E1T0M5YmZtQWU3eFVfOE9ubjFYRUJseGpsTFZQbWx1eHRQVUViNmdOdjkzOWhWdHVqNmRWS2VhTFNoWTNCOHR2elNhVm9ueHJSOHJIaU9FWk1Ma1JWUWdMZFdaaDZDdUtZd1pYM1JGWGUxejk5TnlBVEFLcGdUcURkSTQ?oc=5",
+   "ts": 1793343600000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793559617808
+  },
+  {
    "title": "Tanker targeted with hull-mounted explosives in Hormuz",
    "source": "Splash247",
    "url": "https://splash247.com/tanker-targeted-with-hull-mounted-explosives-in-hormuz/",
@@ -2454,6 +2534,16 @@
    "addedAt": 1793352595421
   },
   {
+   "title": "Indian Union Alleges Falsified Ship Documents Endangering Seafarers",
+   "source": "Data Portuaria",
+   "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPMDRqRmVxQTJrdVdocDR0MnZIdWE5QTFrOHQ3bV9ES3VhNVNxR2hNMFFJbGkwMVhISG91ZW11emVMY2JaUlJLNEFlc3pSQ2tYbkNrYm5pQXJLNFpiUUthbHFacEZaV1FJX0o2QUlsSjhDUVFHNzVFemJ0cTk1VFkxTTJoT3NyeXpMZlZWTXVUYTBhbnNzVkJ1WmpydnktbDlyZm9qbUhFRXNfNFpMQnlDVDNSYWg?oc=5",
+   "ts": 1793026520000,
+   "date": "2026-10-26",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793559617808
+  },
+  {
    "title": "Sri Lanka evacuates 40 Iranian seafarers from 19 commercial ships",
    "source": "safety4sea",
    "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNcjZWX2RmaE12WFY0TGxRVEwzUWpfYldRSDhVLS02Ui1BUTBtWWpIVGw2RGR2UEgxbWVEYy0tY2RvV2VWY0NCQnRDaHdyZ0d1SWFBNXZZRmlhYXI0WXZaZGx3T19OQkFRelJDeGVOQ1FHS05Hb3FieHJVX2tMNklXLXdvay03SjIxeF9yU1U4YS1ETWs?oc=5",
@@ -2907,26 +2997,6 @@
    "title": "24 Indian seafarers safe after tanker incidents in Strait of Hormuz, Romania",
    "source": "Firstpost",
    "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQam5QMzE4d3g5a1RhdkZqLTB4eldMVUZrQzBsMkVLejR6ZGRicVB4LUU3and6bTJvc3MxTXZxdDFrb21xZ3Q2N181amVPV25NSFVGZDhTVDNMTm1CN2habHlQT05KakU0eG5JWGEyaWx5NHNJZWdnSnBQQ01DVzVTbW9TbWpzcXFGM1NoMjYyRGhfcFBHdGx2VVkxUmsxdWVEeFRtQTZIUERpRGJwRlY3T1luUUpNVFNnT3lwMms3MTd0NW14ZTdoOWVJM3JXRDRJRHVn0gHYAUFVX3lxTE1RZTVGWVRwQWR6NGVBV0VBMHRiTTZKbVRXbmhrblhXQjNvLXRraW1JVzEyV25MdFBEdnBLc2E0TGxQaDlLNW9qMnRqRmNBbDN6SDcxbVh4aDJoUWZydkNmaENRSTFralFDeU1KZmRwLU1hZGxTbndOSG9VOEZDUnV1ajdiQ1BPempRRlN5akhwSmRfRUJFbEdSWTU2VWxYMDBMWHJkSHRDZEM5MGFsaXFPM3Q5U3ZVU1dubTR4QkxDMzJmUVhMSy05ZWF6WUNWMHlKXzdLSlNPRA?oc=5",
-   "ts": 1792220400000,
-   "date": "2026-10-17",
-   "summary": "",
-   "topic": "India & Seafarers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "All nine Indian seafarers on board chemical tanker YARA J safe in Romania: Embassy | India News",
-   "source": "Hindustan Times",
-   "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxOcTNVRTdhSkNiejRDTTh5WTlFQlBRVi1UXzA0dWNvN1d0bG0zelRJd0pXSzJtOVVRcUFWSWhLRFdRMTJoRHdXcDk5WEVSbkJVbWcwZDMwNmR3WFg3Sjd6VFBjR0llUWRPQlNKTXRaczV3OUxRRF9aY2xWY3ZYY1I4V2hEczZwY0t6SG1qT2hpR1VBMmEtMjF4R3ZKa3FLczJ4UGQ2c1V6RWRqNUlfVGxMX2IxczdxT1RoVkNkWW5RYWNRS3ozWVdFV0RzdXVHWXNGWTF3RHh5cUt6a3Z50gHiAUFVX3lxTE5EYlVKMDJmdlhiMlEwa3ZvRmlHU0pDNHJXYTNJUWpjSzI5NFBJU2VSb285SGkxVXo1WlZoQ0h5ZTFxNjJFNFNRMWpGYndUa1B3dTQxUkpqWU80M1FUWUNDSlZRd1Btc1ZQOHdCRmFDZ0Y0bUlIVGFseTgzcHAyN2pNMmlGNV80TnFlNDN2YVdGZ3VCdm56eUJ5bzNMQkY3V1dmS1ZIQjVwWDc0VEdkWHBtdUpMX0txWW54ZUtST3JaeVpRU0hQWUd5SU5hanZDNm5QeV94QTRnOWpDdFZJQkZfNkE?oc=5",
-   "ts": 1792220400000,
-   "date": "2026-10-17",
-   "summary": "",
-   "topic": "India & Seafarers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "All 9 Indian seafarers safe as drone-struck tanker reaches Romania port: Embassy",
-   "source": "Moneycontrol.com",
-   "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNQXRhS05aM09oZkpjUFVDNUppVmR1NEo5LU9yN0tTQzNaaTdiNmZFQjhJVVVFQWQyZVlkdm4xLV9RVDdKeVZUMXVaNWpLSVN5d1lWRGo1eGV2STBnYV8zZjR1Zm5qN0FUM0RsaVc5MHRBa0l0cnMwSS1US0FsMm80Q0p0R3gtZEU1QTVDLXc4UUphNVBONXR3Zy03dktydE54SkZfeWVyclpwa2ZwVkQ4ZVhDZ2xoX0RsY3FUN00ydUs5Q2VVOGdnbTg1YWhSUdIB0wFBVV95cUxPX05LWThjY0RsNUJCSzNWN0dvTEYzZ09nazZVb3RDdm1obzlSRWVZdXl5X2xzNEE2VXREOUptTG81RkNjc1ZQSUNFWDc3UEFDVEgxZ1JBYzF5MWZFZW5hZW1VRUJKclV0bDAxSWdUZWZPTTB5RzZDWWM4SUpDRXpjTnlMb0xsZXF2MW5XOW5zX3R3Q3g2TlRmdmRoTkhQZnFGOXlNdmM0dENUV2Nva2NzX054NF9TaXNCSXFVaXZ3MG5NSVljNjIyaVJyX09zeHJrRDZj?oc=5",
    "ts": 1792220400000,
    "date": "2026-10-17",
    "summary": "",
