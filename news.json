@@ -1,8 +1,18 @@
 {
- "updatedAt": 1793473202391,
+ "updatedAt": 1793496441328,
  "feedsOk": 7,
  "keepDays": 60,
  "items": [
+  {
+   "title": "Russia Extends Ban On Most Diesel Exports Through January",
+   "source": "gCaptain",
+   "url": "https://gcaptain.com/russia-extends-ban-on-most-diesel-exports-through-january/",
+   "ts": 1793492405000,
+   "date": "2026-11-01",
+   "summary": "By Bloomberg News Oct 31, 2026 (Bloomberg) –Russia’s government has extended a general ban on diesel exports by producers until the end of January while still allowing some…",
+   "topic": "Markets & Trade",
+   "addedAt": 1793496441328
+  },
   {
    "title": "Iran’s IRGC Navy Says Four Tankers Catch Fire In Strait Of Hormuz",
    "source": "gCaptain",
@@ -102,6 +112,16 @@
    "summary": "The number of young seafarers temporarily stood down from work at sea with mental health recorded as a factor has more than doubled in a year, according to…",
    "topic": "India & Seafarers",
    "addedAt": 1793451991054
+  },
+  {
+   "title": "‘Seafarer-First’: Centre orders real-time monitoring of Indian seafarers after Hormuz attacks",
+   "source": "DD News",
+   "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQNHB4SElfTUY5XzVNd0MtUEtQMS1UeTl3d2NZQkRoSUFzYWIteUNnR0Z3S3ZhcUNkMzhLbUhkdUQxQzZ3MGdUWnZ3QmZScm9DMWx0RS1icDA4YkVEM0xZNDA2bkhia1VCdkZSV2ZHOEtQRE1GSVZWLXNBOFRCcTd1OEFFVmViSFdvMmRJeHFjbGt2REhmeGJMRDJRck9MUE9fbFlsZFZNNmtUVWs?oc=5",
+   "ts": 1793436902000,
+   "date": "2026-10-31",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793496441328
   },
   {
    "title": "Strait of Hormuz: Why Are Oil Tankers Still Sailing Into Danger?",
@@ -2152,6 +2172,26 @@
    "summary": "",
    "topic": "Safety & Security",
    "addedAt": 1793409570432
+  },
+  {
+   "title": "Cargo ship under attack southwest of Yemen’s Al Hudaydah",
+   "source": "Shipping Telegraph",
+   "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQTVVBWm85T1BvdUlSSUxUTWc1WGZtYUR6VU1PRkJCZmFOZkRpYnVsVFZzZXVqOF96RE12X01RVTE3Snh5Vlh2bGlTY2lObUo2cnZpYnhqeUlzRGVYRnFRV1hTZnExc21IaXVFR0EyZFBNeGw2dVVvNDlZTUI1aXVfMkNWdk9YbGhEUm5FWGM4eURVRkRzVlI0ODVLMHk4Q2c?oc=5",
+   "ts": 1793170800000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793496441328
+  },
+  {
+   "title": "Somali pirate group remains onboard tanker hijacked off Yemen | Piracy news",
+   "source": "Shipping Telegraph",
+   "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPYUZPOENLNWx0TTBsaVdyZUg0cUY5WEx0NThudTZpbkdjcnB3ODRvTGs3RVA3VmdBRHUzVkRzcXFuclNqUmc2QnZvNTVQbFhhc001RThZTE5vaWFHNnRVVDBqbWNaM0pCMlpCemJEbnZ2dm4wN3N6Z0Y4cGl4WnlybmR2bTZlZjlMZlhRWXhCdUdlaTF3OXhkY054N1ZKR3VDSWs4U1Nhcw?oc=5",
+   "ts": 1793170800000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "Safety & Security",
+   "addedAt": 1793496441328
   },
   {
    "title": "Utkilen takes delivery of second 7,500DWT chemical tanker in series",
