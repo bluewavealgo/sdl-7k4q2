@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202610301821">
+<link rel="stylesheet" href="app.css?v=202611021016">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body class="locked">
@@ -40,8 +40,7 @@
       <a href="#ships" data-v="ships"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l2 4h14l2-4z"/><path d="M6 17V9h12v8M12 9V3l5 3"/></svg><span>Sea <span class="lbl-long">service</span></span></a>
       <a href="#upload" data-v="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg><span>Upload <span class="lbl-long">seafarer profile</span></span></a>
       <a href="#complete" data-v="complete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4h6M9 4a2 2 0 0 0-2 2v0h10v0a2 2 0 0 0-2-2M7 6H5v15h14V6h-2"/><path d="M8.5 13.5l2.2 2.2 4.8-4.8"/></svg><span><span class="lbl-long">Pending details</span><span class="lbl-short">Pending</span></span><b class="badge" id="cdBadge" hidden>0</b></a>
-      <a href="#certs" data-v="certs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M7 9h6M7 12h4"/><circle cx="16.5" cy="11.5" r="2.5"/><path d="M15 14l-1 6 2.5-1.5L19 20l-1-6"/></svg><span><span class="lbl-long">Certificates</span><span class="lbl-short">Certs</span></span><b class="badge" id="certBadge" hidden>0</b></a>
-      <a href="#docs" data-v="docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5 12 11l2.5 2.5"/></svg><span><span class="lbl-long">My documents</span><span class="lbl-short">Docs</span></span><b class="badge" id="docBadge" hidden>0</b></a>
+      <a href="#bank" data-v="docs" data-group="bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13h8M8 16h5"/></svg><span><span class="lbl-long">Document bank</span><span class="lbl-short">Docs</span></span><b class="badge" id="bankBadge" hidden>0</b></a>
       <div class="sep"></div>
       <a href="#notices" data-v="notices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg><span>Notices</span><b class="badge" id="noticeBadge" hidden>0</b></a>
       <a href="#news" data-v="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/></svg><span><span class="lbl-long">Maritime </span>News</span><b class="badge" id="newsBadge" hidden>0</b></a>
@@ -210,8 +209,12 @@
     </section>
 
     <!-- CERTIFICATES -->
-    <section class="view" id="v-certs" data-title="Certificates" hidden>
-      <div class="vhead"><div><h1>Certificates</h1><p class="muted">Your <b>certificate register</b>: passport, CDC, CoC, endorsements and STCW courses with their numbers and expiry dates, filled in from your seafarer profile. Tap <b>Attach scan</b> to keep the photo or PDF of a certificate with it; the file is saved in My documents too.</p></div><div class="row-act"><a class="btn" href="#upload">Update from seafarer profile</a><button type="button" class="btn-primary" id="certAdd">+ Add certificate</button></div></div>
+    <div class="bankbar" id="bankBar" hidden>
+      <div class="bb-top"><h1>Document bank</h1><div class="vt" id="viewToggle" role="group" aria-label="Layout"><button type="button" data-l="grid" aria-pressed="true">▦ Grid</button><button type="button" data-l="list" aria-pressed="false">☰ List</button></div></div>
+      <nav class="bb-tabs" aria-label="Document bank views"><a href="#docs" data-bv="docs">📁 Folders <b class="badge" id="docBadge" hidden>0</b></a><a href="#certs" data-bv="certs">🎓 Certificates <b class="badge" id="certBadge" hidden>0</b></a><a href="#sheet" data-bv="sheet">▤ Sheet</a></nav>
+    </div>
+    <section class="view" id="v-certs" data-title="Document bank · Certificates" hidden>
+      <div class="vhead"><div><p class="muted">Your <b>certificates</b>, grouped by course: the original course stays valid for life and the <b>latest refresher</b> decides whether you are current. Filled in from your seafarer profile; tap <b>Attach scan</b> to keep the file with it.</p></div><div class="row-act"><a class="btn" href="#upload">Update from seafarer profile</a><button type="button" class="btn-primary" id="certAdd">+ Add certificate</button></div></div>
       <div class="card" id="certFormCard" hidden>
         <div class="card-h"><h2 id="certFormTitle">Add certificate</h2><button type="button" class="btn-ghost btn-sm" id="certFormClose">Close</button></div>
         <form id="certForm" class="card-b" novalidate>
@@ -237,8 +240,8 @@
       <div class="card" id="certList"></div>
     </section>
 
-    <section class="view" id="v-docs" data-title="My documents" hidden>
-      <div class="vhead"><div><h1>My documents</h1><p class="muted">Your <b>file folder</b>: scans and photos of your passport, CDC, CoC, visas, medicals and certificates. Files linked to a certificate also show on that certificate in the Certificates tab. They're saved on this device, and in your private account when you press Sync while signed in, so your other devices get them too. Open them offline, save them to your device, or share them to WhatsApp or email.</p></div><label class="btn-primary" id="docAddLbl" for="docFile" tabindex="0">+ Add document</label></div>
+    <section class="view" id="v-docs" data-title="Document bank · Folders" hidden>
+      <div class="vhead"><div><p class="muted">All your files in <b>folders</b>, like DigiLocker. Files linked to a certificate or a ship are filed automatically; make your own folders and move files any time.</p></div><label class="btn-primary" id="docAddLbl" for="docFile" tabindex="0">+ Add document</label></div>
       <input type="file" id="docFile" accept="image/*,application/pdf" multiple hidden>
       <input type="file" id="certFile" accept="image/*,application/pdf" multiple hidden>
       <input type="file" id="shipFile" accept="image/*,application/pdf" multiple hidden>
@@ -254,6 +257,10 @@
             <label class="f"><span>Ship (optional)</span><select id="dc_ship"></select></label>
             <label class="f" id="dcMonthRow" hidden><span>Salary month</span><input type="month" id="dc_month"></label>
             <label class="f"><span>Link to certificate (optional)</span><select id="dc_cert"></select><small class="hint" id="dcHint"></small></label>
+            <label class="f"><span>Folder</span><select id="dc_folder"></select></label>
+            <div class="s2 dcdet" id="dcDetails"><div class="small muted" style="margin-bottom:6px">Details (for documents not linked to a certificate, like a visa or medical)</div><div class="fgrid">
+              <label class="f"><span>Number</span><input id="dc_number" autocomplete="off"></label><label class="f"><span>Issued by / at</span><input id="dc_issuer" autocomplete="off"></label>
+              <label class="f"><span>Issue date</span><input type="date" id="dc_issued"></label><label class="f"><span>Expiry date</span><input type="date" id="dc_expires"></label></div></div>
             <label class="f s2"><span>Notes</span><input id="dc_notes" autocomplete="off"></label>
           </div>
           <div class="actions" style="margin-top:14px"><button type="submit" class="btn-primary" id="dcSave">Save</button><button type="button" class="btn-ghost" id="dcCancel">Cancel</button><span class="err" id="dcErr"></span></div>
@@ -262,13 +269,21 @@
       </div>
       <div class="card" id="linkCard" hidden></div>
       <div class="sumrow" id="docTiles"></div>
-      <div class="card card-b"><div class="filters">
-        <div class="f wide"><span>Category</span><div class="chips" id="docCat" role="group" aria-label="Category"></div></div>
-        <label class="f wide"><span>Search</span><input id="docQ" placeholder="e.g. passport, visa" autocomplete="off"></label>
-      </div></div>
-      <div class="selbar" id="docSelBar"><button type="button" class="btn-sm btn-primary" id="docViewAll">View all</button><button type="button" class="btn-sm" id="docSelToggle">Select several</button><button type="button" class="btn-sm" id="docLinkBtn" hidden>Link to certificates</button><button type="button" class="btn-sm" id="docShrink" hidden>Compress my documents</button><span class="small muted" id="docSelInfo"></span><span class="sp"></span><button type="button" class="btn-sm" id="docSelAll" hidden>Select all</button><button type="button" class="btn-sm btn-primary" id="docSelShare" hidden disabled>Share</button><button type="button" class="btn-sm" id="docSelSave" hidden disabled>Save</button></div>
+      <div class="card card-b folderbar">
+        <div class="crumbs" id="docCrumbs" aria-label="Folder path"></div>
+        <div class="fb-row"><input id="docQ" placeholder="Search all documents" autocomplete="off" aria-label="Search all documents"><button type="button" class="btn-sm" id="fNew">+ New folder</button><button type="button" class="btn-sm" id="fRename" hidden>Rename folder</button><button type="button" class="btn-sm" id="fMoveF" hidden>Move folder</button><button type="button" class="btn-sm btn-danger" id="fDelete" hidden>Delete folder</button></div>
+        <form id="fForm" class="fform" hidden novalidate><input id="fName" placeholder="Folder name" autocomplete="off" maxlength="60"><button type="submit" class="btn-sm btn-primary" id="fSave">Create</button><button type="button" class="btn-sm btn-ghost" id="fCancel">Cancel</button><span class="err" id="fErr"></span></form>
+      </div>
+      <div class="card" id="movePanel" hidden></div>
+      <div class="selbar" id="docSelBar"><button type="button" class="btn-sm btn-primary" id="docViewAll">View all</button><button type="button" class="btn-sm" id="docSelToggle">Select several</button><button type="button" class="btn-sm" id="docLinkBtn" hidden>Link to certificates</button><button type="button" class="btn-sm" id="docShrink" hidden>Compress my documents</button><span class="small muted" id="docSelInfo"></span><span class="sp"></span><button type="button" class="btn-sm" id="docSelAll" hidden>Select all</button><button type="button" class="btn-sm" id="docSelMove" hidden disabled>Move to…</button><button type="button" class="btn-sm btn-primary" id="docSelShare" hidden disabled>Share</button><button type="button" class="btn-sm" id="docSelSave" hidden disabled>Save</button></div>
       <div id="docList" class="doc-grid"></div>
       <div class="card card-b small muted">🔒 Your documents are encrypted with your own key, on this device and in your account. Only your PIN, Face ID / fingerprint, passphrase or recovery key can open them. The app locks itself when you leave it.</div>
+    </section>
+    <section class="view" id="v-sheet" data-title="Document bank · Sheet" hidden>
+      <div class="vhead"><div><p class="muted">Every certificate and document in one table. Filter any column, tap a heading to sort, and switch on <b>Edit cells</b> to correct details; changes update the certificate everywhere.</p></div>
+        <div class="row-act"><button type="button" class="btn-sm" id="shEdit" aria-pressed="false">✎ Edit cells</button><button type="button" class="btn-sm" id="shClear">Clear filters</button><button type="button" class="btn-sm btn-primary" id="shXlsx">⬇ Download Excel</button></div></div>
+      <div class="small muted" id="shInfo" style="margin:0 2px 8px"></div>
+      <div class="card"><div class="tbl-wrap sheet-wrap"><table class="sheet" id="sheet"></table></div></div>
     </section>
     <div class="viewer" id="docViewer" hidden role="dialog" aria-modal="true" aria-labelledby="dvTitle">
       <div class="viewer-bar"><b id="dvTitle"></b><span class="dv-count" id="dvCount"></span><div class="row-act"><button type="button" class="btn-sm" id="dvPrev" aria-label="Previous document">‹ Prev</button><button type="button" class="btn-sm" id="dvNext" aria-label="Next document">Next ›</button><button type="button" class="btn-sm" id="dvShare">Share</button><button type="button" class="btn-sm" id="dvSave">Save to device</button><button type="button" class="btn-sm btn-primary" id="dvClose">Close</button></div></div>
@@ -391,6 +406,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202610301821"></script>
+<script src="app.js?v=202611021016"></script>
 </body>
 </html>

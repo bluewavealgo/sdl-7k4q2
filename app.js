@@ -64,18 +64,18 @@ const EXAMPLE={v:2,example:true,settings:{edge:true},fy:{},deleted:[],updatedAt:
  {id:"ex2",vessel:"LNG Example Aurora",type:"LNG Carrier",company:"Example Gas Carriers",fleet:"LNG Fleet",rank:"2nd Officer",flag:"Bahamas",on:"2025-12-06",off:"2026-05-10",left:"2025-12-05",arr:"2026-05-12",notes:"Example"},
  {id:"ex3",vessel:"MT Example Meridian",type:"Chemical Tanker",company:"Example Shipmanagement",fleet:"Tanker Fleet 2",rank:"Chief Officer",flag:"Panama",on:"2026-08-02",onIndia:true,onPort:"Mumbai (JNPT)",off:"2027-01-15",offPort:"Houston",arr:"2027-01-17",notes:"Example · sign-off planned"}]};
 let S;
-function adopt(o){S={v:2,example:false,settings:Object.assign({edge:true},o.settings||{}),fy:o.fy||{},contracts:(o.contracts||[]).map(c=>Object.assign({company:"",fleet:"",flag:"",registry:""},c)),deleted:Array.isArray(o.deleted)?o.deleted:[],certs:Array.isArray(o.certs)?o.certs:[],docs:Array.isArray(o.docs)?o.docs:[],updatedAt:+o.updatedAt||0};}
-function snapshot(){return {v:2,app:"sea-days-ledger",settings:S.settings,fy:S.fy,contracts:S.contracts,certs:S.certs||[],docs:S.docs||[],deleted:S.deleted||[],updatedAt:S.updatedAt||0};}
+function adopt(o){S={v:2,example:false,settings:Object.assign({edge:true},o.settings||{}),fy:o.fy||{},contracts:(o.contracts||[]).map(c=>Object.assign({company:"",fleet:"",flag:"",registry:""},c)),deleted:Array.isArray(o.deleted)?o.deleted:[],certs:Array.isArray(o.certs)?o.certs:[],docs:Array.isArray(o.docs)?o.docs:[],folders:Array.isArray(o.folders)?o.folders:[],updatedAt:+o.updatedAt||0};}
+function snapshot(){return {v:2,app:"sea-days-ledger",settings:S.settings,fy:S.fy,contracts:S.contracts,certs:S.certs||[],docs:S.docs||[],folders:S.folders||[],deleted:S.deleted||[],updatedAt:S.updatedAt||0};}
 let saveQ=Promise.resolve();
 function saveLocal(){if(S.example)return;S.updatedAt=Date.now();const j=JSON.stringify(snapshot());saveQ=saveQ.then(()=>storeLedger(j)).catch(()=>{});updateSyncUI();}
 /* the ledger is kept on the device only in encrypted form */
 async function storeLedger(json){if(!MK)return;lsSet("sdlLedgerEnc",b64(await aesEnc(MK,TE.encode(json))));try{localStorage.removeItem("seaDaysLedger");}catch(e){}}
 function loadLocal(){try{const o=JSON.parse(lsGet("seaDaysLedger"));if(o&&Array.isArray(o.contracts))return o;}catch(e){}return null;}
-function leaveExample(){if(S.example)S={v:2,example:false,settings:{edge:S.settings.edge!==false},fy:{},contracts:[],certs:[],docs:[],deleted:[],updatedAt:0};}
+function leaveExample(){if(S.example)S={v:2,example:false,settings:{edge:S.settings.edge!==false},fy:{},contracts:[],certs:[],docs:[],folders:[],deleted:[],updatedAt:0};}
 /* combine another copy into S: newest edit of each contract wins, deletions carry over, nothing is wiped */
 function merge(o){
   if(S.example)leaveExample();
-  S.certs=S.certs||[];S.docs=S.docs||[];const before=JSON.stringify([S.contracts,S.fy,S.deleted,S.certs,S.docs]);
+  S.certs=S.certs||[];S.docs=S.docs||[];S.folders=S.folders||[];const before=JSON.stringify([S.contracts,S.fy,S.deleted,S.certs,S.docs,S.folders]);
   const tomb={},tn={};(S.deleted||[]).concat(Array.isArray(o.deleted)?o.deleted:[]).forEach(d=>{if(d&&d.id){tomb[d.id]=Math.max(tomb[d.id]||0,+d.u||0);if(d.n)tn[d.id]=Math.max(tn[d.id]||0,+d.n);}});
   const m={};S.contracts.concat((o.contracts||[]).map(c=>Object.assign({company:"",fleet:"",flag:"",registry:""},c))).forEach(c=>{if(!c||!c.id)return;const p=m[c.id];if(!p||(+c.u||0)>(+p.u||0))m[c.id]=c;});
   S.contracts=Object.values(m).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
@@ -83,11 +83,13 @@ function merge(o){
   S.certs=Object.values(cm).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
   const dm={};S.docs.concat(Array.isArray(o.docs)?o.docs:[]).forEach(c=>{if(!c||!c.id)return;const p=dm[c.id];if(!p||(+c.u||0)>(+p.u||0)||((+c.u||0)===(+p.u||0)&&(c.chunks||0)>(p.chunks||0)))dm[c.id]=c;});
   S.docs=Object.values(dm).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
+  const fm={};S.folders.concat(Array.isArray(o.folders)?o.folders:[]).forEach(c=>{if(!c||!c.id)return;const p=fm[c.id];if(!p||(+c.u||0)>(+p.u||0))fm[c.id]=c;});
+  S.folders=Object.values(fm).filter(c=>!(tomb[c.id]&&tomb[c.id]>=(+c.u||0)));
   S.deleted=Object.entries(tomb).map(([id,u])=>tn[id]?{id,u,n:tn[id]}:{id,u}).slice(-500);
   const newer=(+o.updatedAt||0)>(+S.updatedAt||0);
   Object.entries(o.fy||{}).forEach(([k,v])=>{S.fy[k]=newer?Object.assign({},S.fy[k],v):Object.assign({},v,S.fy[k]);});
   if(newer&&o.settings)S.settings=Object.assign({},S.settings,o.settings);
-  return before!==JSON.stringify([S.contracts,S.fy,S.deleted,S.certs,S.docs]);
+  return before!==JSON.stringify([S.contracts,S.fy,S.deleted,S.certs,S.docs,S.folders]);
 }
 
 /* ======================= day-count engine ======================= */
@@ -175,18 +177,23 @@ function taxLine(r){
 const actLabel=f=>f>=2026?"Income-tax Act, 2025 · Rule 8 (crew)":"Income-tax Act, 1961 · Rule 126 (crew)";
 
 /* ======================= routing ======================= */
-const VIEWS=["dashboard","years","ships","upload","complete","certs","docs","notices","news","account","help","about"];
+const VIEWS=["dashboard","years","ships","upload","complete","certs","docs","sheet","notices","news","account","help","about"];
 let VIEW="dashboard",noticesPrevSeen=0;
+const BANK=["docs","certs","sheet"];
 function show(v){
+  if(v==="bank")v=lsGet("sdlBankView")||"docs";
   if(!VIEWS.includes(v))v="dashboard";VIEW=v;
   VIEWS.forEach(x=>{$("v-"+x).hidden=x!==v;});
-  document.querySelectorAll(".nav a").forEach(a=>{if(a.dataset.v===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
+  const inBank=BANK.includes(v);$("bankBar").hidden=!inBank;
+  if(inBank){lsSet("sdlBankView",v);$("bankBar").querySelectorAll("[data-bv]").forEach(a=>{if(a.dataset.bv===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});$("viewToggle").hidden=v==="sheet";syncLayoutBtns();}
+  document.querySelectorAll(".nav a").forEach(a=>{if(a.dataset.v===v||(a.dataset.group==="bank"&&inBank))a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
   document.title=($("v-"+v).dataset.title)+" · Sea Days Ledger";
   if(v==="notices"){noticesPrevSeen=+(lsGet("sdlNoticesSeen")||0);lsSet("sdlNoticesSeen",String(Date.now()));renderNotices();}
   if(v==="upload")renderUploadState();
   if(v==="complete")renderComplete(true);
   if(v==="certs")renderCerts();
   if(v==="docs")renderDocs();
+  if(v==="sheet")renderSheet();
   if(v==="news"){newsPrevSeen=+(lsGet("sdlNewsSeen")||0);lsSet("sdlNewsSeen",String(Date.now()));renderNews();}
   if(v==="account")renderAccount();
   window.scrollTo(0,0);
@@ -215,7 +222,7 @@ function render(){
   $("exampleBanner").hidden=!S.example;
   $("exampleBanner").innerHTML=S.example?`<div class="banner example"><div><b>These are example voyages.</b> Upload your seafarer profile or add a contract, and the examples disappear.</div><div class="actions"><a class="btn btn-primary btn-sm" href="#upload">Upload profile</a><a class="btn btn-sm" href="#ships" id="exAdd">Add contract</a></div></div>`:"";
   if(!S.certs)S.certs=[];
-  renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();renderCdBadge();renderCertBadge();if(VIEW==="certs")renderCerts();if(!S.docs)S.docs=[];renderDocBadge();if(VIEW==="docs")renderDocs();renderStorage();
+  renderDashboard();renderYears();renderShips();renderHist();renderNotices();renderNews();updateSyncUI();renderCdBadge();renderCertBadge();if(VIEW==="certs")renderCerts();if(!S.docs)S.docs=[];if(!S.folders)S.folders=[];renderDocBadge();if(VIEW==="docs")renderDocs();if(VIEW==="sheet")renderSheet();renderStorage();
   fillSelect($("cdFY"),[["","All years"]].concat(fyOpts),$("cdFY").value);
   $("cdCompany").innerHTML=uniq("company").map(f=>`<option value="${esc(f)}">`).join("");$("cdFleet").innerHTML=uniq("fleet").map(f=>`<option value="${esc(f)}">`).join("");
   if(VIEW==="complete"&&!cdEditing)renderComplete();else renderCdProgress();
@@ -861,8 +868,8 @@ function renderImport(){
     <div class="chips"><span class="pill NR">${nNew} new</span><span class="pill RNOR">${nUp} to fill in</span><span class="pill UNK">${plan.length-nNew-nUp} already up to date</span></div>
     ${ranks.length?`<div><div class="eyebrow" style="margin-bottom:6px">Rank in the PDF → rank in the app</div><div class="fgrid">${ranks.map((rk,i)=>`<label class="f"><span>${esc(rk)}</span><select data-rk="${i}">${opts(PIMP.map[rk]!=null?PIMP.map[rk]:(ALLRANKS.includes(defaultRank(rk))?defaultRank(rk):""))}</select></label>`).join("")}</div></div>`:""}
     <div class="tbl-wrap"><table><thead><tr><th>Vessel</th><th>Type</th><th>Rank</th><th>Sign-on</th><th>Sign-off</th><th>Result</th></tr></thead><tbody>${plan.map(p=>`<tr><td><b>${esc(p.cand.vessel)}</b><span class="sub">${p.cand.imo?"IMO "+esc(p.cand.imo):""}</span></td><td>${esc(p.cand.type)}</td><td>${esc(p.cand.rank||"—")}</td><td class="mono">${fmt(dn(p.cand.on))}</td><td class="mono">${fmt(dn(p.cand.off))}</td><td>${p.status==="new"?'<span class="pill NR">New ship</span>':p.status==="update"?`<span class="pill RNOR">Fill ${p.fill.length} detail${p.fill.length===1?"":"s"}</span>`:'<span class="pill UNK">Up to date</span>'}</td></tr>`).join("")}</tbody></table></div>
-    ${nCert?`<div><b>${nCert} new certificate${nCert===1?"":"s"}</b> found too. They'll be added to the Certificates tab.</div>`:`<div class="small muted">Certificates: all ${(PIMP.certs||[]).length} are already in the Certificates tab.</div>`}
-    <label class="chk"><input type="checkbox" id="pKeep" checked> <span>Also keep this profile PDF in My documents (category "Seafarer profile")</span></label>
+    ${nCert?`<div><b>${nCert} new certificate${nCert===1?"":"s"}</b> found too. They'll be added to Document bank → Certificates.</div>`:`<div class="small muted">Certificates: all ${(PIMP.certs||[]).length} are already in the Certificates tab.</div>`}
+    <label class="chk"><input type="checkbox" id="pKeep" checked> <span>Also keep this profile PDF in Document bank (folder "Seafarer profile")</span></label>
     <div class="actions"><button type="button" class="btn-primary" id="pImpGo">${nNew+nUp+nCert?[nNew?`Add ${nNew} new ship${nNew===1?"":"s"}`:"",nUp?`update ${nUp}`:"",nCert?`add ${nCert} certificate${nCert===1?"":"s"}`:""].filter(Boolean).join(", ").replace(/^./,m=>m.toUpperCase()):"Save the PDF only"}</button><button type="button" class="btn-ghost" id="pImpCancel">Close</button></div></div>`;
   body.querySelectorAll("[data-rk]").forEach(sel=>sel.addEventListener("change",()=>{PIMP.map[ranks[+sel.dataset.rk]]=sel.value||ranks[+sel.dataset.rk];renderImport();}));
   $("pImpCancel").onclick=()=>{PIMP=null;renderImport();};
@@ -964,36 +971,79 @@ const CERT_KIND={document:"ID document",coc:"CoC",endorsement:"Endorsement",cour
 const FAMILY=[["pst",/personal survival|\bpst\b/i],["fpff",/fire prevention|\bfpff\b/i],["aff",/advanced (training in )?fire fighting|\baff\b/i],["mfa",/medical first aid|\bmfa\b/i],["mc",/medical care/i],["pscrb",/survival craft|\bpscrb\b/i],["engref",/refresher and updating/i],["pssr",/personal safety/i],["efa",/elementary first aid/i]];
 const KEY_FAMILIES=new Set(["pst","fpff","aff","mfa","mc","pscrb","engref","passport","cdc","coc"]);
 function certFamily(c){const n=String(c.name||"");if(c.kind==="document")return n.toLowerCase().replace(/[^a-z]/g,"");if(c.kind==="coc")return "coc";if(c.kind==="endorsement")return "end-"+(n.split("·")[1]||"").trim().toLowerCase();if(c.kind==="medical")return "medical";const hit=FAMILY.find(([,re])=>re.test(n));return hit?hit[0]:n.toLowerCase();}
+/* ---------- certificate groups: a course = its original certificate + its refreshers ---------- */
+const COURSE_FAM=[["pst","PST","Personal Survival Techniques (PST)",/personal survival|\bpst\b/i],["pscrb","PSCRB","Survival Craft & Rescue Boats (PSCRB)",/survival craft|\bpscrb\b/i],["fpff","FPFF","Fire Prevention & Fire Fighting (FPFF)",/fire prevention|\bfpff\b/i],
+  ["aff","AFF","Advanced Fire Fighting (AFF)",/advanced (training in )?fire|\baff\b/i],["mfa","MFA","Medical First Aid (MFA)",/medical first aid|\bmfa\b/i],["mc","Medical Care","Medical Care",/medical care/i],["efa","EFA","Elementary First Aid (EFA)",/elementary first aid|\befa\b/i],
+  ["pssr","PSSR","Personal Safety & Social Responsibilities (PSSR)",/personal safety|\bpssr\b/i],["stsdsd","STSDSD","Security Duties (STSDSD)",/security duties|designated security|\bstsdsd\b/i],["ssa","Security Awareness","Security Awareness",/security awareness/i]];
+const isRefresher=c=>c.kind==="course"&&/refresher|updating/i.test(String(c.name));
+function groupInfo(c){
+  const n=String(c.name||"");
+  if(c.kind==="course"){const f=COURSE_FAM.find(x=>x[3].test(n));if(f)return {key:"c:"+f[0],label:f[2],short:f[1]};
+    const base=n.replace(/^refresher training (for|in)( proficiency in)?\s*/i,"").trim()||n;return {key:"c:"+base.toLowerCase().replace(/[^a-z0-9]+/g," ").trim(),label:base,short:base.length>28?base.slice(0,28)+"…":base};}
+  if(c.kind==="coc")return {key:"coc",label:"Certificate of Competency (CoC)",short:"CoC"};
+  if(c.kind==="medical")return {key:"medical",label:"Medical fitness",short:"Medical"};
+  if(c.kind==="endorsement")return {key:certFamily(c),label:n.replace(/\s*·.*$/,"")+(n.includes("·")?" · "+n.split("·")[1].trim():""),short:n.slice(0,28)};
+  return {key:certFamily(c)||n.toLowerCase(),label:n,short:n.slice(0,28)};
+}
+function certGroups(list){
+  const m={};list.forEach(c=>{const g=groupInfo(c);(m[g.key]=m[g.key]||{key:g.key,label:g.label,short:g.short,kind:c.kind,all:[]}).all.push(c);});
+  Object.values(m).forEach(g=>{const live=g.all.filter(c=>!c.hidden),by=(a,b)=>String(a.issued||"").localeCompare(String(b.issued||""));
+    g.orig=live.filter(c=>!isRefresher(c)).sort(by);g.ref=live.filter(isRefresher).sort(by);
+    g.gov=g.kind==="course"&&g.ref.length?g.ref[g.ref.length-1]:live.slice().sort(by).pop()||null;
+    if(g.gov&&g.kind==="course"&&!isRefresher(g.gov)&&g.orig.length>1)g.gov=g.orig[g.orig.length-1];
+    g.label=g.kind==="course"&&!g.orig.length&&g.ref.length&&!COURSE_FAM.some(f=>"c:"+f[0]===g.key)?g.label:g.label;});
+  return Object.values(m);
+}
+let GCACHE=null,GKEY="";
+function groupFor(c){const k=(S.certs||[]).length+"|"+(S.certs||[]).reduce((a,x)=>a+(+x.u||0)+(x.hidden?1:0),0);if(!GCACHE||GKEY!==k){GCACHE={};certGroups(S.certs||[]).forEach(g=>g.all.forEach(x=>GCACHE[x.id]=g));GKEY=k;}return GCACHE[c.id]||{gov:c,ref:[],orig:[c],all:[c]};}
+function expStatus(x){if(!x||!x.expires)return "noexp";const d=dn(x.expires)-TODAY;return d<0?"expired":d<=183?"soon":"valid";}
 function certStatus(c){
   if(c.hidden)return "hiddenc";
-  const fam=certFamily(c),newer=(S.certs||[]).some(x=>x!==c&&!x.hidden&&certFamily(x)===fam&&(x.issued||"")>(c.issued||""));
-  if(newer)return "replaced";
-  if(!c.expires)return "noexp";const d=dn(c.expires)-TODAY;return d<0?"expired":d<=183?"soon":"valid";}
+  const g=groupFor(c);
+  if(g.gov&&g.gov!==c){if(c.kind==="course"&&!isRefresher(c)&&g.ref.length)return "original";return "replaced";}
+  return expStatus(c);}
 function isKeyCert(c){const f=certFamily(c);return KEY_FAMILIES.has(f)||c.kind==="endorsement"||c.kind==="medical";}
-function certAttention(){let expired=0,soon=0;(S.certs||[]).forEach(c=>{if(!isKeyCert(c))return;const s=certStatus(c);if(s==="expired")expired++;else if(s==="soon")soon++;});return {expired,soon};}
-function renderCertBadge(){const a=S.example?{expired:0,soon:0}:certAttention(),n=a.expired+a.soon;$("certBadge").hidden=!n;$("certBadge").textContent=n;}
+function certAttention(){let expired=0,soon=0;(S.certs||[]).forEach(c=>{if(!isKeyCert(c))return;const s=certStatus(c);if(s==="expired")expired++;else if(s==="soon")soon++;});
+  (S.docs||[]).forEach(d=>{if(d.cert||!d.expires)return;const s=expStatus(d);if(s==="expired")expired++;else if(s==="soon")soon++;});return {expired,soon};}
+function renderCertBadge(){const a=S.example?{expired:0,soon:0}:certAttention(),n=a.expired+a.soon;["certBadge","bankBadge"].forEach(id=>{$(id).hidden=!n;$(id).textContent=n;});}
 let certType="",certShow="current";
-const STLBL={valid:"Valid",soon:"Expires soon",expired:"Expired",noexp:"No expiry date",replaced:"Replaced by newer",hiddenc:"Hidden"};
+const STLBL={valid:"Valid",soon:"Expires soon",expired:"Expired",noexp:"No expiry date",replaced:"Superseded",original:"Original · valid for life",hiddenc:"Hidden"};
+const STPILL={valid:"NR",soon:"RNOR",expired:"ROR",original:"NR"};
 function relDays(d){const n=d-TODAY,a=Math.abs(n);const t=a<45?a+" day"+(a===1?"":"s"):a<730?Math.round(a/30.44)+" months":(a/365).toFixed(1)+" years";return n>=0?"in "+t:t+" ago";}
 function maskNo(n){n=String(n||"");return n.length>4?"•••• "+n.slice(-4):n;}
 function renderCerts(){
-  const all=S.example?[]:(S.certs||[]);const cnt={valid:0,soon:0,expired:0,noexp:0};all.forEach(c=>{const s=certStatus(c);if(cnt[s]!=null)cnt[s]++;});
+  const all=S.example?[]:(S.certs||[]),showAll=certShow==="all",L=LAYOUT.certs;
+  const groups=certGroups(showAll?all:all.filter(c=>!c.hidden)).filter(g=>g.all.length);
+  const gst=g=>g.gov?expStatus(g.gov):"hiddenc",scanN=g=>g.all.reduce((a,c)=>a+scansOf(c).length,0);
+  const cnt={valid:0,soon:0,expired:0,noexp:0};groups.forEach(g=>{const s=gst(g);if(cnt[s]!=null)cnt[s]++;});
   $("certTiles").innerHTML=`<div class="tile"><b style="color:var(--ok)">${cnt.valid}</b><span>valid</span></div><div class="tile"><b style="color:var(--warn)">${cnt.soon}</b><span>expire within 6 months</span></div><div class="tile"><b style="color:var(--bad)">${cnt.expired}</b><span>expired</span></div><div class="tile"><b>${cnt.noexp}</b><span>no expiry date</span></div>`;
-  const noScan=all.filter(c=>{const s=certStatus(c);return s!=="replaced"&&s!=="hiddenc"&&!hasScan(c);}).length;$("certNoScan").textContent=`Missing scan (${noScan})`;
+  const noScan=groups.filter(g=>!scanN(g)).length;$("certNoScan").textContent=`Missing scan (${noScan})`;
   $("certType").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.t===certType)));$("certShow").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.s===certShow)));
   const q=$("certQ").value.trim().toLowerCase();
-  const list=all.filter(c=>{const s=certStatus(c);
-    if(certType==="coc"&&!(c.kind==="coc"||c.kind==="endorsement"))return false;if(certType==="other"&&!(c.kind==="medical"||c.kind==="other"))return false;if(certType&&certType!=="coc"&&certType!=="other"&&c.kind!==certType)return false;
-    if(certShow==="current"&&(s==="replaced"||s==="hiddenc"))return false;if(certShow==="attention"&&!(s==="expired"||s==="soon"))return false;if(certShow==="noscan"&&(s==="replaced"||s==="hiddenc"||hasScan(c)))return false;
-    if(q&&!(String(c.name)+" "+String(c.issuer||"")+" "+String(c.number||"")).toLowerCase().includes(q))return false;return true;})
-   .sort((a,b)=>{const o={expired:0,soon:1,valid:2,noexp:3,replaced:4,hiddenc:5};const sa=o[certStatus(a)],sb=o[certStatus(b)];return sa-sb||String(a.expires||"9").localeCompare(String(b.expires||"9"))||String(a.name).localeCompare(String(b.name));});
-  if(!all.length){$("certList").innerHTML='<div class="empty">No certificates yet. Upload your seafarer profile or add one.</div>';return;}
-  if(!list.length){$("certList").innerHTML=`<div class="empty">${certShow==="attention"?"Nothing has expired or is expiring soon.":"No certificates match these filters."}</div>`;return;}
-  $("certList").innerHTML=list.map(c=>{const s=certStatus(c),e=dn(c.expires);
-    return `<div class="cert ${s}" data-id="${esc(c.id)}"><span class="stripe"></span><div><div class="cn">${esc(c.name)}${hasScan(c)?` <span class="clip">📎 ${scansOf(c).length>1?scansOf(c).length+" scans":"scan"}</span>`:""}</div>
-      <div class="meta"><span class="tchip" style="--tc:${{document:"var(--c0)",coc:"var(--c6)",endorsement:"var(--c6)",course:"var(--c2)",medical:"var(--c7)",other:"var(--cx)"}[c.kind]||"var(--cx)"}">${esc(CERT_KIND[c.kind]||"Other")}</span>${c.number?`<span>No. <span class="num" data-num="${esc(c.number)}">${esc(c.kind==="document"?maskNo(c.number):c.number)}</span>${c.kind==="document"&&String(c.number).length>4?'<button type="button" class="reveal" data-reveal>Show</button>':""}</span>`:""}${c.issuer?`<span>${esc(c.issuer)}</span>`:""}${c.issued?`<span>Issued ${fmt(dn(c.issued))}</span>`:""}</div>${c.notes?`<div class="small muted" style="margin-top:3px">${esc(c.notes)}</div>`:""}</div>
-      <div class="right">${hasScan(c)?`<button type="button" class="cthumb" data-cscan aria-label="View scan of ${esc(c.name)}" data-th="${esc(scansOf(c)[0].id)}">📎</button>`:""}<span class="pill ${{valid:"NR",soon:"RNOR",expired:"ROR"}[s]||"UNK"}">${STLBL[s]}</span>${e!=null?`<span class="exp">${s==="expired"?"Expired":"Expires"} ${fmt(e)}<br><span class="muted">${relDays(e)}</span></span>`:""}
-      <div class="row-act">${hasScan(c)?'<button type="button" class="btn-sm btn-primary scan" data-cscan>View scan</button>':""}<button type="button" class="btn-sm" data-cattach>${hasScan(c)?"Add scan":"Attach scan"}</button><button type="button" class="btn-sm" data-cedit>Edit</button><button type="button" class="btn-sm" data-chide>${c.hidden?"Unhide":"Hide"}</button><button type="button" class="btn-sm btn-danger" data-cdel>Delete</button></div></div></div>`;}).join("");
+  const list=groups.filter(g=>{const k=g.kind;
+    if(certType==="coc"&&!(k==="coc"||k==="endorsement"))return false;if(certType==="other"&&!(k==="medical"||k==="other"))return false;if(certType&&certType!=="coc"&&certType!=="other"&&k!==certType)return false;
+    const s=gst(g);if(certShow==="attention"&&!(s==="expired"||s==="soon"))return false;if(certShow==="noscan"&&scanN(g))return false;
+    if(q&&!(g.label+" "+g.all.map(c=>c.name+" "+(c.issuer||"")+" "+(c.number||"")).join(" ")).toLowerCase().includes(q))return false;return true;})
+   .sort((a,b)=>{const o={expired:0,soon:1,valid:2,noexp:3,hiddenc:4};return o[gst(a)]-o[gst(b)]||String(a.label).localeCompare(String(b.label));});
+  if(!all.length){$("certList").innerHTML='<div class="card empty">No certificates yet. Upload your seafarer profile or add one.</div>';return;}
+  if(!list.length){$("certList").innerHTML=`<div class="card empty">${certShow==="attention"?"Nothing has expired or is expiring soon.":certShow==="noscan"?"Every certificate has a scan.":"No certificates match these filters."}</div>`;return;}
+  const KC={document:"var(--c0)",coc:"var(--c6)",endorsement:"var(--c6)",course:"var(--c2)",medical:"var(--c7)",other:"var(--cx)"};
+  const mem=(c,lbl,solo)=>{const s=certStatus(c),e=dn(c.expires),sc=scansOf(c);
+    return `<div class="cmem cert ${s==="replaced"?"super":""} ${solo?"solo":""}" data-id="${esc(c.id)}"><div>${solo?"":`<div class="ml">${lbl}</div><div class="mn">${esc(c.name)}${sc.length?` <span class="clip">📎 ${sc.length>1?sc.length+" scans":"scan"}</span>`:""}</div>`}
+      <div class="mm">${c.number?`<span>No. <span class="num" data-num="${esc(c.number)}">${esc(c.kind==="document"?maskNo(c.number):c.number)}</span>${c.kind==="document"&&String(c.number).length>4?' <button type="button" class="reveal" data-reveal>Show</button>':""}</span>`:""}${c.issuer?`<span>${esc(c.issuer)}</span>`:""}${c.issued?`<span>Issued ${fmt(dn(c.issued))}</span>`:""}</div>${c.notes?`<div class="mm">${esc(c.notes)}</div>`:""}</div>
+      <div class="mr">${sc.length?`<button type="button" class="cthumb" data-cscan aria-label="View scan of ${esc(c.name)}" data-th="${esc(sc[0].id)}">📎</button>`:""}${solo?"":`<span class="pill ${STPILL[s]||"UNK"}">${STLBL[s]}</span>${e!=null&&s!=="original"?`<div class="exp">${s==="expired"?"Expired":"Expires"} ${fmt(e)}</div>`:""}`}</div>
+      <div class="row-act">${sc.length?'<button type="button" class="btn-sm btn-primary scan" data-cscan>View scan</button>':""}<button type="button" class="btn-sm" data-cattach>${sc.length?"Add scan":"Attach scan"}</button><button type="button" class="btn-sm" data-cedit>Edit</button><button type="button" class="btn-sm" data-chide>${c.hidden?"Unhide":"Hide"}</button><button type="button" class="btn-sm btn-danger" data-cdel>Delete</button></div></div>`;};
+  $("certList").className="cgroups "+L;
+  $("certList").innerHTML=list.map(g=>{const s=gst(g),gov=g.gov,e=gov&&dn(gov.expires),hid=g.all.filter(c=>c.hidden);let rows="",older=[];
+    if(g.kind==="course"&&g.all.filter(c=>!c.hidden).length===1&&gov&&gov.name.trim()===g.label.trim()){rows+=mem(gov,"",true);}
+    else if(g.kind==="course"){g.orig.forEach((c,i)=>{if(g.ref.length||c===gov)rows+=mem(c,g.ref.length?"Original course":"Course certificate");else older.push(c);});
+      if(g.ref.length){rows+=mem(gov,"Latest refresher · decides validity");older=older.concat(g.ref.slice(0,-1).reverse());}}
+    else if(g.all.filter(c=>!c.hidden).length===1&&gov&&gov.name.trim()===g.label.trim()){rows+=mem(gov,"",true);}
+    else{if(gov)rows+=mem(gov,"Current");older=g.all.filter(c=>!c.hidden&&c!==gov).sort((a,b)=>String(b.issued||"").localeCompare(String(a.issued||"")));}
+    return `<div class="cgroup ${s}"><div class="cg-head"><div class="cg-t"><span class="tchip" style="--tc:${KC[g.kind]||"var(--cx)"}">${esc(CERT_KIND[g.kind]||"Other")}</span><b>${esc(g.label)}</b>${scanN(g)?`<span class="small muted">📎 ${scanN(g)} scan${scanN(g)>1?"s":""}</span>`:""}</div>
+      <div class="cg-s"><span class="pill ${STPILL[s]||"UNK"}">${s==="noexp"?"No expiry":STLBL[s]}</span>${e!=null?`<div>${s==="expired"?"expired":"until"} ${fmt(e)}</div><div class="muted">${relDays(e)}</div>`:""}</div></div>
+      ${rows}${older.length?`<details><summary>${older.length} older ${g.kind==="course"?"refresher"+(older.length>1?"s":""):"certificate"+(older.length>1?"s":"")} (superseded)</summary>${older.map(c=>mem(c,"Older · superseded")).join("")}</details>`:""}
+      ${hid.length?`<details><summary>${hid.length} hidden</summary>${hid.map(c=>mem(c,"Hidden")).join("")}</details>`:""}</div>`;}).join("");
   fillCertThumbs();
 }
 function scansOf(c){return (S.docs||[]).filter(d=>d.cert===c.id);}
@@ -1105,12 +1155,14 @@ $("dc_cat").addEventListener("change",syncFormBits);$("dc_ship").addEventListene
 $("dc_name").addEventListener("input",()=>{nameAuto=false;});
 function suggestInForm(){if(certTouched||$("dc_id").value)return;const c=suggestCert($("dc_name").value,$("dc_cat").value);$("dc_cert").innerHTML=docCertOpts(c?c.id:"");$("dcHint").textContent=c?"Suggested from the name. Change it if it's not right.":"";}
 $("dc_name").addEventListener("input",suggestInForm);$("dc_cat").addEventListener("change",suggestInForm);
-$("dc_cert").addEventListener("change",()=>{certTouched=true;$("dcHint").textContent="";});
+$("dc_cert").addEventListener("change",()=>{certTouched=true;$("dcHint").textContent="";syncDetails();});
+function syncDetails(){$("dcDetails").hidden=!!$("dc_cert").value;}
+function resetDetails(d){["number","issuer","issued","expires"].forEach(k=>$("dc_"+k).value=d&&d[k]||"");}
 /* attach a scan straight from a certificate: the add form opens inside the Certificates tab, already linked */
 let ATTACH=null,SHIPATTACH=null;const formHome=$("docFormCard").parentNode,formNext=$("docFormCard").nextSibling;
 function formBackHome(){if($("docFormCard").parentNode!==formHome)formHome.insertBefore($("docFormCard"),formNext);ATTACH=null;SHIPATTACH=null;}
 $("certFile").addEventListener("change",()=>{const files=[...$("certFile").files];$("certFile").value="";if(!files.length||!ATTACH)return;
-  const c=ATTACH,row=$("certList").querySelector(`.cert[data-id="${CSS.escape(c.id)}"]`);(row||$("certList")).after($("docFormCard"));
+  const c=ATTACH,row=$("certList").querySelector(`.cert[data-id="${CSS.escape(c.id)}"]`),grp=row&&row.closest(".cgroup");(grp||row||$("certList")).after($("docFormCard"));
   startDocAdd(files,{name:c.name,cat:catForCert(c),cert:c.id});});
 
 const docCertOpts=sel=>{const cs=(S.certs||[]).filter(c=>!c.hidden),cur=cs.filter(c=>certStatus(c)!=="replaced"),old=cs.filter(c=>certStatus(c)==="replaced"),o=c=>`<option value="${esc(c.id)}" ${c.id===sel?"selected":""}>${esc(c.name)}${c.expires?" · exp "+fmt(dn(c.expires)):""}</option>`,srt=l=>l.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
@@ -1129,19 +1181,24 @@ function startDocAdd(files,preset){
   else if(preset){$("dc_name").value=preset.name;$("dc_cat").value=preset.cat;$("dc_cert").innerHTML=docCertOpts(preset.cert);certTouched=true;$("docFormTitle").textContent="Attach scan";$("dcHint").textContent="Linked to this certificate.";}
   else{$("dc_name").value=files.length>1&&$("dcCombineRow").hidden?"":base;$("dc_cat").value=guessCat(base);suggestInForm();}
   if(!(preset&&preset.ship))syncFormBits();
+  resetDetails(null);$("dc_folder").innerHTML=folderOpts(preset||!CUR?"__auto":CUR,{auto:true});syncDetails();
   $("docPrev").innerHTML=files.map((f,i)=>`<div class="pv" data-i="${i}">${/^image\//.test(f.type)?"":"PDF<br>"+esc(f.name.slice(0,24))}</div>`).join("");
   files.forEach((f,i)=>{if(/^image\//.test(f.type)){const u=URL.createObjectURL(f),im=new Image();im.onload=()=>setTimeout(()=>URL.revokeObjectURL(u),1000);im.src=u;$("docPrev").querySelector(`[data-i="${i}"]`).appendChild(im);}});
   $("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});
 }
 function openDocForm(d){formBackHome();PEND=[];$("dcHint").textContent="";certTouched=true;$("docForm").reset();$("dcErr").textContent="";$("dc_id").value=d.id;$("docFormTitle").textContent="Edit document";$("dcCombineRow").hidden=true;$("docPrev").innerHTML="";
-  $("dc_name").value=d.name;$("dc_cat").value=normCat(d.cat);$("dc_ship").innerHTML=shipOpts(d.ship||"");$("dc_month").value=d.month||"";nameAuto=false;$("dcMonthRow").hidden=$("dc_cat").value!=="Salary slip";$("dc_cert").innerHTML=docCertOpts(d.cert||"");$("dc_notes").value=d.notes||"";$("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});}
+  resetDetails(d);$("dc_folder").innerHTML=folderOpts(d.fauto||d.folder===undefined?"__auto":(d.folder||""),{auto:true});
+  $("dc_name").value=d.name;$("dc_cat").value=normCat(d.cat);$("dc_ship").innerHTML=shipOpts(d.ship||"");$("dc_month").value=d.month||"";nameAuto=false;$("dcMonthRow").hidden=$("dc_cat").value!=="Salary slip";$("dc_cert").innerHTML=docCertOpts(d.cert||"");$("dc_notes").value=d.notes||"";syncDetails();$("docFormCard").hidden=false;$("docFormCard").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"});}
 const closeDocForm=()=>{$("docFormCard").hidden=true;PEND=[];formBackHome();};
 $("docFormClose").addEventListener("click",closeDocForm);$("dcCancel").addEventListener("click",closeDocForm);
 $("docForm").addEventListener("submit",async e=>{e.preventDefault();
   const name=$("dc_name").value.trim(),meta={cat:$("dc_cat").value,cert:$("dc_cert").value,ship:$("dc_ship").value,month:$("dc_cat").value==="Salary slip"?$("dc_month").value:"",notes:$("dc_notes").value.trim()};
+  const linked=!!meta.cert;["number","issuer","issued","expires"].forEach(k=>meta[k]=linked?"":$("dc_"+k).value.trim());
+  if(meta.issued&&meta.expires&&meta.expires<meta.issued){$("dcErr").textContent="Expiry can't be before the issue date.";return;}
+  const fsel=$("dc_folder").value;if(fsel==="__auto"){meta.fauto=true;meta.folder=undefined;}else{meta.fauto=false;meta.folder=fsel;}
   if(!name&&!(PEND.length>1&&$("dcCombineRow").hidden)){$("dcErr").textContent="Enter a name for the document.";return;}
   const id=$("dc_id").value;
-  if(id){const d=S.docs.find(x=>x.id===id);if(d){Object.assign(d,meta,{name,u:Date.now()});saveLocal();render();renderDocs();}closeDocForm();toast("Document updated");return;}
+  if(id){const d=S.docs.find(x=>x.id===id);if(d){Object.assign(d,meta,{name,u:Date.now()});if(d.fauto)delete d.folder;autoFileAll();saveLocal();render();renderDocs();}closeDocForm();toast("Document updated");return;}
   const addSize=PEND.reduce((a,f)=>a+(/^image\//.test(f.type)?500000:f.size),0);
   if(storageInfo().used+addSize*4/3>docLimit()){$("dcErr").textContent=`This would go over the ${mb(docLimit())} document space for your account. Delete old or replaced documents first.`;return;}
   $("dcSave").disabled=true;$("dcSave").textContent="Compressing…";const prog=m=>$("dcProg").textContent=m;
@@ -1158,7 +1215,8 @@ $("docForm").addEventListener("submit",async e=>{e.preventDefault();
         else{const c=await compressPdf(f,(p,n)=>prog(`Compressing page ${p} of ${n}…`));if(c.blob.size>PDF_MAX)throw Object.assign(new Error("big"),{code:"big",nm:f.name});items.push({name:nm,blob:c.blob,type:"application/pdf",pages:c.pages,before:f.size});}}
     }
     for(const it of items){const d=Object.assign({id:"doc-"+uid(),name:it.name,type:it.type,size:it.blob.size,added:new Date().toISOString().slice(0,10),u:Date.now(),chunks:0,enc:1,cz:1},meta);if(it.pages)d.pages=it.pages;
-      await blobPut(d.id,it.blob);LOCAL.add(d.id);S.docs.push(d);}
+      if(d.fauto)delete d.folder;await blobPut(d.id,it.blob);LOCAL.add(d.id);S.docs.push(d);}
+    autoFileAll();
     const fromCert=!!ATTACH,fromShip=!!SHIPATTACH;saveLocal();closeDocForm();render();renderDocs();if(fromCert)renderCerts();
     const b0=items.reduce((a,it)=>a+(it.before||it.blob.size),0),b1=items.reduce((a,it)=>a+it.blob.size,0),saved=b0>b1?` Compressed ${mb(b0)} → ${mb(b1)}.`:"";
     toast((items.length===1?"Document saved.":`${items.length} documents saved.`)+saved+(savedUser()?" Press Sync to keep it in your account.":""),6000);
@@ -1178,25 +1236,29 @@ async function renderDocs(){
   await refreshLocal();
   const all=S.example?[]:(S.docs||[]),total=all.reduce((a,d)=>a+(d.size||0),0),waiting=all.filter(d=>!d.chunks).length,away=all.filter(d=>!LOCAL.has(d.id)).length;
   $("docTiles").innerHTML=`<div class="tile"><b>${all.length}</b><span>documents</span></div><div class="tile"><b>${mb(storageInfo().used)}</b><span>of ${mb(docLimit())} cloud space used</span></div><div class="tile"><b style="color:${waiting?"var(--warn)":"var(--ok)"}">${savedUser()?waiting:"—"}</b><span>${savedUser()?"waiting to sync":"sign in to back up"}</span></div>${away?`<div class="tile"><b>${away}</b><span>in your account, not on this device yet</span></div>`:""}`;
-  all.forEach(d=>{if(d.cat==="Contract / letter")d.cat="Contract letter";});
-  const cats=DOC_CATS.filter(c=>all.some(d=>d.cat===c));if(docCat&&!cats.includes(docCat))docCat="";
-  $("docCat").innerHTML=`<button type="button" data-c="" aria-pressed="${!docCat}">All</button>`+cats.map(c=>`<button type="button" data-c="${esc(c)}" aria-pressed="${docCat===c}">${esc(c)}</button>`).join("");
-  const q=$("docQ").value.trim().toLowerCase();
+  all.forEach(d=>{if(d.cat==="Contract / letter")d.cat="Contract letter";});autoFileAll();
+  if(CUR&&!fById(CUR))CUR="";
+  const q=$("docQ").value.trim().toLowerCase(),path=fPath(CUR);
+  $("docCrumbs").innerHTML=`<button type="button" data-fid="" ${CUR?"":'aria-current="page"'}>📁 All folders</button>`+path.map((f,i)=>`<span class="sep">›</span><button type="button" data-fid="${esc(f.id)}" ${i===path.length-1?'aria-current="page"':""}>${esc(f.name)}</button>`).join("");
+  ["fRename","fMoveF","fDelete"].forEach(id=>$(id).hidden=!CUR);
+  let fbox=$("docFolders");if(!fbox){fbox=document.createElement("div");fbox.id="docFolders";$("docList").before(fbox);}
+  const subs=q?[]:kids(CUR);fbox.className="folders "+LAYOUT.docs;fbox.hidden=!subs.length;
+  fbox.innerHTML=subs.map(f=>{const n=countIn(f.id),k=kids(f.id).length;return `<button type="button" class="folder" data-fid="${esc(f.id)}"><span class="fi">📁</span><span><b>${esc(f.name)}</b><small>${n} file${n===1?"":"s"}${k?` · ${k} folder${k===1?"":"s"}`:""}</small></span></button>`;}).join("");
   const shipName=d=>{const c=d.ship&&S.contracts.find(x=>x.id===d.ship);return c?c.vessel:"";};
-  const list=all.filter(d=>(!docCat||d.cat===docCat)&&(!q||(d.name+" "+d.cat+" "+(d.notes||"")+" "+shipName(d)).toLowerCase().includes(q))).sort((a,b)=>DOC_CATS.indexOf(a.cat)-DOC_CATS.indexOf(b.cat)||String(a.name).localeCompare(String(b.name)));
+  const list=all.filter(d=>(q?(d.name+" "+d.cat+" "+(d.notes||"")+" "+shipName(d)+" "+(d.number||"")+" "+fPathName(d.folder)).toLowerCase().includes(q):(d.folder||"")===CUR)).sort((a,b)=>DOC_CATS.indexOf(a.cat)-DOC_CATS.indexOf(b.cat)||String(a.name).localeCompare(String(b.name)));
   if(!all.length){$("docList").innerHTML='<div class="card empty" style="grid-column:1/-1">No documents yet. Tap <b>+ Add document</b> to take a photo or choose a scan or PDF.</div>';renderDocBadge();return;}
-  if(!list.length){$("docList").innerHTML='<div class="card empty" style="grid-column:1/-1">No documents match.</div>';return;}
-  $("docList").classList.toggle("selecting",SELECTING);
-  $("docList").innerHTML=list.map(d=>{const here=LOCAL.has(d.id),cert=d.cert&&(S.certs||[]).find(c=>c.id===d.cert),xs=cert?docExp(cert):null,cs=!here?["away","In account · download on Sync"]:d.chunks?["ok","✓ In your account"]:savedUser()?["wait","Waiting to sync"]:["away","On this device only"];
+  $("docList").className="doc-grid "+LAYOUT.docs+(SELECTING?" selecting":"");
+  if(!list.length){$("docList").innerHTML=q?'<div class="card empty" style="grid-column:1/-1">No documents match.</div>':subs.length?"":'<div class="card empty" style="grid-column:1/-1">This folder is empty. Tap <b>+ Add document</b> to add a file here, or make a folder inside it.</div>';renderSelBar();return;}
+  $("docList").innerHTML=list.map(d=>{const here=LOCAL.has(d.id),cert=d.cert&&(S.certs||[]).find(c=>c.id===d.cert),xs=cert?docExp(cert):(d.expires?docExp(d):null),cs=!here?["away","In account · download on Sync"]:d.chunks?["ok","✓ In your account"]:savedUser()?["wait","Waiting to sync"]:["away","On this device only"];
     return `<div class="doc ${xs?xs.k:""} ${PICKED.has(d.id)?"picked":""}" data-id="${esc(d.id)}"><span class="pick" aria-hidden="true">✓</span><button type="button" class="thumb" data-open aria-label="Open ${esc(d.name)}"><span class="ph">${here?"…":"Not on this device yet"}</span></button>
     <div class="db"><div class="dn">${esc(d.name)}</div><div class="dm"><span class="ftype">${d.type==="application/pdf"?"PDF":"JPG"}</span><span>${esc(d.cat||"Other")}</span><span>${mb(d.size||0)}</span>${d.pages>1?`<span>${d.pages} pages</span>`:""}</div>
-    ${cert?`<div class="dm">Linked: ${esc(cert.name)}</div>`:""}${shipName(d)?`<div class="dm">🚢 ${esc(shipName(d))}${d.month?" · "+monthLbl(d.month):""}</div>`:""}${xs?`<div class="dm"><span class="xs ${xs.k}">${xs.t}</span></div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
+    ${q?`<div class="fpath">📁 ${esc(fPathName(d.folder))}</div>`:""}${cert?`<div class="dm">Linked: ${esc(cert.name)}</div>`:""}${!cert&&d.number?`<div class="dm">No. ${esc(d.number)}</div>`:""}${shipName(d)?`<div class="dm">🚢 ${esc(shipName(d))}${d.month?" · "+monthLbl(d.month):""}</div>`:""}${xs?`<div class="dm"><span class="xs ${xs.k}">${xs.t}</span></div>`:""}${d.notes?`<div class="dm">${esc(d.notes)}</div>`:""}
     <div class="dm"><span class="cs ${cs[0]}">${cs[1]}</span></div>
     <div class="row-act">${here?'<button type="button" class="btn-sm btn-primary" data-open>View</button><button type="button" class="btn-sm" data-share>Share</button><button type="button" class="btn-sm" data-save>Save</button>':""}<button type="button" class="btn-sm" data-dedit>Edit</button><button type="button" class="btn-sm btn-danger" data-ddel>Delete</button></div></div></div>`;}).join("");
   renderDocBadge();renderSelBar();renderLinkBtn();$("docShrink").hidden=!all.some(d=>!d.cz&&LOCAL.has(d.id));
   for(const d of list){if(!LOCAL.has(d.id))continue;const t=await thumbFor(d);const el=$("docList").querySelector(`.doc[data-id="${CSS.escape(d.id)}"] .thumb`);if(el)el.innerHTML=t?`<img src="${t}" alt="">`:'<span class="ph">PDF</span>';}
 }
-$("docCat").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;docCat=b.dataset.c;renderDocs();});
+$("v-docs").addEventListener("click",e=>{const b=e.target.closest("#docFolders [data-fid]");if(b)goFolder(b.dataset.fid);});
 $("docQ").addEventListener("input",renderDocs);
 function fileName(d){const ext=d.type==="application/pdf"?".pdf":".jpg";return (String(d.name).normalize("NFKD").replace(/[\u2010-\u2015]/g,"-").replace(/[^\x20-\x7E]/g,"").replace(/[\\/:*?"<>|]+/g," ").replace(/\s+/g," ").trim()||"document")+ext;}
 async function docFile(d){const b=await blobGet(d.id);if(!b)throw new Error("missing");return new File([b],fileName(d),{type:d.type});}
@@ -1218,7 +1280,8 @@ $("dvPrev").addEventListener("click",()=>stepView(-1));$("dvNext").addEventListe
 document.addEventListener("keydown",e=>{if($("docViewer").hidden)return;if(e.key==="ArrowLeft")stepView(-1);if(e.key==="ArrowRight")stepView(1);});
 let tx0=null;$("dvBody").addEventListener("touchstart",e=>{tx0=e.touches.length===1?e.touches[0].clientX:null;},{passive:true});
 $("dvBody").addEventListener("touchend",e=>{if(tx0==null)return;const dx=e.changedTouches[0].clientX-tx0;tx0=null;if(Math.abs(dx)>70&&$("dvBody").scrollWidth<=$("dvBody").clientWidth+4)stepView(dx<0?1:-1);},{passive:true});
-$("docViewAll").addEventListener("click",()=>{const l=shownDocs();if(!l.length){toast("No documents on this device to view yet. Press Sync while online.");return;}viewList(l,l[0]);});
+$("docViewAll").addEventListener("click",async()=>{await refreshLocal();const q=$("docQ").value.trim(),set=CUR?descendants(CUR):null;
+  const l=q?shownDocs():(S.docs||[]).filter(d=>LOCAL.has(d.id)&&(!set||set.has(d.folder))).sort((a,b)=>fPathName(a.folder).localeCompare(fPathName(b.folder))||String(a.name).localeCompare(String(b.name)));if(!l.length){toast("No documents on this device to view yet. Press Sync while online.");return;}viewList(l,l[0]);});
 async function openDoc(d,inList){if(!inList){VLIST=[d];VIDX=0;}
   const b=await blobGet(d.id);if(!b){toast("This file isn't on this device yet. Press Sync while online.");return;}
   $("dvBody").querySelectorAll("img").forEach(i=>URL.revokeObjectURL(i.src));
@@ -1307,6 +1370,60 @@ $("shipFile").addEventListener("change",()=>{const files=[...$("shipFile").files
   const base=files[0].name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ").trim();
   startDocAdd(files,{ship:c.id,cat:a.cat,month:a.cat==="Salary slip"?nextSlipMonth(c):"",name:a.cat==="Contract letter"?"Contract letter – "+c.vessel:a.cat==="Other"?base+" – "+c.vessel:""});});
 
+
+/* ======================= folders (any depth) ======================= */
+const LAYOUT=Object.assign({docs:"grid",certs:"grid"},lsJSON("sdlLayout",{}));
+function syncLayoutBtns(){const v=VIEW==="certs"?"certs":"docs";$("viewToggle").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.l===LAYOUT[v])));}
+$("viewToggle").addEventListener("click",e=>{const b=e.target.closest("[data-l]");if(!b)return;const v=VIEW==="certs"?"certs":"docs";LAYOUT[v]=b.dataset.l;lsSet("sdlLayout",JSON.stringify(LAYOUT));syncLayoutBtns();v==="certs"?renderCerts():renderDocs();});
+let CUR=lsGet("sdlFolder")||"",FMODE="";
+const FL=()=>S.folders||(S.folders=[]),fById=id=>id?FL().find(f=>f.id===id):null;
+const kids=pid=>FL().filter(f=>(f.parent||"")===(pid||"")).sort((a,b)=>String(a.name).localeCompare(String(b.name),undefined,{numeric:true}));
+function fPath(id){const out=[];let f=fById(id),g=0;while(f&&g++<60){out.unshift(f);f=fById(f.parent);}return out;}
+const fPathName=id=>fPath(id).map(f=>f.name).join(" › ")||"Top level";
+function descendants(id){const out=new Set([id]);let grew=true;while(grew){grew=false;FL().forEach(f=>{if(out.has(f.parent)&&!out.has(f.id)){out.add(f.id);grew=true;}});}return out;}
+function countIn(id){const set=descendants(id);return (S.docs||[]).filter(d=>set.has(d.folder)).length;}
+function hashKey(t){let h=0;for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;return (h>>>0).toString(36);}
+/* automatic folders get a fixed id from their key, so two devices make the same folder */
+function ensureFolder(segs){let parent="";for(const sg of segs){let f=FL().find(x=>x.auto===sg.key);
+    if(!f){f={id:"fld-a-"+hashKey(sg.key),name:sg.name,parent,auto:sg.key,u:Date.now()};const dead=(S.deleted||[]).some(t=>t.id===f.id);if(dead){f.id="fld-a-"+hashKey(sg.key)+"-"+uid().slice(0,4);}FL().push(f);}
+    parent=f.id;}return parent;}
+function autoSegs(d){
+  if(d.ship){const c=S.contracts.find(x=>x.id===d.ship);if(c)return [{key:"ships",name:"Ships"},{key:"ship:"+c.id,name:c.vessel+(c.on?" ("+String(c.on).slice(0,4)+")":"")}];}
+  const c=d.cert&&(S.certs||[]).find(x=>x.id===d.cert);
+  if(c){if(c.kind==="document")return [{key:"identity",name:"Identity"}];if(c.kind==="coc"||c.kind==="endorsement")return [{key:"coc",name:"CoC & Endorsements"}];if(c.kind==="medical")return [{key:"medical",name:"Medical"}];
+    if(c.kind==="course"){const g=groupInfo(c);return [{key:"stcw",name:"STCW courses"},{key:"course:"+g.key,name:g.short}];}}
+  return ({Passport:[{key:"identity",name:"Identity"}],CDC:[{key:"identity",name:"Identity"}],CoC:[{key:"coc",name:"CoC & Endorsements"}],Endorsement:[{key:"coc",name:"CoC & Endorsements"}],"STCW course":[{key:"stcw",name:"STCW courses"}],
+    Medical:[{key:"medical",name:"Medical"}],Visa:[{key:"visas",name:"Visas"}],"Seafarer profile":[{key:"profile",name:"Seafarer profile"}],"Contract letter":[{key:"ships",name:"Ships"}],"Salary slip":[{key:"ships",name:"Ships"}]})[normCat(d.cat)]||null;}
+function autoFileAll(){if(S.example)return;let ch=false;(S.docs||[]).forEach(d=>{if(d.folder!==undefined&&!d.fauto)return;const sg=autoSegs(d),fid=sg?ensureFolder(sg):"";if(d.folder!==fid||!d.fauto){d.folder=fid;d.fauto=true;d.u=Date.now();ch=true;}});if(ch)saveLocal();}
+function folderOpts(sel,opts){opts=opts||{};const ex=opts.exclude||new Set();let out=opts.auto?`<option value="__auto" ${sel==="__auto"?"selected":""}>Automatic (by type)</option>`:"";out+=`<option value="" ${sel===""?"selected":""}>Top level</option>`;
+  const walk=(pid,depth)=>kids(pid).forEach(f=>{if(ex.has(f.id))return;out+=`<option value="${esc(f.id)}" ${f.id===sel?"selected":""}>${"  ".repeat(depth)}${depth?"└ ":""}${esc(f.name)}</option>`;walk(f.id,depth+1);});walk("",0);return out;}
+function goFolder(id){CUR=id||"";lsSet("sdlFolder",CUR);$("docQ").value="";FMODE="";$("fForm").hidden=true;$("movePanel").hidden=true;renderDocs();}
+$("docCrumbs").addEventListener("click",e=>{const b=e.target.closest("[data-fid]");if(b)goFolder(b.dataset.fid);});
+$("fNew").addEventListener("click",()=>{FMODE="new";$("fForm").hidden=false;$("fName").value="";$("fSave").textContent="Create";$("fErr").textContent="";$("fName").focus();});
+$("fRename").addEventListener("click",()=>{const f=fById(CUR);if(!f)return;FMODE="rename";$("fForm").hidden=false;$("fName").value=f.name;$("fSave").textContent="Rename";$("fErr").textContent="";$("fName").select();});
+$("fCancel").addEventListener("click",()=>{$("fForm").hidden=true;FMODE="";});
+$("fForm").addEventListener("submit",e=>{e.preventDefault();const n=$("fName").value.trim().replace(/\s+/g," ");if(!n){$("fErr").textContent="Type a name.";return;}
+  const parent=FMODE==="rename"?((fById(CUR)||{}).parent||""):CUR;if(kids(parent).some(f=>f.name.toLowerCase()===n.toLowerCase()&&f.id!==(FMODE==="rename"?CUR:""))){$("fErr").textContent="A folder with this name is already here.";return;}
+  if(S.example)leaveExample();
+  if(FMODE==="rename"){const f=fById(CUR);f.name=n;f.u=Date.now();toast("Folder renamed.");}else{FL().push({id:"fld-"+uid(),name:n,parent:CUR,auto:"",u:Date.now()});toast(`Folder "${n}" created.`);}
+  $("fForm").hidden=true;FMODE="";saveLocal();renderDocs();});
+$("fDelete").addEventListener("click",e=>{const f=fById(CUR);if(!f)return;const b=e.currentTarget;
+  if(!b.dataset.c){b.dataset.c="1";b.textContent="Tap again: delete folder (files move up)";setTimeout(()=>{delete b.dataset.c;b.textContent="Delete folder";},5000);return;}
+  delete b.dataset.c;b.textContent="Delete folder";const now=Date.now(),up=f.parent||"";
+  (S.docs||[]).forEach(d=>{if(d.folder===f.id){d.folder=up;d.fauto=false;d.u=now;}});FL().forEach(x=>{if(x.parent===f.id){x.parent=up;x.u=now;}});
+  S.folders=FL().filter(x=>x.id!==f.id);(S.deleted=S.deleted||[]).push({id:f.id,u:now});saveLocal();toast(`Folder "${f.name}" deleted. Its files and folders moved up one level.`,5000);goFolder(up);});
+/* move files (selection) or the current folder */
+let MOVE=null;
+function openMove(kind){MOVE=kind;const ex=kind==="folder"?descendants(CUR):new Set(),title=kind==="folder"?`Move folder "${(fById(CUR)||{}).name}" to…`:`Move ${PICKED.size} document${PICKED.size===1?"":"s"} to…`;
+  let rows=`<button type="button" data-mv="">📁 Top level</button>`;const walk=(pid,depth)=>kids(pid).forEach(f=>{if(ex.has(f.id))return;rows+=`<button type="button" data-mv="${esc(f.id)}" style="padding-left:${14+depth*18}px">📁 ${esc(f.name)}</button>`;walk(f.id,depth+1);});walk("",0);
+  $("movePanel").innerHTML=`<div class="card-h"><h2>${esc(title)}</h2><button type="button" class="btn-ghost btn-sm" data-mvclose>Cancel</button></div><div class="movelist">${rows}</div>`;$("movePanel").hidden=false;$("movePanel").scrollIntoView({behavior:reduced()?"auto":"smooth",block:"nearest"});}
+$("docSelMove").addEventListener("click",()=>{if(PICKED.size)openMove("files");});
+$("fMoveF").addEventListener("click",()=>{if(CUR)openMove("folder");});
+$("movePanel").addEventListener("click",e=>{if(e.target.closest("[data-mvclose]")){$("movePanel").hidden=true;return;}const b=e.target.closest("[data-mv]");if(!b)return;const to=b.dataset.mv,now=Date.now();
+  if(MOVE==="folder"){const f=fById(CUR);if(f){f.parent=to;f.u=now;toast(`Moved to ${fPathName(to)}.`);}}
+  else{let n=0;PICKED.forEach(id=>{const d=(S.docs||[]).find(x=>x.id===id);if(d){d.folder=to;d.fauto=false;d.u=now;n++;}});PICKED.clear();SELECTING=false;toast(`${n} document${n===1?"":"s"} moved to ${fPathName(to)}.`);}
+  $("movePanel").hidden=true;saveLocal();renderDocs();});
+
 /* ---------- compress documents added before compression was stronger ---------- */
 async function shrinkAll(btn){
   await refreshLocal();const list=(S.docs||[]).filter(d=>LOCAL.has(d.id)&&!d.cz);if(!list.length){toast("All documents are already compressed.");renderDocs();return;}
@@ -1345,8 +1462,8 @@ function docExp(c){if(!c||!c.expires)return null;const e=dn(c.expires),n=e-TODAY
 /* choose several documents and share or save them together */
 let SELECTING=false;const PICKED=new Set();
 function renderSelBar(){const n=PICKED.size,all=(S.docs||[]).length;$("docSelBar").hidden=!all||S.example;$("docSelBar").classList.toggle("on",SELECTING);
-  $("docSelToggle").textContent=SELECTING?"Done":"Select several";["docSelAll","docSelShare","docSelSave"].forEach(id=>$(id).hidden=!SELECTING);
-  $("docSelShare").disabled=$("docSelSave").disabled=!n;$("docSelShare").textContent=n?`Share ${n}`:"Share";$("docSelSave").textContent=n?`Save ${n}`:"Save";
+  $("docSelToggle").textContent=SELECTING?"Done":"Select several";["docSelAll","docSelShare","docSelSave","docSelMove"].forEach(id=>$(id).hidden=!SELECTING);
+  $("docSelShare").disabled=$("docSelSave").disabled=$("docSelMove").disabled=!n;$("docSelShare").textContent=n?`Share ${n}`:"Share";$("docSelSave").textContent=n?`Save ${n}`:"Save";
   const size=[...PICKED].reduce((a,id)=>{const d=S.docs.find(x=>x.id===id);return a+(d?d.size||0:0);},0);
   $("docSelInfo").textContent=SELECTING?(n?`${n} selected · ${mb(size)}`:"Tap documents to select them"):"";}
 $("docSelToggle").addEventListener("click",()=>{SELECTING=!SELECTING;PICKED.clear();renderDocs();});
@@ -1368,7 +1485,62 @@ function renderStorage(){const s=storageInfo(),pct=Math.min(100,s.used/docLimit(
   $("storeCard").innerHTML=`<h2 style="margin-bottom:4px">Document storage</h2><p class="small muted">${docLimit()===OWNER_SPACE?"Your account can use the whole free document space.":`Each account can keep up to ${mb(docLimit())} of documents in the cloud, so the free space is shared fairly between all seafarers using the app.`}</p>
    <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="${docLimit()}" aria-valuenow="${s.used}" aria-label="Document storage used"><i style="width:${Math.max(pct,s.used?2:0)}%;background:${col}"></i></div>
    <div class="small"><b>${mb(s.used)}</b> of ${mb(docLimit())} used · ${s.n} document${s.n===1?"":"s"}${s.pend?` · ${mb(s.pend)} waiting to sync`:""}</div>
-   ${pct>=90?'<p class="small" style="color:var(--bad);margin-top:6px">Almost full. Delete old or replaced documents to make room.</p>':""}<p class="small muted" style="margin-top:6px">On this device: ${mb(s.file)}. Photos are made smaller when you add them.</p><div style="margin-top:8px"><a class="btn btn-sm" href="#docs">Open My documents</a></div>`;}
+   ${pct>=90?'<p class="small" style="color:var(--bad);margin-top:6px">Almost full. Delete old or replaced documents to make room.</p>':""}<p class="small muted" style="margin-top:6px">On this device: ${mb(s.file)}. Photos are made smaller when you add them.</p><div style="margin-top:8px"><a class="btn btn-sm" href="#docs">Open Document bank</a></div>`;}
+
+
+/* ======================= Sheet: every certificate and document in one table ======================= */
+const SHCOLS=[["name","Certificate / document","text"],["type","Type","pick"],["group","Course / group","pick"],["number","Number","text"],["issued","Issue date","date"],["expires","Expiry date","date"],["status","Status","pick"],["issuer","Issued by","text"],["folder","Folder","pick"],["scan","Scan","pick"]];
+const SH={sort:"",dir:1,f:{},edit:false};
+const EDITABLE=new Set(["name","number","issued","expires","issuer"]);
+function sheetRows(){
+  const rows=[],ex=S.example;if(ex)return rows;
+  (S.certs||[]).filter(c=>!c.hidden).forEach(c=>{const g=groupFor(c),st=certStatus(c),sc=scansOf(c);
+    rows.push({ref:c,kind:"cert",name:c.name,type:CERT_KIND[c.kind]||"Other",group:(g.label&&g.all&&g.all.length>1)||c.kind==="course"?groupInfo(c).label:"",number:c.number||"",issued:c.issued||"",expires:c.expires||"",status:STLBL[st]||"",issuer:c.issuer||"",folder:sc.length?fPathName(sc[0].folder):"",scan:sc.length?"✓ "+sc.length:"–"});});
+  (S.docs||[]).filter(d=>!d.cert&&!["Salary slip","Contract letter","Seafarer profile"].includes(normCat(d.cat))).forEach(d=>{const st=expStatus(d);
+    rows.push({ref:d,kind:"doc",name:d.name,type:normCat(d.cat),group:"",number:d.number||"",issued:d.issued||"",expires:d.expires||"",status:d.expires?STLBL[st]:"No expiry date",issuer:d.issuer||"",folder:fPathName(d.folder),scan:"✓"});});
+  return rows;
+}
+const shText=(r,k)=>k==="issued"||k==="expires"?(r[k]?fmt(dn(r[k])):(k==="expires"?"Not available":"")):String(r[k]||"");
+function sheetView(){
+  let rows=sheetRows();
+  SHCOLS.forEach(([k,,t])=>{const v=SH.f[k];if(!v)return;rows=rows.filter(r=>t==="pick"?String(r[k]||"(blank)")===v:shText(r,k).toLowerCase().includes(v.toLowerCase()));});
+  if(SH.sort){const k=SH.sort;rows.sort((a,b)=>{const A=k==="issued"||k==="expires"?(a[k]||"9999"):shText(a,k).toLowerCase(),B=k==="issued"||k==="expires"?(b[k]||"9999"):shText(b,k).toLowerCase();return (A<B?-1:A>B?1:0)*SH.dir;});}
+  else rows.sort((a,b)=>String(a.type).localeCompare(String(b.type))||String(a.group).localeCompare(String(b.group))||String(a.issued).localeCompare(String(b.issued)));
+  return rows;
+}
+function renderSheet(){
+  const all=sheetRows(),rows=sheetView();
+  const opts=k=>[...new Set(all.map(r=>String(r[k]||"(blank)")))].sort();
+  $("shEdit").setAttribute("aria-pressed",String(SH.edit));$("shEdit").textContent=SH.edit?"✓ Done editing":"✎ Edit cells";
+  $("shInfo").textContent=`${rows.length} of ${all.length} rows${Object.values(SH.f).some(Boolean)?" (filtered)":""}. Expiry shows "Not available" when a certificate has none.`+(SH.edit?" Editing: changes save as you leave each cell.":"");
+  const head=`<thead><tr>${SHCOLS.map(([k,l])=>`<th data-sort="${k}" title="Sort">${esc(l)} ${SH.sort===k?`<span class="ar">${SH.dir>0?"▲":"▼"}</span>`:""}</th>`).join("")}</tr>
+    <tr class="flt">${SHCOLS.map(([k,l,t])=>`<th>${t==="pick"?`<select data-f="${k}" aria-label="Filter ${esc(l)}"><option value="">All</option>${opts(k).map(o=>`<option ${SH.f[k]===o?"selected":""}>${esc(o)}</option>`).join("")}</select>`:`<input data-f="${k}" value="${esc(SH.f[k]||"")}" placeholder="Filter" aria-label="Filter ${esc(l)}">`}</th>`).join("")}</tr></thead>`;
+  const body=rows.length?rows.map((r,i)=>`<tr data-i="${i}">${SHCOLS.map(([k])=>{const v=shText(r,k);
+      if(SH.edit&&EDITABLE.has(k))return `<td><input data-e="${k}" ${k==="issued"||k==="expires"?'type="date"':""} value="${esc(r[k]||"")}" aria-label="${esc(k)}"></td>`;
+      return `<td class="${k==="expires"&&!r.expires?"na":""}" title="${esc(v)}">${k==="status"?`<span class="pill ${{Valid:"NR","Expires soon":"RNOR",Expired:"ROR","Original · valid for life":"NR"}[v]||"UNK"}">${esc(v)}</span>`:esc(v)}</td>`;}).join("")}</tr>`).join(""):`<tr><td colspan="${SHCOLS.length}" class="empty">No rows match these filters.</td></tr>`;
+  $("sheet").innerHTML=head+`<tbody>${body}</tbody>`;SHROWS=rows;
+}
+let SHROWS=[];
+$("sheet").addEventListener("click",e=>{const th=e.target.closest("th[data-sort]");if(!th)return;const k=th.dataset.sort;if(SH.sort===k)SH.dir=-SH.dir;else{SH.sort=k;SH.dir=1;}renderSheet();});
+$("sheet").addEventListener("change",e=>{const f=e.target.closest("select[data-f]");if(f){SH.f[f.dataset.f]=f.value;renderSheet();return;}
+  const inp=e.target.closest("input[data-e]");if(!inp)return;const r=SHROWS[+inp.closest("tr").dataset.i];if(!r)return;const k=inp.dataset.e,v=inp.value.trim();
+  if(k==="name"&&!v){inp.value=r.ref.name;toast("The name can't be empty.");return;}
+  const o=r.ref;if(k==="expires"&&v&&o.issued&&v<o.issued){inp.value=o.expires||"";toast("Expiry can't be before the issue date.");return;}if(k==="issued"&&v&&o.expires&&o.expires<v){inp.value=o.issued||"";toast("Issue date can't be after the expiry.");return;}
+  o[k]=v;o.u=Date.now();r[k]=v;saveLocal();renderCertBadge();});
+let shT=null;$("sheet").addEventListener("input",e=>{const f=e.target.closest("input[data-f]");if(!f)return;SH.f[f.dataset.f]=f.value;clearTimeout(shT);shT=setTimeout(()=>{const pos=f.selectionStart,k=f.dataset.f;renderSheet();const n=$("sheet").querySelector(`input[data-f="${k}"]`);if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(err){}}},250);});
+$("shEdit").addEventListener("click",()=>{SH.edit=!SH.edit;if(!SH.edit)render();renderSheet();});
+$("shClear").addEventListener("click",()=>{SH.f={};SH.sort="";renderSheet();});
+$("shXlsx").addEventListener("click",async e=>{const b=e.currentTarget;b.disabled=true;
+  try{if(!window.XLSX)await loadScript("vendor/xlsx.mini.min.js");const rows=sheetView(),X=window.XLSX;
+    const aoa=[SHCOLS.map(c=>c[1])].concat(rows.map(r=>SHCOLS.map(([k])=>k==="issued"||k==="expires"?(r[k]?new Date(dn(r[k])*DAY):(k==="expires"?"Not available":"")):String(r[k]||""))));
+    const ws=X.utils.aoa_to_sheet(aoa,{cellDates:true,dateNF:"dd-mmm-yyyy"});ws["!cols"]=[{wch:48},{wch:16},{wch:34},{wch:22},{wch:13},{wch:13},{wch:22},{wch:30},{wch:30},{wch:7}];
+    ws["!autofilter"]={ref:X.utils.encode_range({s:{r:0,c:0},e:{r:aoa.length-1,c:SHCOLS.length-1}})};ws["!freeze"]={xSplit:1,ySplit:1};
+    Object.keys(ws).forEach(a=>{if(a[0]!=="!"&&ws[a].t==="d")ws[a].z="dd-mmm-yyyy";});
+    const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,"Certificates");const out=X.write(wb,{type:"array",bookType:"xlsx",cellDates:true});
+    const name=`Sea-Days-Document-bank-${new Date().toISOString().slice(0,10)}.xlsx`,blob=new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000);toast("Excel file saved: "+name,5000);}
+  catch(err){toast(navigator.onLine===false&&!window.XLSX?"The Excel maker needs internet the first time. Connect once and try again.":"Couldn't make the Excel file. Please try again.",5000);}
+  finally{b.disabled=false;}});
 
 /* ======================= report for your CA (PDF) ======================= */
 function fyDocs(f){const s0=fyStart(f),e0=fyEnd(f);return (S.docs||[]).filter(d=>{if(!d.ship)return false;const c=S.contracts.find(x=>x.id===d.ship);if(!c)return false;
