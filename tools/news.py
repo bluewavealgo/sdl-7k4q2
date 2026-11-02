@@ -16,13 +16,13 @@ FEEDS = [
     ("maritime", "Marine Insight", "https://www.marineinsight.com/feed/", False),
     ("maritime", "gCaptain", "https://gcaptain.com/feed/", False),
     ("maritime", "Splash247", "https://splash247.com/feed/", False),
-    ("maritime", "SAFETY4SEA", "https://safety4sea.com/feed/", False),
     ("maritime", "Hellenic Shipping News", "https://www.hellenicshippingnews.com/feed/", False),
     ("maritime", "Google News", GN + "%22DG+Shipping%22+OR+%22Indian+seafarers%22+OR+%22Indian+seafarer%22+when:14d", True),
     ("maritime", "Google News", GN + "tanker+OR+%22LNG+carrier%22+OR+%22LPG+carrier%22+shipping+when:7d", True),
     ("maritime", "Google News", GN + "seafarers+OR+%22merchant+navy%22+OR+piracy+ship+when:7d", True),
     ("india", "The Hindu", "https://www.thehindu.com/news/national/feeder/default.rss", False),
-    ("india", "Indian Express", "https://indianexpress.com/section/india/feed/", False),
+    ("india", "India Today", "https://www.indiatoday.in/rss/1206514", False),
+    ("india", "News18", "https://www.news18.com/commonfeeds/v1/eng/rss/india.xml", False),
     ("india", "Times of India", "https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms", False),
     ("india", "NDTV", "https://feeds.feedburner.com/ndtvnews-india-news", False),
     ("india", "Hindustan Times", "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml", False),
@@ -36,9 +36,8 @@ FEEDS = [
     ("tech", "MotorBeam", "https://www.motorbeam.com/feed/", False),
     ("tech", "CarToq", "https://www.cartoq.com/feed/", False),
     ("tech", "GaadiWaadi", "https://gaadiwaadi.com/feed/", False),
-    ("tech", "Autocar India", "https://www.autocarindia.com/rss/all", False),
     ("tech", "Gadgets 360", "https://feeds.feedburner.com/gadgets360-latest", False),
-    ("tech", "91mobiles", "https://www.91mobiles.com/hub/feed/", False),
+    ("tech", "Smartprix", "https://www.smartprix.com/bytes/feed/", False),
     ("tech", "Beebom", "https://beebom.com/feed/", False),
 ]
 TOPIC_RULES = {
@@ -85,10 +84,13 @@ def topic(sec, t):
             return name
     return "Gadgets" if sec == "tech" else "General"
 
+ABBR = re.compile(r"\b(Rs|Mr|Mrs|Ms|Dr|No|Nos|vs|Ltd|Inc|Co|St|Jr|Sr|Govt|Dept|approx|est|e\.g|i\.e|U\.S|U\.K)\.\s?", re.I)
+
 def sentences(text):
     text = BOILER.sub("", text)
+    text = ABBR.sub(lambda m: m.group(1).replace(".", "\u2024") + "\u2024 " if m.group(1).lower() != "rs" else "Rs ", text)
     parts = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"“‘₹(])", text)
-    return [p.strip() for p in parts if 40 <= len(p.strip()) <= 320]
+    return [p.strip().replace("\u2024", ".") for p in parts if 40 <= len(p.strip()) <= 320]
 
 def key_points(title, text, n=4):
     """Pick the most informative sentences (facts: numbers, names, places), keep them in article order."""
@@ -114,13 +116,24 @@ def key_points(title, text, n=4):
 
 PRICE = re.compile(r"(?:₹|rs\.?|inr)\s?\d[\d,]*(?:\.\d+)?\s?(?:lakh|lakhs|crore|cr|k)?(?:\s?(?:-|–|to)\s?(?:₹|rs\.?|inr)?\s?\d[\d,]*(?:\.\d+)?\s?(?:lakh|lakhs|crore|cr|k)?)?(?:\s?\(?ex-showroom\)?)?", re.I)
 
+NOT_PRICE = re.compile(r"^\W{0,3}(?:\w+\W+){0,3}?(discount|cashback|off\b|bank|emi|exchange|bonus|coupon|savings?|benefits?|per month|/month|subsidy|token|booking amount)", re.I)
+
 def find_price(title, text):
-    for src in (title, text[:1500]):
-        m = re.search(r"(?:priced at|price(?:s)? (?:starts?|start) (?:at|from)|launched at|starting at|costs?|price tag of)\s+(" + PRICE.pattern + ")", src, re.I)
-        if m:
-            return tidy_price(m.group(1))
-    m = PRICE.search(title) or PRICE.search(text[:1500])
-    return tidy_price(m.group(0)) if m and re.search(r"\d", m.group(0)) and len(re.sub(r"\D", "", m.group(0))) >= 3 else ""
+    text = re.sub(r"(?i)\brs\.\s?", "Rs ", text[:2500])
+    title = re.sub(r"(?i)\brs\.\s?", "Rs ", title)
+    best, best_sc = "", -9
+    for src, bonus in ((title, 2), (text, 0)):
+        for m in PRICE.finditer(src):
+            p = m.group(0)
+            if len(re.sub(r"\D", "", p)) < 3:
+                continue
+            before, after = src[max(0, m.start() - 45): m.start()].lower(), src[m.end(): m.end() + 40]
+            if NOT_PRICE.search(after) or re.search(r"(discount|cashback|off|save|saving|bank offer|emi)\W*$", before):
+                continue
+            sc = bonus + (3 if re.search(r"(priced|price|starts?|starting|launched|costs?|tag|ex-showroom|retail)", before + after[:20]) else 0) - m.start() / 2000
+            if sc > best_sc:
+                best, best_sc = p, sc
+    return tidy_price(best) if best else ""
 
 def tidy_price(p):
     p = re.sub(r"(?i)^(rs\.?|inr)\s?", "₹", p.strip())
@@ -208,17 +221,22 @@ def index_move(name, text, lo, hi):
 
 def market_line(items):
     best = None
-    for n in sorted(items, key=lambda x: x.get("ts") or 0, reverse=True):
-        if n.get("sec") != "markets":
+    for with_points in (False, True):
+      for n in sorted(items, key=lambda x: x.get("ts") or 0, reverse=True):
+        if n.get("sec") != "markets" or re.search(r"\b(outlook|prediction|preview|ahead of|what to expect|trade setup|pre-?market|gift nifty)\b", n["title"], re.I):
             continue
-        t = n["title"] + ". " + " ".join(n.get("points", [])[:2])
+        t = n["title"] + (". " + " ".join(n.get("points", [])[:2]) if with_points else "")
         if not re.search(r"\b(close|closes|closed|closing|ends?|ended|settles?|settled|end of day|wrap)\b", t, re.I):
             continue
         sx, nf = index_move("sensex", t, 40000, 200000), index_move("nifty(?: 50)?", t, 10000, 60000)
         if sx or nf:
-            best = {"date": n.get("date"), "ts": n.get("ts"), "sensex": sx, "nifty": nf, "title": n["title"], "source": n["source"], "url": n["url"]}
+            cand = {"date": n.get("date"), "ts": n.get("ts"), "sensex": sx, "nifty": nf, "title": n["title"], "source": n["source"], "url": n["url"]}
+            if not best or (sx and nf and not (best["sensex"] and best["nifty"])):
+                best = cand
             if sx and nf:
-                break
+                return best
+      if best:
+        return best
     return best
 
 # ---------- main ----------
