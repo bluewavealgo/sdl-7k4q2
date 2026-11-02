@@ -1,5 +1,5 @@
 {
- "at": 1793621701154,
+ "at": 1793625591007,
  "feeds": {
   "Marine Insight (maritime)": 15,
   "gCaptain (maritime)": 12,
@@ -24,14 +24,14 @@
   "Smartprix (tech)": 20,
   "Beebom (tech)": 10
  },
- "new": 568,
+ "new": 68,
  "bySection": {
-  "maritime": 168,
-  "india": 121,
-  "markets": 148,
-  "tech": 131
+  "maritime": 8,
+  "india": 40,
+  "markets": 10,
+  "tech": 10
  },
- "withPoints": 441,
- "withImage": 437,
- "withPrice": 20
+ "withPoints": 59,
+ "withImage": 63,
+ "withPrice": 1
 }
