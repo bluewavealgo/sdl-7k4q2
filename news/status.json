@@ -1,14 +1,14 @@
 {
- "at": 1793618054794,
+ "at": 1793618222749,
  "feeds": {
   "Marine Insight (maritime)": 15,
   "gCaptain (maritime)": 12,
   "Splash247 (maritime)": 10,
-  "SAFETY4SEA (maritime)": "failed: syntax error: line 1, column 0",
-  "Hellenic Shipping News (maritime)": "failed: HTTP Error 403: Forbidden",
+  "Hellenic Shipping News (maritime)": 20,
   "Google News (maritime)": 34,
   "The Hindu (india)": 40,
-  "Indian Express (india)": "failed: HTTP Error 403: Forbidden",
+  "India Today (india)": 20,
+  "News18 (india)": "failed: HTTP Error 403: Forbidden",
   "Times of India (india)": 20,
   "NDTV (india)": 20,
   "Hindustan Times (india)": 40,
@@ -21,19 +21,18 @@
   "MotorBeam (tech)": 15,
   "CarToq (tech)": 30,
   "GaadiWaadi (tech)": 8,
-  "Autocar India (tech)": "failed: HTTP Error 410: Gone",
   "Gadgets 360 (tech)": 40,
-  "91mobiles (tech)": "failed: HTTP Error 404: Not Found",
+  "Smartprix (tech)": 20,
   "Beebom (tech)": 10
  },
- "new": 509,
+ "new": 560,
  "bySection": {
-  "maritime": 131,
-  "india": 120,
+  "maritime": 161,
+  "india": 121,
   "markets": 147,
-  "tech": 111
+  "tech": 131
  },
- "withPoints": 347,
- "withImage": 390,
- "withPrice": 16
+ "withPoints": 396,
+ "withImage": 419,
+ "withPrice": 21
 }
