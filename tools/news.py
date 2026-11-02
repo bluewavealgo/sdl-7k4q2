@@ -216,6 +216,7 @@ def _move_at(mn, name, text, lo, hi):
     nxt = re.search(r"\b(sensex|nifty|bank nifty|midcap|smallcap)\b", seg[base:], re.I)
     if nxt:
         seg = seg[: base + nxt.start()]
+    seg = re.split(r"[;|]", seg)[0]
     ch = re.search(r"(\d[\d,]*(?:\.\d+)?)\s*(?:pts|points)", seg, re.I)
     pc = re.search(r"(\d+(?:\.\d+)?)\s*(?:%|per ?cent)", seg, re.I)
     down = re.search(r"\b(down|lower|falls?|fell|slips?|slipped|declines?|declined|drops?|dropped|sheds?|lose[s]?|lost|tumbles?|crash|sinks?|sank|in red|snaps?)\b", seg, re.I)
@@ -223,6 +224,10 @@ def _move_at(mn, name, text, lo, hi):
     sign = -1 if down and (not up or down.start() < up.start()) else (1 if up else 0)
     chv = (num(ch.group(1)) * sign) if ch and sign else None
     pcv = (num(pc.group(1)) * sign) if pc and sign else None
+    if pcv is not None and abs(pcv) > 8:
+        pcv = None
+    if chv is not None and v is not None and abs(chv) > v * 0.08:
+        chv = None
     if v is None and chv is None and pcv is None:
         return None
     approx = bool(m and v is not None and re.search(r"\b(above|below|around|near|over|under)\s+$", text[max(0, m.start(1) - 12): m.start(1)], re.I))
