@@ -594,7 +594,7 @@ function card(n,seen){const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^
   return `<div class="news" data-k="${esc(k)}"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><div class="nbody">
     <button type="button" class="hl" data-more aria-expanded="false">${isNew?'<span class="newtag">NEW</span> ':""}${esc(n.title)}</button>${n.price?`<span class="price">${esc(n.price)}</span>`:""}
     ${pts.length?`<div class="kp1">${esc(pts[0])}</div>`:""}
-    <div class="ndet" hidden>${pts.length>1?`<ul class="kp">${pts.slice(1).map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${n.img?`<div class="nphoto" data-img="${esc(n.img)}"><span class="small muted">Photo loads when online…</span></div>`:""}</div>
+    <div class="ndet" hidden>${pts.length>1?`<ul class="kp">${pts.slice(1).map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${n.img?`<div class="nphoto" data-img="${esc(n.img)}"></div>`:""}</div>
     <div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||TCOL[n.topic]||"var(--cx)"}">${esc(n.topic||"General")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span>${more?`<button type="button" class="more" data-more>More ▾</button>`:""}<a class="opens" href="${esc(safe)}" target="_blank" rel="noopener noreferrer">Open article ↗</a></div>
   </div><button type="button" class="star" data-star="${esc(k)}" aria-pressed="${st}" aria-label="${st?"Remove from saved":"Save for later"}" title="${st?"Remove from saved":"Save for later"}">${st?"★":"☆"}</button></div>`;}
 let NDAYS={};
@@ -642,7 +642,11 @@ async function showPhoto(box){const u=box.dataset.img;if(!u||box.dataset.done)re
 $("newsList").addEventListener("click",e=>{const b=e.target.closest("[data-star]");if(b){e.preventDefault();toggleSave(b.dataset.star);return;}
   const m=e.target.closest("[data-more]");if(!m)return;const card=m.closest(".news"),det=card.querySelector(".ndet"),open=det.hidden;det.hidden=!open;card.classList.toggle("open",open);
   card.querySelectorAll("[data-more]").forEach(x=>{x.setAttribute("aria-expanded",String(open));if(x.classList.contains("more"))x.textContent=open?"Less ▴":"More ▾";});
-  if(open){const ph=card.querySelector(".nphoto");if(ph)showPhoto(ph);}});
+  if(open){const ph=card.querySelector(".nphoto");if(ph)photoSlot(ph);}});
+/* a photo is downloaded only when its button is pressed; one already on this device is shown straight away (no data used) */
+async function photoSlot(box){if(box.dataset.done)return;let have=null;try{have=await nGet("img",box.dataset.img);}catch(e){}
+  if(have){showPhoto(box);return;}box.innerHTML='<button type="button" class="btn-sm" data-photo>📷 Show photo <span class="muted">(about 15–40 KB)</span></button>';}
+$("newsList").addEventListener("click",e=>{const b=e.target.closest("[data-photo]");if(b){e.stopPropagation();showPhoto(b.closest(".nphoto"));}});
 $("newsSecs").addEventListener("click",e=>{const a=e.target.closest("[data-sec]");if(!a)return;e.preventDefault();newsSec=a.dataset.sec;lsSet("sdlNewsSec",newsSec);newsTopic="All";$("newsSearch").value="";renderNews();window.scrollTo(0,0);});
 $("newsTopics").addEventListener("click",e=>{const b=e.target.closest("[data-topic]");if(!b)return;newsTopic=b.dataset.topic;renderNews();});
 $("newsShow").addEventListener("click",e=>{const b=e.target.closest("[data-show]");if(!b)return;newsShow=b.dataset.show;renderNews();});
