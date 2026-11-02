@@ -81,7 +81,7 @@ def topic(sec, t):
     for name, rx in TOPIC_RULES.get(sec, []):
         if re.search(rx, t, re.I):
             return name
-    return "Gadgets" if sec == "tech" else "General"
+    return "Other tech" if sec == "tech" else "General"
 
 ABBR = re.compile(r"\b(Rs|Mr|Mrs|Ms|Dr|No|Nos|vs|Ltd|Inc|Co|St|Jr|Sr|Govt|Dept|approx|est|e\.g|i\.e|U\.S|U\.K)\.\s?", re.I)
 
@@ -179,7 +179,7 @@ def read(sec, name, url, gn):
         n = {"sec": sec, "title": title, "source": src, "url": link, "ts": ts,
              "date": time.strftime("%Y-%m-%d", time.gmtime(ts / 1000)) if ts else "",
              "topic": topic(sec, title + " " + text[:400]), "points": pts}
-        if sec == "tech":
+        if sec == "tech" and re.search(r"\b(launch|launched|launches|unveil|unveiled|price|priced|prices|review|vs|bookings?|starts? at|under rs|under ₹|variants?|first drive|first look|goes on sale|on sale)\b", title, re.I) and not re.search(r"\b(sales|units|sold|market share|exports?|registrations?)\b", title, re.I):
             p = find_price(title, text)
             if p:
                 n["price"] = p
