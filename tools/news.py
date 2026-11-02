@@ -200,9 +200,13 @@ def num(s):
         return None
 
 def index_move(name, text, lo, hi):
-    mn = re.search(name + r"\b", text, re.I)
-    if not mn:
-        return None
+    for mn in re.finditer(name + r"\b", text, re.I):
+        r = _move_at(mn, name, text, lo, hi)
+        if r:
+            return r
+    return None
+
+def _move_at(mn, name, text, lo, hi):
     m = re.compile(r"(?:[^.;|]|\.(?=\d)){0,90}?\b(\d{2,3},\d{3}(?:\.\d+)?|\d{5,6}(?:\.\d+)?)", re.I).match(text, mn.end())
     v = num(m.group(1)) if m else None
     if v is not None and not (lo <= v <= hi):
