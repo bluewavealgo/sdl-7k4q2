@@ -1,8 +1,98 @@
 {
- "updatedAt": 1793605420811,
+ "updatedAt": 1793616201833,
  "feedsOk": 7,
  "keepDays": 60,
  "items": [
+  {
+   "title": "JP Morgan doubles down on VLCCs with fresh Hanwha deal",
+   "source": "Splash247",
+   "url": "https://splash247.com/jp-morgan-doubles-down-on-vlccs-with-fresh-hanwha-deal/",
+   "ts": 1793615400000,
+   "date": "2026-11-02",
+   "summary": "US banking giant JP Morgan has signed up for another two VLCC newbuildings at South Korea’s Hanwha Ocean, lifting its growing crude tanker orderbook to 12 vessels across…",
+   "topic": "Tankers",
+   "addedAt": 1793616201833
+  },
+  {
+   "title": "Yangzijiang Maritime extends tanker buying spree at Haifeng",
+   "source": "Splash247",
+   "url": "https://splash247.com/yangzijiang-maritime-extends-tanker-buying-spree-at-haifeng/",
+   "ts": 1793614200000,
+   "date": "2026-11-02",
+   "summary": "Singapore-listed Yangzijiang Maritime Development has signed a contract for four 50,000 dwt MR product tankers at Jiangsu Haifeng Shipbuilding, extending its extensive newbuilding programme in China. The Ren…",
+   "topic": "Tankers",
+   "addedAt": 1793616201833
+  },
+  {
+   "title": "Subsea 7 lands North Sea subsea contract from Aker BP",
+   "source": "Splash247",
+   "url": "https://splash247.com/subsea-7-lands-north-sea-subsea-contract-from-aker-bp/",
+   "ts": 1793613600000,
+   "date": "2026-11-02",
+   "summary": "Offshore engineering and construction specialist Subsea 7 has secured a contract worth between $150m and $300m from Aker BP for the fast-track development of the Lyra field in…",
+   "topic": "General",
+   "addedAt": 1793616201833
+  },
+  {
+   "title": "Asia Break Bulk adds heavylift muscle in Schoeller deal",
+   "source": "Splash247",
+   "url": "https://splash247.com/asia-break-bulk-adds-heavylift-muscle-in-schoeller-deal/",
+   "ts": 1793613313000,
+   "date": "2026-11-02",
+   "summary": "Singapore-based Asia Break Bulk has secured four 12,600 dwt multipurpose heavylift newbuildings through a long-term deal with Schoeller Holdings. The COLI Group-controlled carrier said the Octopus-type vessels, designed…",
+   "topic": "General",
+   "addedAt": 1793616201833
+  },
+  {
+   "title": "WISTA International elects Céline Mortier as new president",
+   "source": "Splash247",
+   "url": "https://splash247.com/wista-international-elects-celine-mortier-as-new-president/",
+   "ts": 1793613251000,
+   "date": "2026-11-02",
+   "summary": "Céline Mortier, chief executive of Belgian maritime navigation services provider Bogerd Martin, has been elected president of WISTA International, succeeding Elpi Petraki after four years leading the global…",
+   "topic": "General",
+   "addedAt": 1793616201833
+  },
+  {
+   "title": "U.S Navy Wants Super Intelligence To Help Design A Planned 10,100-Ton Nuclear Attack Submarine",
+   "source": "Marine Insight",
+   "url": "https://www.marineinsight.com/u-s-navy-wants-super-intelligence-to-help-design-a-planned-10100-ton-nuclear-attack-submarine/?utm_source=rss&utm_medium=rss&utm_campaign=u-s-navy-wants-super-intelligence-to-help-design-a-planned-10100-ton-nuclear-attack-submarine",
+   "ts": 1793613093000,
+   "date": "2026-11-02",
+   "summary": "The service has urged companies who would like to be selected as a contractor through a competition to register their interest by November 6, 2026.",
+   "topic": "Safety & Security",
+   "addedAt": 1793616201833
+  },
+  {
+   "title": "Union Maritime returns to Dalian for product tanker pair",
+   "source": "Splash247",
+   "url": "https://splash247.com/union-maritime-returns-to-dalian-for-product-tanker-pair/",
+   "ts": 1793611980000,
+   "date": "2026-11-02",
+   "summary": "UK diversified shipowner Union Maritime has added two more 24,200 dwt product tanker newbuildings at China’s Dalian Shipbuilding Offshore Co (DSOC), taking its programme at the yard to…",
+   "topic": "Tankers",
+   "addedAt": 1793616201833
+  },
+  {
+   "title": "Hijacked fishing vessel approaches shipping lane amid Somali piracy fears",
+   "source": "Splash247",
+   "url": "https://splash247.com/hijacked-fishing-vessel-approaches-shipping-lane-amid-somali-piracy-fears/",
+   "ts": 1793610780000,
+   "date": "2026-11-02",
+   "summary": "Commercial shipping in the western Indian Ocean has been warned of a potential new piracy threat after armed attackers seized an Iranian fishing vessel off Somalia and moved…",
+   "topic": "India & Seafarers",
+   "addedAt": 1793616201833
+  },
+  {
+   "title": "MSC adds three more megamaxes at Waigaoqiao",
+   "source": "Splash247",
+   "url": "https://splash247.com/msc-adds-three-more-megamaxes-at-waigaoqiao/",
+   "ts": 1793609134000,
+   "date": "2026-11-02",
+   "summary": "Mediterranean Shipping Co (MSC) has been linked to another three LNG dual-fuel megamax containerships at China’s Shanghai Waigaoqiao Shipbuilding (SWS), expanding its series at the CSSC-owned yard to…",
+   "topic": "LNG & Gas",
+   "addedAt": 1793616201833
+  },
   {
    "title": "Hormuz attacks spread deeper into the Gulf",
    "source": "Splash247",
@@ -42,6 +132,16 @@
    "summary": "The global shipbuilding orderbook has surpassed its pre-financial crisis record, with the world’s yards set to eclipse their previous production peak next year and expand output still further…",
    "topic": "Markets & Trade",
    "addedAt": 1793605420811
+  },
+  {
+   "title": "China Merchants Energy Shipping Names First 174,000-cbm LNG Carrier \"LEKHRAIB\" Under QatarEnergy Phase II Project",
+   "source": "iMarine",
+   "url": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFBVaGlJWDRvWENLUWlKNW1zd3JfZVdKS2s2UkllM29xbktncWF5Z2NIU002UjA0RV81WmQyRGFhcGNzTUsxYkMwdmFjd2JnV2M?oc=5",
+   "ts": 1793589664000,
+   "date": "2026-11-02",
+   "summary": "",
+   "topic": "LNG & Gas",
+   "addedAt": 1793616201833
   },
   {
    "title": "Meet Captain Ritu Kumari, who went from an unexpected maritime college admission to commanding a Great Ea",
@@ -862,6 +962,16 @@
    "summary": "",
    "topic": "India & Seafarers",
    "addedAt": 1793409570432
+  },
+  {
+   "title": "India lodges ‘strong protest’ with US over ‘deeply worrisome’ attacks on ships in West Asia",
+   "source": "DD News",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNZ3U5OHFieEVtWXp4dzRpbzdZUXpFWFZFMkkxaUM1LTJnWGR0TW92a0tfdmUzSVYwU2YweUNfZl8zZUcwSml6dHd3cEVQaWNfTXhDemhjWmZMZERoamtJTjZwdkRDaXZ3WHJPZ3Jya1RLODVnXzRTcnV2NnA2aVQwRmI0RTNZVE9RX0Z4WDBNTWZSdjNWSTNMN090N1gyYm50cHZEdEJmbUt1YUVUWUpyZXYxaw?oc=5",
+   "ts": 1793388240000,
+   "date": "2026-10-30",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793616201833
   },
   {
    "title": "Strike Threat at Los Angeles, Long Beach Ports Delayed as Union and Employers Extend Talks",
@@ -2674,6 +2784,16 @@
    "addedAt": 1793496441328
   },
   {
+   "title": "India tightens shipping insurance rules for RPSL companies",
+   "source": "Shipping Telegraph",
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPNlZqSEQ4SHBYNzItZk04X01hMkZTSF9xV3FHelZwbjJIdGpsSzVrbGFWNldGS1ZoN1pJMlVNVUNjX0NZVUZjYkZMOFEzWFJqeHlWZkhiUHM3Um43a2dVX2pKblBIZDF1bTd1QmlXejVBMzdoQlZkYnBNS1ZtVjRpY1VCa0RtbFFORzJveUlNRkg2Nm96d1lBelV6dGJjZUlfTXRhalp0cWNYaUkwNFNoUVAxdw?oc=5",
+   "ts": 1793170800000,
+   "date": "2026-10-28",
+   "summary": "",
+   "topic": "India & Seafarers",
+   "addedAt": 1793616201833
+  },
+  {
    "title": "Utkilen takes delivery of second 7,500DWT chemical tanker in series",
    "source": "Baird Maritime",
    "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPZzNDWXJHZThQRWozanFMVHlrM2tsU1laYmdXNndwT253VlRPbDlKZlR1OHJPQ2daeDBrY1d6RHljcDJiVUtRRGFEcHdaUXBna0ZOX0tCSW5abEdWSUVYOER1eXBQTml2S0RnTU5TbkVSUEhVQXVnZmZGeUR4VW51NzJyRTRkVl9aampRWUNXWFVBZ9IBnwFBVV95cUxQZmJrRzF0M2ZfMTRnNHVaVHl4S0Jtdnl5alVLVHBwZmUxbjhxWWphTDY2X1RZX1gtUzZndjRoZzdLbUhJM1NjeklDcDhpLTVHaDF3aVBaa04xT0tHYVZUUHJGY2c5alNfLWFOOFVuVzJ2M3RsWGIwdjZKS0VQb3pTN3N3S0hYTmFPY3NYWkFRLWNSS1BfUDU0eU1OQ0IydVU?oc=5",
@@ -2881,126 +3001,6 @@
    "date": "2026-10-26",
    "summary": "",
    "topic": "General",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "Indian seafarers’ union raises alarm over fraudulent ship registrations",
-   "source": "safety4sea",
-   "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNLThPUjh6RERvRnRtUl8xNE1jbHlKWTJIWWlSNnZXRm5KdU41dkJlR2VMUjhlQ1JzaDdnbVhab2ktWDFnQlMxNll0YjB3OHMyazdIRWFEUFpTc3VUbmJ3cWFQVlJyYm9YbnNaNTBobkhLVkhTcDNFQ0tzSEVybFZ2VDBlWmhseWxjNm5qVXFhbVctWVZuRHRqYzVB?oc=5",
-   "ts": 1793011394000,
-   "date": "2026-10-26",
-   "summary": "",
-   "topic": "India & Seafarers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "Seafarers Happiness Index Q3 2026: Crew resilience masks worsening conditions at sea",
-   "source": "safety4sea",
-   "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxOelBpMW4zTFlhVG9aOUxfbUFESlpiTXFpMUxOb0QxcFdUTnhZWm92d01kQV9fMk1mU3lEMjg1TEwxajgzZkJjZ0h6VWFldzNCX1BsZnpBalI0WmwtaTdJazBfdFRRR1VFTFVZOUpTZXpKUHdhMzFqcUhMX1h1Unk0bUc0ckJLRGlCSHBYaHZZSkt3OXRJaFJKRGFiOTFpUnZFS1RCcGRhbEZsc1E?oc=5",
-   "ts": 1793009324000,
-   "date": "2026-10-26",
-   "summary": "",
-   "topic": "India & Seafarers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "Great Eastern continues secondhand spending with LPG carrier deal",
-   "source": "Splash247",
-   "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPWldSQUJPTGlIcm1LMUZ5cFFSWFFmTHBnSGplNkQ1V2w0WUFfcHlQeE1nU3dseXNTbm9wYWlPT2wtTXEyOEd5cHN4TTRLWEtSTUtKM0d5ZFJaemxNM3RKREJOQzlVdDNEa3ZUc0NQUjRBTW4zTUI5UktxcnVBQkdXb1M0UmVKV3NBMXk2OFhfQzZ6Zw?oc=5",
-   "ts": 1793007747000,
-   "date": "2026-10-26",
-   "summary": "",
-   "topic": "LNG & Gas",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "82% of seafarers say training fails to prepare crews for digital ship operations",
-   "source": "Digital Ship",
-   "url": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxPYXA3OVItQ2d0cWZhanJwWG14S0oxbDk3WkxsZHFwMzZqY2RxaVpkTmNIczVIN09oZWtHN0tLWDBlZVVBek5aNXF2MEN5UWRDckJfcFdudC1LYk5IVU1NRW85WS1XYUlMUk16QkluTkJiZk5YUjYtWUpqaHFDSFBaamNjTmRUT3dPV3NsM0VxOVVHSFp4aTViNGpwc21rS3RKRHJmOVpoNGFucGtMYllzemJ0aDZoenI4bG1HdUpkU1FhSG5lc2VMMGNEM29CcEg2?oc=5",
-   "ts": 1793000369000,
-   "date": "2026-10-26",
-   "summary": "",
-   "topic": "India & Seafarers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "113 ships attacked, 24 seafarers dead as Hormuz crisis deepens",
-   "source": "The Sun Nigeria",
-   "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQRnJrSkg4eWhBWXRIeGlMY0dQaVNTekc5Ym4tWEctWGg5R0ZiSHplS3VPUUVaREd3WjVxR0o5S0hlb09ZVU40eDdtUVVmVmtKbjdEZDJta1Y0Q1A2Z3VtamItMkc5Tnd1STJ0eFlyeG9menBFVXJpV0wwVm5hd1ZvUGtkWDlaazA?oc=5",
-   "ts": 1792974156000,
-   "date": "2026-10-26",
-   "summary": "",
-   "topic": "India & Seafarers",
-   "addedAt": 1793366087980
-  },
-  {
-   "title": "Strait of Hormuz crisis: Nearly 500 vessels delayed amid new tanker attack and rising maritime threats",
-   "source": "Gulf News",
-   "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOS1QwN2hrTUszZUY4XzJkQk16NGkzSW1tUXdDcXg1aHhvNUh2RHJhTi1peDRvX2s5Qmdnb1dqRWg5SGxoOHUwaUlfSG1WN1pXNWJSSWQ4Wkk3dGRHYVIyYU5ENld5T1BxSC03Q1NMRG9OV0xWZjNtUDZuc0tKc182UVFRQzFweEp2LUl3clB3WUo3VWtuNGt3YnlIT0tEdkRXX1JZVGYtVllacXgtMTVVNTgxRWs5Q3FrLWRzLUdjMER4UUU?oc=5",
-   "ts": 1792945361000,
-   "date": "2026-10-25",
-   "summary": "",
-   "topic": "Safety & Security",
-   "addedAt": 1793386976072
-  },
-  {
-   "title": "Kerala Maritime Board’s Vizhinjam port handles first crew change since pandemic",
-   "source": "The Times of India",
-   "url": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxQXzhqaXZySmpkT1B4a0RkRmUtSmpVc1lJZ1pMSnpnMlMxOVNZMlNYZ2h1VTZISjRCblotRTJ4ZkgySE9TRjU0Q3ZBSGNfSWNQbnlQUzZTYkVqZlNUR1ZuWERlWmgxWlE5eEp4TkNJZDhQLWg4WktUVDdrTHFPdlNORUFMN1hYU0xVNUNIay1HUU15RXZvSVFSX0ZPUUxyWWtzbkhwdm5wOHdWQ1Bhck5FRVJtaWtfNWNVS3FxQWdiTXNLQUNXZUNGTy1zNUQ1NjBoRzdndlBsd3hHLVIzNjB3R1d4TVNPLUN0T3lEQnpOVlpqV0ZndTUw0gH8AUFVX3lxTE5nZHFRaFpMX1BGT25DYWlWaTJ0dGlYVXJ5N2I0NmRFSXlXZHFvdnBVcUZSU2U4bkN1cGRtaUxDYm4zWFVycDUwNHJhdWl0WTNsNnhpMUw4azBnM0Rxck5RSHlYeTlZMlJSYm01R1NmMG9PU1g0b2xXUnhwM0hJYjFQU011US1pMmREeENLaGkxY1REN203UFhzLUFKRHhVclVTcGtUYXBiSEZxTXpmakFSczlteUtscjkxRHlNRW5wNGd4TVZyUndFSTNFMC1zUWU4T245Y3d1dHdHMnRxRVVpa2FqampmaWNKRk1ibFdWamZIYkdkakhQcDZhVQ?oc=5",
-   "ts": 1792942080000,
-   "date": "2026-10-25",
-   "summary": "",
-   "topic": "India & Seafarers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "Oil slick from tanker in Hormuz Strait washes up on UAE beaches",
-   "source": "Al Jazeera",
-   "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPNmtfU2dvTlRXRVJJdUdYbTR6Q0s1VGJ6dVNHenBfMmF1NGxLeW9hOTFzeWFmV2JsTWFJc1JnSXFZOV9LUk5yLV9XeE1YNDUyRGVkdDRFSGJ0TEl3YlpUMnFYVE1xUGlrQ0xUTXQ1QUowYW1xMFk2YS1mSXRYbTN2ZTlRaW4xdzlwYjNrV0djU0dNTWlPdlhybWtPMVFnM1k2T3dDMlliODhqWHh3VkpNNW81azBzQdIBuwFBVV95cUxOdXZYVGk1TU1WNlBqYVczeDFuQjZDR1Z3Ym5NSW9hd0J5RWNJdkJGMWRxTUxvaEdnclcwMmpEUF9CY3Vvb3RzMEtDQl82bnltVV9WVWFYdVBsRG5WWUg2T28zX01ER20zUTFXVmd4MXFCcVBMN3FVdFczYzU3OWVXaUlwZ2NDTnNmNll2UTN2d2lEY1VtOVNzNGg0NFB3MndXUWVFVUtXVzRVYkFORFFKT0ZWNUtTUWxvdF9v?oc=5",
-   "ts": 1792931690000,
-   "date": "2026-10-25",
-   "summary": "",
-   "topic": "Tankers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "In Singapore, Improper Drone Use Can Mean Fines or Prison for Seafarers",
-   "source": "The Maritime Executive",
-   "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOdGZObXJrSl9TcEw0OHNiaXAteGxpb3czVFozcjYyM2piUHY0bXRtRE9yT3dFeWo4QkE2ZzB2UnVnWkFkc3ZCanFYdDhiYXZCbnJ3WDE1bkxtcXZRTkZsOVBqSk5EQUp6QlE0dF9fZzZtWGU1emxiTUwwU3k5NUVBWUhzVTFocXdXeVVqTVkwTUNidmllSU0tU001dnp3OGNKSWxwM3lsNnp4N3Q5RDN4MFdVaEZudlZITm9Z?oc=5",
-   "ts": 1792911600000,
-   "date": "2026-10-25",
-   "summary": "",
-   "topic": "India & Seafarers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "Record Tanker Rates Cripple U.S. Crude Oil Flows to Asia",
-   "source": "Crude Oil Prices Today | OilPrice.com",
-   "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxORUF5TG56V3NCLUlWZDEwR1d1Z3J4bEtUSFh2eThCWW9QOTREd3pqX21CN3p1cGNwZTNWVDU5NW52NU1XdkNSNWVBbVo4N2dOZUZGM1o3M0FUUWNNelg2ekNySlVtMHJPVkxTd1lEQ0hxc0RyaFV4NjFBUFpuZ3U1cXBlbkowclJsNkRmVEtGcTNjR3lfZTB0U1FlU0Vsd9IBowFBVV95cUxNdDZ3cW15VlNTc1lKcW5UTi0weUFWMFdESWN0Z3IzR3hJbnBGWFlpM09YZ20wT0NFUkJROWJjTG1aVnJvZV9ZY1kzRzc5WTdwWk9yREljeE9wX0wxSzRwajQ4bUN3NUdaSThzLTBTSzNaZmVNcHljRlB2eFhkcFhBMFlVc2ZKWHBEbE01Z3lOX1ZqNkZsTDZiQnFRSEZKVGlVa3pZ?oc=5",
-   "ts": 1792882800000,
-   "date": "2026-10-24",
-   "summary": "",
-   "topic": "Tankers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "3 Tanker Stocks In Focus As Oil Shipping Risk Returns",
-   "source": "Yahoo Finance",
-   "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNc0Y5RGdIUEd2STcyUU0zX3FSd3ZKd21STm9ZWmNSaUwtYXlMNlU3U0RnSkt3eGhZOVRYUUozY19qVUNBb1g4ZW5RZnYtQ1dkTWtsMC1iUS1GVlcwellUeXVzY09lRV8tTFFxYXhCSzNhX3NkeXJ6cDhSeGJES1hQbzcwTngzd2VlVkE?oc=5",
-   "ts": 1792872731000,
-   "date": "2026-10-24",
-   "summary": "",
-   "topic": "Tankers",
-   "addedAt": 1793352595421
-  },
-  {
-   "title": "Indian seafarers' union warns IMO of 'hundreds' affected in fake documents crisis; UN agency responds",
-   "source": "The Week",
-   "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPLUVfMnJuUUtFdnlRTVBPVmdQVmpqYzRCbXdYbXZ2aGQ4MldEQzZZTWQwUWNfa1ZDRlpSZE5TdGZQVU92a2t4WU9rcWpqaXNESzkxSmhaaEJ4Q21QV2dJU0xsbUMtZFA2R2MxWnJoeTVubktXcmEtcmpQcjJEQUoxY2YwX205VlhQbXFhS19XRUNrYklkLXNwM1AyMlg5em11aGl5OFl5djR6UEdsU21LSktmRlpPZ20wNkQzQjNnYzNyS1lnV2VjYjFjd9IB0AFBVV95cUxQRnNOaVNjT29hTzdpeW1vS2xHc0E1cmF5RnJwS0JUbkxqOHY5RmtQSGpQUk95THpjOUE0N1N3dzEwWUlFMElrMlBGTHJnWWdTMng5U2JtdjZSNEdDZWVBYmVHd0pJbFVDeUNIQ2llMWRuZ0tfOFZOaEJUenIteENWOVZwamEzeFY1OGtCTERIZTYxLXY0WU9nQjh2RlV6SllIZW1Tcl9PalVjd2NrbDN1dVlRUDRhdTJEZWRMWm9nRm9HVGpxZzFETDMzZjlISkNH?oc=5",
-   "ts": 1792842526000,
-   "date": "2026-10-24",
-   "summary": "",
-   "topic": "India & Seafarers",
    "addedAt": 1793352595421
   }
  ]
