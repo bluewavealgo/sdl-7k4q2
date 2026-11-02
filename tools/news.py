@@ -22,7 +22,6 @@ FEEDS = [
     ("maritime", "Google News", GN + "seafarers+OR+%22merchant+navy%22+OR+piracy+ship+when:7d", True),
     ("india", "The Hindu", "https://www.thehindu.com/news/national/feeder/default.rss", False),
     ("india", "India Today", "https://www.indiatoday.in/rss/1206514", False),
-    ("india", "News18", "https://www.news18.com/commonfeeds/v1/eng/rss/india.xml", False),
     ("india", "Times of India", "https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms", False),
     ("india", "NDTV", "https://feeds.feedburner.com/ndtvnews-india-news", False),
     ("india", "Hindustan Times", "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml", False),
@@ -201,23 +200,29 @@ def num(s):
         return None
 
 def index_move(name, text, lo, hi):
-    m = re.search(name + r"\b(?:[^.;|]|\.(?=\d)){0,90}?\b(\d{2,3},\d{3}(?:\.\d+)?|\d{5,6}(?:\.\d+)?)", text, re.I)
-    if not m:
+    mn = re.search(name + r"\b", text, re.I)
+    if not mn:
         return None
-    v = num(m.group(1))
-    if v is None or not (lo <= v <= hi):
-        return None
-    seg = text[m.start(): m.end() + 80]
-    nxt = re.search(r"\b(sensex|nifty|bank nifty|midcap|smallcap)\b", seg[len(name.split("(")[0]) + 1:], re.I)
+    m = re.compile(r"(?:[^.;|]|\.(?=\d)){0,90}?\b(\d{2,3},\d{3}(?:\.\d+)?|\d{5,6}(?:\.\d+)?)", re.I).match(text, mn.end())
+    v = num(m.group(1)) if m else None
+    if v is not None and not (lo <= v <= hi):
+        v = None
+    seg = text[mn.start(): (m.end() if m and v is not None else mn.end()) + 80]
+    base = len(name.split("(")[0]) + 1
+    nxt = re.search(r"\b(sensex|nifty|bank nifty|midcap|smallcap)\b", seg[base:], re.I)
     if nxt:
-        seg = seg[: len(name.split("(")[0]) + 1 + nxt.start()]
+        seg = seg[: base + nxt.start()]
     ch = re.search(r"(\d[\d,]*(?:\.\d+)?)\s*(?:pts|points)", seg, re.I)
     pc = re.search(r"(\d+(?:\.\d+)?)\s*(?:%|per ?cent)", seg, re.I)
     down = re.search(r"\b(down|lower|falls?|fell|slips?|slipped|declines?|declined|drops?|dropped|sheds?|lose[s]?|lost|tumbles?|crash|sinks?|sank|in red|snaps?)\b", seg, re.I)
-    up = re.search(r"\b(up|higher|gains?|gained|rises?|rose|jumps?|jumped|climbs?|climbed|surges?|surged|rall(y|ies|ied)|adds?|added|in green|extends?)\b", seg, re.I)
+    up = re.search(r"\b(up|higher|gains?|gained|rises?|rose|jumps?|jumped|climbs?|climbed|surges?|surged|soars?|soared|rall(y|ies|ied)|adds?|added|in green|extends?)\b", seg, re.I)
     sign = -1 if down and (not up or down.start() < up.start()) else (1 if up else 0)
-    approx = bool(re.search(r"\b(above|below|around|near|over|under)\s+$", text[max(0, m.start(1) - 12): m.start(1)], re.I))
-    return {"v": v, "approx": approx, "ch": (num(ch.group(1)) * sign) if ch and sign else None, "pct": (num(pc.group(1)) * sign) if pc and sign else None}
+    chv = (num(ch.group(1)) * sign) if ch and sign else None
+    pcv = (num(pc.group(1)) * sign) if pc and sign else None
+    if v is None and chv is None and pcv is None:
+        return None
+    approx = bool(m and v is not None and re.search(r"\b(above|below|around|near|over|under)\s+$", text[max(0, m.start(1) - 12): m.start(1)], re.I))
+    return {"v": v, "approx": approx, "ch": chv, "pct": pcv}
 
 def market_line(items):
     best = None
