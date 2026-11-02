@@ -70,6 +70,10 @@ TOPIC_RULES = {
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
 NS = {"content": "http://purl.org/rss/1.0/modules/content/", "media": "http://search.yahoo.com/mrss/"}
 KEEP_DAYS, PER_FEED = 30, 40
+# The app is private (owner only), so up to ~10 lines are taken from the article page when the feed is short.
+# Set FULL_TEXT = False before sharing the app with others: then only the text the sites put in their own feeds is used.
+FULL_TEXT = True
+MAX_POINTS, MAX_WORDS = 8, 170
 BOILER = re.compile(r"(the post .*? appeared first on.*$|read more.*$|also read.*$|click here.*$|subscribe to.*$|follow us on.*$|download the app.*$|\(this story has not been edited.*$|disclaimer:.*$)", re.I)
 
 def plain(s):
@@ -91,9 +95,9 @@ def sentences(text):
     parts = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"“‘₹(])", text)
     return [p.strip().replace("\u2024", ".") for p in parts if 40 <= len(p.strip()) <= 320]
 
-def key_points(title, text, n=4):
+def key_points(title, text, n=MAX_POINTS):
     """Pick the most informative sentences (facts: numbers, names, places), keep them in article order."""
-    sents = sentences(text)[:14]
+    sents = sentences(text)[:30]
     if not sents:
         return []
     tw = {w for w in re.findall(r"[a-z]{4,}", title.lower())}
@@ -111,7 +115,14 @@ def key_points(title, text, n=4):
         sc -= 1.5 if re.search(r"\b(i|we|you|our|my)\b", low) and i > 2 else 0
         scored.append((sc, i, s))
     best = sorted(sorted(scored, reverse=True)[:n], key=lambda x: x[1])
-    return [s if len(s) <= 260 else s[:257].rsplit(" ", 1)[0] + "…" for _, _, s in best]
+    out, words = [], 0
+    for _, _, s in best:
+        s = s if len(s) <= 260 else s[:257].rsplit(" ", 1)[0] + "…"
+        w = len(s.split())
+        if out and words + w > MAX_WORDS:
+            break
+        out.append(s); words += w
+    return out
 
 PRICE = re.compile(r"(?:₹|rs\.?|inr)\s?\d[\d,]*(?:\.\d+)?\s?(?:lakh|lakhs|crore|cr|k)?(?:\s?(?:-|–|to)\s?(?:₹|rs\.?|inr)?\s?\d[\d,]*(?:\.\d+)?\s?(?:lakh|lakhs|crore|cr|k)?)?(?:\s?\(?ex-showroom\)?)?", re.I)
 
@@ -178,7 +189,7 @@ def read(sec, name, url, gn):
         pts = key_points(title, text) if text else []
         n = {"sec": sec, "title": title, "source": src, "url": link, "ts": ts,
              "date": time.strftime("%Y-%m-%d", time.gmtime(ts / 1000)) if ts else "",
-             "topic": topic(sec, title + " " + text[:400]), "points": pts}
+             "topic": topic(sec, title + " " + text[:400]), "points": pts, "_text": text, "_gn": gn}
         if sec == "tech" and re.search(r"\b(launch|launched|launches|unveil|unveiled|price|priced|prices|review|vs|bookings?|starts? at|under rs|under ₹|variants?|first drive|first look|goes on sale|on sale)\b", title, re.I) and not re.search(r"\b(sales|units|sold|market share|exports?|registrations?)\b", title, re.I):
             p = find_price(title, text)
             if p:
@@ -191,6 +202,75 @@ def read(sec, name, url, gn):
 
 def key(n):
     return re.sub(r"[^a-z0-9]", "", n["title"].lower())[:70]
+
+# ---------- article page: main paragraphs (only when the feed text is short) ----------
+from html.parser import HTMLParser
+from concurrent.futures import ThreadPoolExecutor
+SKIP_TAGS = {"script", "style", "nav", "footer", "aside", "header", "figure", "figcaption", "form", "noscript", "button", "select", "svg"}
+JUNK = re.compile(r"(subscribe|sign up|newsletter|follow us|download (the|our) app|all rights reserved|copyright|advertisement|also read|read more|click here|whatsapp channel|telegram channel|first published|updated on|published on|terms of use|privacy policy|cookies?)", re.I)
+
+class Paras(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.skip = 0; self.in_p = 0; self.in_art = 0; self.buf = []; self.paras = []; self.art_paras = []; self.og = ""
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == "meta" and (a.get("property") == "og:image" or a.get("name") == "twitter:image") and not self.og:
+            self.og = a.get("content") or ""
+        if tag in SKIP_TAGS: self.skip += 1
+        elif tag == "article": self.in_art += 1
+        elif tag == "p" and not self.skip: self.in_p += 1; self.buf = []
+    def handle_endtag(self, tag):
+        if tag in SKIP_TAGS and self.skip: self.skip -= 1
+        elif tag == "article" and self.in_art: self.in_art -= 1
+        elif tag == "p" and self.in_p:
+            self.in_p -= 1
+            t = re.sub(r"\s+", " ", "".join(self.buf)).strip()
+            if len(t) >= 60 and not JUNK.search(t[:120]):
+                (self.art_paras if self.in_art else self.paras).append(t)
+    def handle_data(self, d):
+        if self.in_p and not self.skip: self.buf.append(d)
+
+BLOCKED = {}
+def page_text(url):
+    host = re.sub(r"^https?://([^/]+).*$", r"\1", url)
+    if BLOCKED.get(host, 0) >= 2:
+        return "", ""
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html,application/xhtml+xml", "Accept-Language": "en-IN,en;q=0.9"})
+        with urllib.request.urlopen(req, timeout=12) as r:
+            if "html" not in (r.headers.get("Content-Type") or "html"):
+                return "", ""
+            raw = r.read(1_500_000).decode(r.headers.get_content_charset() or "utf-8", "replace")
+    except Exception:
+        BLOCKED[host] = BLOCKED.get(host, 0) + 1
+        return "", ""
+    p = Paras()
+    try:
+        p.feed(raw)
+    except Exception:
+        pass
+    paras = p.art_paras if len(p.art_paras) >= 2 else p.paras
+    return " ".join(paras[:25]), p.og
+
+def enrich(n):
+    """Feed text short? Read the article page and take its key lines; also its main photo and price if missing."""
+    text = n.get("_text", "")
+    if FULL_TEXT and not n.get("_gn") and len(text.split()) < 120:
+        body, og = page_text(n["url"])
+        if len(body.split()) > len(text.split()) + 30:
+            text = body
+            pts = key_points(n["title"], text)
+            if len(pts) > len(n.get("points", [])):
+                n["points"] = pts
+        if og.startswith("http") and not n.get("img"):
+            n["img"] = og
+        if n["sec"] == "tech" and not n.get("price") and re.search(r"\b(launch|launched|launches|unveil|unveiled|price|priced|prices|review|vs|bookings?|variants?|on sale)\b", n["title"], re.I) and not re.search(r"\b(sales|units|sold|market share|exports?|registrations?)\b", n["title"], re.I):
+            pr = find_price(n["title"], text)
+            if pr:
+                n["price"] = pr
+    n.pop("_text", None); n.pop("_gn", None)
+    return n
 
 # ---------- market close line, from market-report headlines ----------
 def num(s):
@@ -288,6 +368,8 @@ for sec, name, url, gn in FEEDS:
         n["addedAt"] = now
         seen_k.add(k); seen_u.add(n["url"])
         new_items.append(n)
+with ThreadPoolExecutor(max_workers=8) as ex:
+    new_items = list(ex.map(enrich, new_items))
 ok = sum(1 for v in status.values() if isinstance(v, int))
 if ok == 0:
     raise SystemExit("all feeds failed")
