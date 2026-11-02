@@ -105,4 +105,29 @@ recent = [n for n in items if n.get("addedAt", 0) >= now - RECENT_DAYS * 8640000
 json.dump({"updatedAt": now, "recentDays": RECENT_DAYS, "items": recent},
           open(os.path.join(os.path.dirname(__file__), "..", "news-recent.json"), "w"), separators=(",", ":"), ensure_ascii=False)
 print(f"news-recent.json: {len(recent)} items")
+# only the headlines added in this run, as a small "batch" file, plus a tiny index of batches:
+# the app downloads the index and then just the batches it doesn't have yet
+ndir = os.path.join(os.path.dirname(__file__), "..", "news")
+os.makedirs(ndir, exist_ok=True)
+ipath = os.path.join(ndir, "index.json")
+try:
+    idx = json.load(open(ipath))
+except Exception:
+    idx = {"since": now, "batches": []}
+new_items = [n for n in items if n.get("addedAt") == now]
+if new_items:
+    json.dump({"t": now, "items": new_items}, open(os.path.join(ndir, f"b-{now}.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+    idx["batches"].append({"t": now, "n": len(new_items)})
+keep_from = now - KEEP_DAYS * 86400000
+for b in idx["batches"]:
+    if b["t"] < keep_from:
+        try:
+            os.remove(os.path.join(ndir, f"b-{b['t']}.json"))
+        except OSError:
+            pass
+idx["batches"] = [b for b in idx["batches"] if b["t"] >= keep_from]
+idx["since"] = max(idx.get("since", now), keep_from) if idx["batches"] else idx.get("since", now)
+idx["updatedAt"] = now
+json.dump(idx, open(ipath, "w"), separators=(",", ":"))
+print(f"news batch: {len(new_items)} new headlines; index has {len(idx['batches'])} batches")
 print(f"news.json: {len(items)} items from {ok} feeds")

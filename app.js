@@ -579,7 +579,7 @@ function renderNews(){
   const nSaved=Object.keys(SAVED).length;
   $("newsShow").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.show===newsShow)));
   $("savedCount").textContent=nSaved?` (${nSaved})`:"";
-  $("newsUpdated").textContent=NEWS.updatedAt?`Last updated ${when(NEWS.updatedAt)} · keeps the last 60 days (up to 300 headlines). New headlines arrive only when you press Sync.`:"Press Sync while online to load the latest headlines.";
+  $("newsUpdated").textContent=NEWS.updatedAt?`Last updated ${when(NEWS.updatedAt)} · keeps the last 60 days (up to 300 headlines). Sync downloads only headlines you don't have yet, usually a few KB.`:"Press Sync while online to load the latest headlines.";
   const q=$("newsSearch").value.trim().toLowerCase(),seen=newsPrevSeen;
   const pool=newsShow==="saved"?Object.values(SAVED):(NEWS.items||[]);
   const items=pool.filter(n=>(newsTopic==="All"||n.topic===newsTopic)&&(newsShow!=="new"||(+n.addedAt||0)>seen)&&(!q||(String(n.title)+" "+String(n.summary||"")+" "+String(n.source||"")).toLowerCase().includes(q))).sort((a,b)=>(+b.ts||0)-(+a.ts||0)||String(b.date).localeCompare(String(a.date)));
@@ -697,21 +697,32 @@ async function readFeed(f){
    If this device synced news in the last 2.5 days, only the small "recent" file (headlines added in the last 3 days) is downloaded. */
 async function getJSON(name){
   for(const u of ["https://raw.githubusercontent.com/bluewavealgo/sdl-7k4q2/main/"+name,name]){
-    try{const r=await timed(u+"?ts="+Date.now(),10000);if(!r.ok)continue;const j=await r.json();if(j&&Array.isArray(j.items))return j;}catch(e){}
+    try{const r=await timed(u+"?ts="+Date.now(),10000);if(!r.ok)continue;const t=await r.text();NEWSBYTES+=t.length;const j=JSON.parse(t);if(j&&Array.isArray(j.items))return j;}catch(e){}
   }
   return null;
 }
+/* Sync downloads only headlines this device doesn't have: a tiny index, then just the newer batch files */
+async function getRaw(name){
+  for(const u of ["https://raw.githubusercontent.com/bluewavealgo/sdl-7k4q2/main/"+name,name]){
+    try{const r=await timed(u+"?ts="+Date.now(),10000);if(!r.ok)continue;const t=await r.text();NEWSBYTES+=t.length;return JSON.parse(t);}catch(e){}}
+  return null;
+}
+let NEWSBYTES=0;
 async function readNewsFile(){
-  const last=+(lsGet("sdlNewsServerAt")||0),haveSome=(NEWS.items||[]).length>0;
+  const last=+(lsGet("sdlNewsServerAt")||0),haveSome=(NEWS.items||[]).length>0,lastT=+(lsGet("sdlNewsBatch")||0);
+  if(haveSome&&lastT){const idx=await getRaw("news/index.json");
+    if(idx&&Array.isArray(idx.batches)&&(+idx.since||Infinity)<=lastT){let out=[],ok=true;
+      for(const b of idx.batches.filter(b=>+b.t>lastT)){const j=await getRaw("news/b-"+b.t+".json");if(!j||!Array.isArray(j.items)){ok=false;break;}out=out.concat(j.items);}
+      if(ok){lsSet("sdlNewsBatch",String(+idx.updatedAt||lastT));if(idx.updatedAt)lsSet("sdlNewsServerAt",String(idx.updatedAt));return out.length?out:[{__empty:true}];}}}
   let j=null;
   if(haveSome&&last&&Date.now()-last<2.5*DAY)j=await getJSON("news-recent.json");
   if(!j||(!j.items.length&&!haveSome))j=await getJSON("news.json");
   if(!j)return [];
-  if(j.updatedAt)lsSet("sdlNewsServerAt",String(j.updatedAt));
+  if(j.updatedAt){lsSet("sdlNewsServerAt",String(j.updatedAt));lsSet("sdlNewsBatch",String(j.updatedAt));}
   return j.items.length?j.items:[{__empty:true}];
 }
 async function fetchNews(){
-  let fresh=await readNewsFile(),res=[];
+  NEWSBYTES=0;const before=(NEWS.items||[]).length;let fresh=await readNewsFile(),res=[];
   if(!fresh.length){res=await Promise.allSettled(FEEDS.map(readFeed));fresh=[].concat(...res.filter(r=>r.status==="fulfilled").map(r=>r.value));}
   if(!fresh.length)throw new Error("news");
   fresh=fresh.filter(n=>!n.__empty);
@@ -720,6 +731,7 @@ async function fetchNews(){
   const cutoff=now-60*DAY;
   NEWS={updatedAt:now,items:[...have.values()].filter(n=>(+n.ts||Date.parse(n.date)||now)>=cutoff).sort((a,b)=>(+b.ts||0)-(+a.ts||0)).slice(0,300),failed:res.filter(r=>r.status==="rejected").length};
   lsSet("sdlNews",JSON.stringify(NEWS));
+  return {added:NEWS.items.filter(n=>n.addedAt===now).length,bytes:NEWSBYTES};
 }
 
 /* ======================= Sync (only when pressed) ======================= */
@@ -738,7 +750,7 @@ async function syncAll(){
   if(!navigator.onLine){toast("You're offline. Your data is saved on this device; press Sync when you're connected.");return;}
   syncing=true;updateSyncUI();const notes=[];
   try{
-    try{await fetchNews();}catch(e){notes.push("news");}
+    let nw=null;try{nw=await fetchNews();}catch(e){notes.push("news");}
     try{await fetchNotices();}catch(e){notes.push("notices");}
     let dataMsg="";
     if(fbUser||savedUser()){
@@ -765,7 +777,8 @@ async function syncAll(){
         try{if(navigator.serviceWorker){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(x=>x.unregister()));}}catch(e){}
         try{if(window.caches){const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}}catch(e){}
         location.replace(location.pathname+"?v="+vj.v+"#"+VIEW);return;}}catch(e){}
-    toast(notes.length?`Synced, but ${notes.join(" and ")} couldn't load. Try again shortly.`:("Up to date. "+dataMsg),5000);
+    const newsMsg=nw?(nw.added?` ${nw.added} new headline${nw.added===1?"":"s"} (${nw.bytes<1024?"under 1":Math.round(nw.bytes/1024)} KB).`:" No new headlines."):"";
+    toast(notes.length?`Synced, but ${notes.join(" and ")} couldn't load. Try again shortly.`:("Up to date. "+dataMsg+newsMsg),6000);
   }finally{syncing=false;updateSyncUI();}
 }
 $("syncBtn").addEventListener("click",syncAll);
