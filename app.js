@@ -567,46 +567,86 @@ function renderNotices(){
 $("nFilter").addEventListener("click",e=>{const b=e.target.closest("[data-l]");if(!b)return;nLevel=b.dataset.l;$("nFilter").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderNotices();});
 
 /* ---------- news ---------- */
-let NEWS=lsJSON("sdlNews",{items:[]}),newsTopic="All",newsShow="all",newsPrevSeen=+(lsGet("sdlNewsSeen")||0);
-let SAVED=lsJSON("sdlNewsSaved",{}); /* starred headlines, kept on this device even after they leave the 60-day window */
+/* ======================= news: Maritime · India · Markets · Tech ======================= */
+/* kept in the device's larger storage (IndexedDB); photos are downloaded only when you open a story, made small first, and kept for offline */
+let NEWS={items:[]},newsTopic="All",newsShow="all",newsPrevSeen=+(lsGet("sdlNewsSeen")||0),newsSec=lsGet("sdlNewsSec")||"maritime";
+let SAVED=lsJSON("sdlNewsSaved",{}); /* starred headlines, kept on this device even after they leave the 30-day window */
+const SECS=[["maritime","⚓ Maritime"],["india","🇮🇳 India"],["markets","📈 Markets"],["tech","📱 Tech"]];
+const SEC_TOPICS={maritime:["India & Seafarers","Tankers","LNG & Gas","Safety & Security","Markets & Trade","Regulation","General"],india:["Politics","Courts & Law","Economy","Weather & Disaster","General"],markets:["Stocks","IPO","Mutual funds","Commodities","Economy","General"],tech:["Cars","Bikes","Phones & gadgets","Other tech","Gadgets"]};
+const TCOL={"Politics":"var(--c3)","Courts & Law":"var(--c6)","Economy":"var(--c2)","Weather & Disaster":"var(--c7)","Stocks":"var(--c0)","IPO":"var(--c1)","Mutual funds":"var(--c6)","Commodities":"var(--c3)","Cars":"var(--c0)","Bikes":"var(--c1)","Phones & gadgets":"var(--c6)","Gadgets":"var(--c6)"};
+const secOf=n=>n.sec||"maritime";
 const newsKey=n=>String(n.title||"").toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,70);
-function newsNewCount(){const seen=+(lsGet("sdlNewsSeen")||0);return (NEWS.items||[]).filter(n=>(+n.addedAt||0)>seen).length;}
-function renderNewsBadge(){const n=newsNewCount();$("newsBadge").hidden=!n;$("newsBadge").textContent=n;}
+let nidbP=null;
+function nidb(){if(!nidbP)nidbP=new Promise((res,rej)=>{const q=indexedDB.open("sdl-news",1);q.onupgradeneeded=()=>{q.result.createObjectStore("kv");q.result.createObjectStore("img");};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});return nidbP;}
+async function nDo(store,mode,fn){const db=await nidb();return new Promise((res,rej)=>{const tx=db.transaction(store,mode),q=fn(tx.objectStore(store));tx.oncomplete=()=>res(q&&q.result);tx.onerror=()=>rej(tx.error);});}
+const nGet=(s,k)=>nDo(s,"readonly",st=>st.get(k)),nPut=(s,k,v)=>nDo(s,"readwrite",st=>st.put(v,k)),nDel=(s,k)=>nDo(s,"readwrite",st=>st.delete(k)),nKeys=s=>nDo(s,"readonly",st=>st.getAllKeys());
+async function loadNews(){try{const v=await nGet("kv","news");if(v&&Array.isArray(v.items))NEWS=v;else{const old=lsJSON("sdlNews",null);if(old&&Array.isArray(old.items)){NEWS=old;await nPut("kv","news",NEWS);}}try{localStorage.removeItem("sdlNews");}catch(e){}}catch(e){NEWS=lsJSON("sdlNews",{items:[]});}renderNews();}
+function newsNewCount(sec){const seen=+(lsGet("sdlNewsSeen")||0);return (NEWS.items||[]).filter(n=>(+n.addedAt||0)>seen&&(!sec||secOf(n)===sec)).length;}
+function renderNewsBadge(){const n=newsNewCount();$("newsBadge").hidden=!n;$("newsBadge").textContent=n>999?"999+":n;}
 function relDate(s){const n=dn(s);if(n==null)return "";const d=TODAY-n;return d<=0?"Today":d===1?"Yesterday":d<7?d+" days ago":fmt(n);}
+const fmtN=v=>v==null?"":Number(v).toLocaleString("en-IN",{maximumFractionDigits:2});
+function mkLine(k,x){if(!x)return "";const up=(x.ch||x.pct||0)>0,dn2=(x.ch||x.pct||0)<0,arrow=up?"▲":dn2?"▼":"",col=up?"var(--ok)":dn2?"var(--bad)":"var(--muted)";
+  return `<span class="mk"><b>${k}</b> ${x.v!=null?(x.approx?"≈ ":"")+fmtN(x.v):""} ${arrow?`<span style="color:${col}">${arrow} ${x.ch!=null?fmtN(Math.abs(x.ch))+" pts":""}${x.pct!=null?` (${Math.abs(x.pct)}%)`:""}</span>`:""}</span>`;}
+function renderMarket(){const m=NEWS.market,el=$("marketLine");if(newsSec!=="markets"||!m||(!m.sensex&&!m.nifty)){el.hidden=true;return;}el.hidden=false;
+  el.innerHTML=`<div class="ml-h">Market close · ${m.date?esc(fmt(dn(m.date))):""}</div><div class="ml-v">${mkLine("Sensex",m.sensex)}${mkLine("Nifty 50",m.nifty)}</div><div class="small muted">Read from a closing report: <a href="${esc(/^https:\/\//.test(m.url||"")?m.url:"#")}" target="_blank" rel="noopener noreferrer">${esc(m.source||"source")} ↗</a>. Check the exchange for exact figures.</div>`;}
+const photoURL=u=>"https://wsrv.nl/?url="+encodeURIComponent(u)+"&w=640&h=420&fit=inside&we&q=55&output=webp";
+function card(n,seen){const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^https:\/\//i.test(String(n.url||""))?n.url:"#",isNew=newsShow!=="saved"&&(+n.addedAt||0)>seen,k=newsKey(n),st=!!SAVED[k],pts=Array.isArray(n.points)?n.points:(n.summary?[n.summary]:[]),more=pts.length>1||n.img;
+  return `<div class="news" data-k="${esc(k)}"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><div class="nbody">
+    <button type="button" class="hl" data-more aria-expanded="false">${isNew?'<span class="newtag">NEW</span> ':""}${esc(n.title)}</button>${n.price?`<span class="price">${esc(n.price)}</span>`:""}
+    ${pts.length?`<div class="kp1">${esc(pts[0])}</div>`:""}
+    <div class="ndet" hidden>${pts.length>1?`<ul class="kp">${pts.slice(1).map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}${n.img?`<div class="nphoto" data-img="${esc(n.img)}"><span class="small muted">Photo loads when online…</span></div>`:""}</div>
+    <div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||TCOL[n.topic]||"var(--cx)"}">${esc(n.topic||"General")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span>${more?`<button type="button" class="more" data-more>More ▾</button>`:""}<a class="opens" href="${esc(safe)}" target="_blank" rel="noopener noreferrer">Open article ↗</a></div>
+  </div><button type="button" class="star" data-star="${esc(k)}" aria-pressed="${st}" aria-label="${st?"Remove from saved":"Save for later"}" title="${st?"Remove from saved":"Save for later"}">${st?"★":"☆"}</button></div>`;}
+let NDAYS={};
 function renderNews(){
   renderNewsBadge();
-  $("newsTopics").innerHTML=TOPICS.map(t=>`<button type="button" aria-pressed="${t===newsTopic}" data-topic="${esc(t)}">${esc(t)}</button>`).join("");
-  const nSaved=Object.keys(SAVED).length;
+  const all=NEWS.items||[],seen=newsPrevSeen,nSaved=Object.keys(SAVED).length;
+  $("newsSecs").innerHTML=SECS.map(([k,l])=>{const c=all.filter(n=>secOf(n)===k).length,nn=newsNewCount(k);return `<a href="#news" data-sec="${k}" ${k===newsSec?'aria-current="page"':""}>${l} <small>${c}</small>${nn?`<b class="badge">${nn>99?"99+":nn}</b>`:""}</a>`;}).join("");
+  const tops=SEC_TOPICS[newsSec]||[],present=new Set(all.filter(n=>secOf(n)===newsSec).map(n=>n.topic));if(newsTopic!=="All"&&!present.has(newsTopic))newsTopic="All";
+  $("newsTopics").innerHTML=["All"].concat(tops.filter(t=>present.has(t))).map(t=>`<button type="button" aria-pressed="${t===newsTopic}" data-topic="${esc(t)}">${esc(t)}</button>`).join("");
   $("newsShow").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.show===newsShow)));
   $("savedCount").textContent=nSaved?` (${nSaved})`:"";
-  $("newsUpdated").textContent=NEWS.updatedAt?`Last updated ${when(NEWS.updatedAt)} · keeps the last 60 days (up to 300 headlines). Sync downloads only headlines you don't have yet, usually a few KB.`:"Press Sync while online to load the latest headlines.";
-  const q=$("newsSearch").value.trim().toLowerCase(),seen=newsPrevSeen;
-  const pool=newsShow==="saved"?Object.values(SAVED):(NEWS.items||[]);
-  const items=pool.filter(n=>(newsTopic==="All"||n.topic===newsTopic)&&(newsShow!=="new"||(+n.addedAt||0)>seen)&&(!q||(String(n.title)+" "+String(n.summary||"")+" "+String(n.source||"")).toLowerCase().includes(q))).sort((a,b)=>(+b.ts||0)-(+a.ts||0)||String(b.date).localeCompare(String(a.date)));
-  if(!items.length){$("newsList").innerHTML=`<div class="empty">${newsShow==="saved"?(nSaved?"No saved headlines match this topic or search.":"Nothing saved yet. Tap ☆ on a headline to keep it on this device."):(NEWS.items||[]).length?(newsShow==="new"?"No new headlines since you last looked.":"No headlines match this topic or search."):"No headlines yet. Press Sync while online."}</div>`;return;}
-  const card=n=>{const d=dn(n.date),dd=d!=null?new Date(d*DAY):null,safe=/^https:\/\//i.test(String(n.url||""))?n.url:"#",isNew=newsShow!=="saved"&&(+n.addedAt||0)>seen,k=newsKey(n),st=!!SAVED[k];
-    return `<div class="news"><div class="dt">${dd?`<b>${dd.getUTCDate()}</b>${MON[dd.getUTCMonth()]}`:""}</div><a class="nlink" href="${esc(safe)}" target="_blank" rel="noopener noreferrer"><div class="hl">${isNew?'<span class="newtag">NEW</span> ':""}${esc(n.title)}</div>${n.summary?`<div class="gist">${esc(n.summary)}</div>`:""}<div class="meta"><span class="tchip" style="--tc:${TOPIC_COL[n.topic]||"var(--cx)"}">${esc(n.topic||"General")}</span><span>${esc(n.source||"")}</span><span>· ${esc(relDate(n.date))}</span><span class="opens">Opens the full article online ↗</span></div></a><button type="button" class="star" data-star="${esc(k)}" aria-pressed="${st}" aria-label="${st?"Remove from saved":"Save for later"}" title="${st?"Remove from saved":"Save for later"}">${st?"★":"☆"}</button></div>`;};
-  /* month folders, each with day folders; the newest month and day are open */
+  $("newsSearch").placeholder={maritime:"e.g. tanker, DG Shipping",india:"e.g. Mumbai, election",markets:"e.g. Nifty, IPO, Reliance",tech:"e.g. Creta, Royal Enfield, iPhone"}[newsSec];
+  $("newsUpdated").textContent=NEWS.updatedAt?`Last updated ${when(NEWS.updatedAt)} · keeps 30 days; older news is removed automatically. Sync downloads only headlines you don't have yet.`:"Press Sync while online to load the latest headlines.";
+  renderMarket();
+  const q=$("newsSearch").value.trim().toLowerCase();
+  const pool=newsShow==="saved"?Object.values(SAVED):all;
+  const items=pool.filter(n=>secOf(n)===newsSec&&(newsTopic==="All"||n.topic===newsTopic)&&(newsShow!=="new"||(+n.addedAt||0)>seen)&&(!q||(String(n.title)+" "+(n.points||[]).join(" ")+" "+String(n.summary||"")+" "+String(n.source||"")+" "+String(n.price||"")).toLowerCase().includes(q))).sort((a,b)=>(+b.ts||0)-(+a.ts||0)||String(a.title).localeCompare(String(b.title)));
+  if(!items.length){$("newsList").innerHTML=`<div class="empty">${newsShow==="saved"?(nSaved?"No saved headlines here.":"Nothing saved yet. Tap ☆ on a headline to keep it."):all.length?(newsShow==="new"?"No new headlines in this section since your last visit.":"No headlines match."):"No news yet. Press Sync while online."}</div>`;return;}
+  /* month folders → day folders; a day's stories are only drawn when its folder is open (fast with thousands of items) */
   const months=[],byM={};items.forEach(n=>{const k=String(n.date||"").slice(0,7)||"Undated";if(!byM[k]){byM[k]=[];months.push(k);}byM[k].push(n);});
-  const searching=!!q,openM=k=>searching||NOPEN.has(k)||(!NOPEN.size&&k===months[0]),isNewN=n=>newsShow!=="saved"&&(+n.addedAt||0)>seen;
+  const searching=!!q,openM=k=>searching||NOPEN.has(newsSec+k)||(!NOPEN.size&&k===months[0])||(NOPEN.has("__"+newsSec)?false:k===months[0]&&![...NOPEN].some(x=>x.startsWith(newsSec)));NDAYS={};
+  const FULL={Jan:"January",Feb:"February",Mar:"March",Apr:"April",May:"May",Jun:"June",Jul:"July",Aug:"August",Sep:"September",Oct:"October",Nov:"November",Dec:"December"};
   $("newsList").innerHTML=months.map(k=>{const list=byM[k],days=[],byD={};list.forEach(n=>{const dk=String(n.date||"").slice(0,10)||"Undated";if(!byD[dk]){byD[dk]=[];days.push(dk);}byD[dk].push(n);});
-    const nn=list.filter(isNewN).length,ml=/^\d{4}-\d{2}$/.test(k)?monthLbl(k).replace(/^(\w+)/,m=>({Jan:"January",Feb:"February",Mar:"March",Apr:"April",May:"May",Jun:"June",Jul:"July",Aug:"August",Sep:"September",Oct:"October",Nov:"November",Dec:"December"})[m]||m):k;
+    const nn=list.filter(n=>newsShow!=="saved"&&(+n.addedAt||0)>seen).length,ml=/^\d{4}-\d{2}$/.test(k)?monthLbl(k).replace(/^(\w+)/,m=>FULL[m]||m):k;
     return `<details class="nmonth" data-m="${esc(k)}" ${openM(k)?"open":""}><summary><span>📁 ${esc(ml)}</span>${nn?`<span class="nnew">${nn} new</span>`:""}<span class="cnt">${list.length} headline${list.length===1?"":"s"}</span></summary>
-      ${days.map((dk,i)=>{const dd=dn(dk),lbl=dd!=null?(TODAY-dd===0?"Today":TODAY-dd===1?"Yesterday":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(dd*DAY).getUTCDay()]+" "+fmt(dd)):dk,dOpen=searching||DOPEN.has(dk)||(i===0&&!DCLOSED.has(dk));
-        return `<details class="nday" data-d="${esc(dk)}" ${dOpen?"open":""}><summary><b>${esc(lbl)}</b> · ${byD[dk].length}</summary>${byD[dk].map(card).join("")}</details>`;}).join("")}</details>`;}).join("");
+      ${days.map((dk,i)=>{const dd=dn(dk),lbl=dd!=null?(TODAY-dd===0?"Today":TODAY-dd===1?"Yesterday":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(dd*DAY).getUTCDay()]+" "+fmt(dd)):dk,dOpen=searching||DOPEN.has(newsSec+dk)||(i===0&&!DCLOSED.has(newsSec+dk));
+        NDAYS[dk]=byD[dk];return `<details class="nday" data-d="${esc(dk)}" ${dOpen?"open":""}><summary><b>${esc(lbl)}</b> · ${byD[dk].length}</summary><div class="ndays">${dOpen?byD[dk].map(n=>card(n,seen)).join(""):""}</div></details>`;}).join("")}</details>`;}).join("");
 }
 const NOPEN=new Set(),DOPEN=new Set(),DCLOSED=new Set();
-$("newsList").addEventListener("toggle",e=>{const el=e.target;if(el.classList.contains("nmonth")){if(!NOPEN.size){const first=$("newsList").querySelector(".nmonth");if(first&&first!==el&&first.open)NOPEN.add(first.dataset.m);}el.open?NOPEN.add(el.dataset.m):NOPEN.delete(el.dataset.m);if(!NOPEN.size&&!el.open)NOPEN.add("__none");}
-  if(el.classList.contains("nday")){const k=el.dataset.d;if(el.open){DOPEN.add(k);DCLOSED.delete(k);}else{DOPEN.delete(k);DCLOSED.add(k);}}},true);
+$("newsList").addEventListener("toggle",e=>{const el=e.target;
+  if(el.classList.contains("nmonth")){const k=newsSec+el.dataset.m;el.open?NOPEN.add(k):NOPEN.delete(k);}
+  if(el.classList.contains("nday")){const k=newsSec+el.dataset.d;if(el.open){DOPEN.add(k);DCLOSED.delete(k);const box=el.querySelector(".ndays");if(box&&!box.children.length)box.innerHTML=(NDAYS[el.dataset.d]||[]).map(n=>card(n,newsPrevSeen)).join("");}else{DOPEN.delete(k);DCLOSED.add(k);}}},true);
 function toggleSave(k){
   if(SAVED[k]){delete SAVED[k];toast("Removed from saved");}
   else{const n=(NEWS.items||[]).find(x=>newsKey(x)===k);if(!n)return;SAVED[k]=Object.assign({},n,{savedAt:Date.now()});toast("Saved on this device");}
   lsSet("sdlNewsSaved",JSON.stringify(SAVED));renderNews();
 }
-$("newsList").addEventListener("click",e=>{const b=e.target.closest("[data-star]");if(!b)return;e.preventDefault();toggleSave(b.dataset.star);});
+/* photo: from this device's store if seen before, otherwise downloaded small (about 20–40 KB) — only now, when the story is opened */
+async function showPhoto(box){const u=box.dataset.img;if(!u||box.dataset.done)return;box.dataset.done="1";
+  try{let b=await nGet("img",u);
+    if(!b){if(!navigator.onLine){box.innerHTML='<span class="small muted">Photo will load when you open this story online.</span>';delete box.dataset.done;return;}
+      box.innerHTML='<span class="small muted">Loading photo…</span>';const r=await timed(photoURL(u),15000);if(!r.ok)throw new Error("img");b=await r.blob();if(!/^image\//.test(b.type))throw new Error("type");try{await nPut("img",u,b);}catch(e){}}
+    const url=URL.createObjectURL(b);box.innerHTML=`<img src="${url}" alt="" loading="lazy"><span class="small muted">Photo · ${Math.max(1,Math.round(b.size/1024))} KB</span>`;}
+  catch(e){box.innerHTML='<span class="small muted">Photo not available.</span>';}}
+$("newsList").addEventListener("click",e=>{const b=e.target.closest("[data-star]");if(b){e.preventDefault();toggleSave(b.dataset.star);return;}
+  const m=e.target.closest("[data-more]");if(!m)return;const card=m.closest(".news"),det=card.querySelector(".ndet"),open=det.hidden;det.hidden=!open;card.classList.toggle("open",open);
+  card.querySelectorAll("[data-more]").forEach(x=>{x.setAttribute("aria-expanded",String(open));if(x.classList.contains("more"))x.textContent=open?"Less ▴":"More ▾";});
+  if(open){const ph=card.querySelector(".nphoto");if(ph)showPhoto(ph);}});
+$("newsSecs").addEventListener("click",e=>{const a=e.target.closest("[data-sec]");if(!a)return;e.preventDefault();newsSec=a.dataset.sec;lsSet("sdlNewsSec",newsSec);newsTopic="All";$("newsSearch").value="";renderNews();window.scrollTo(0,0);});
 $("newsTopics").addEventListener("click",e=>{const b=e.target.closest("[data-topic]");if(!b)return;newsTopic=b.dataset.topic;renderNews();});
 $("newsShow").addEventListener("click",e=>{const b=e.target.closest("[data-show]");if(!b)return;newsShow=b.dataset.show;renderNews();});
-$("newsSearch").addEventListener("input",renderNews);
+let nsT=null;$("newsSearch").addEventListener("input",()=>{clearTimeout(nsT);nsT=setTimeout(renderNews,200);});
 
 /* ======================= Firebase (loaded only when needed, online) ======================= */
 let fb=null,fbUser=null;
@@ -680,58 +720,32 @@ async function fetchNotices(){const f=await fbReady();const q=await f.db.collect
 function timed(url,ms){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms||12000);return fetch(url,{signal:c.signal,cache:"no-store"}).finally(()=>clearTimeout(t));}
 const plain=h=>{try{return (new DOMParser().parseFromString(String(h||""),"text/html").body.textContent||"").replace(/\s+/g," ").trim();}catch(e){return "";}};
 const words=(t,n)=>{const w=t.split(" ");return w.length>n?w.slice(0,n).join(" ")+"…":t;};
-async function readFeed(f){
-  let raw=[];
-  try{const r=await timed("https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(f.url));const j=await r.json();
-    if(j&&j.status==="ok"&&Array.isArray(j.items))raw=j.items.map(i=>({title:i.title,link:i.link,date:i.pubDate?i.pubDate.replace(" ","T")+"Z":"",desc:i.description||i.content||""}));else throw 0;}
-  catch(e){const r=await timed("https://api.allorigins.win/raw?url="+encodeURIComponent(f.url));if(!r.ok)throw new Error("feed");
-    const x=new DOMParser().parseFromString(await r.text(),"text/xml");
-    raw=[...x.querySelectorAll("item")].slice(0,20).map(i=>({title:i.querySelector("title")?.textContent||"",link:i.querySelector("link")?.textContent||"",date:i.querySelector("pubDate")?.textContent||"",desc:i.querySelector("description")?.textContent||"",src:i.querySelector("source")?.textContent||""}));}
-  return raw.map(i=>{let title=plain(i.title),source=f.name;
-    if(f.gn){const m=title.match(/^(.*) - ([^-]{2,60})$/);if(m){title=m[1].trim();source=m[2].trim();}else if(i.src)source=i.src;}
-    const ts=Date.parse(i.date)||0,d=ts?new Date(ts):null;
-    return {title,source,url:String(i.link||"").trim(),ts,date:d?d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()):"",summary:f.gn?"":words(plain(i.desc).replace(/The post .*? appeared first on .*$/i,"").trim(),28),topic:topicOf(title+" "+(f.gn?"":plain(i.desc)))};
-  }).filter(n=>n.title&&/^https:\/\//i.test(n.url));
-}
-/* built every few hours by a free GitHub job; read only when Sync is pressed.
-   If this device synced news in the last 2.5 days, only the small "recent" file (headlines added in the last 3 days) is downloaded. */
-async function getJSON(name){
-  for(const u of ["https://raw.githubusercontent.com/bluewavealgo/sdl-7k4q2/main/"+name,name]){
-    try{const r=await timed(u+"?ts="+Date.now(),10000);if(!r.ok)continue;const t=await r.text();NEWSBYTES+=t.length;const j=JSON.parse(t);if(j&&Array.isArray(j.items))return j;}catch(e){}
-  }
-  return null;
-}
-/* Sync downloads only headlines this device doesn't have: a tiny index, then just the newer batch files */
+/* built every 3 hours by a free GitHub job; read only when Sync is pressed.
+   Sync reads a tiny index and downloads only the batches of headlines this device doesn't have. */
+let NEWSBYTES=0;
 async function getRaw(name){
   for(const u of ["https://raw.githubusercontent.com/bluewavealgo/sdl-7k4q2/main/"+name,name]){
-    try{const r=await timed(u+"?ts="+Date.now(),10000);if(!r.ok)continue;const t=await r.text();NEWSBYTES+=t.length;return JSON.parse(t);}catch(e){}}
+    try{const r=await timed(u+"?ts="+Date.now(),15000);if(!r.ok)continue;const t=await r.text();NEWSBYTES+=t.length;return JSON.parse(t);}catch(e){}}
   return null;
 }
-let NEWSBYTES=0;
-async function readNewsFile(){
-  const last=+(lsGet("sdlNewsServerAt")||0),haveSome=(NEWS.items||[]).length>0,lastT=+(lsGet("sdlNewsBatch")||0);
-  if(haveSome&&lastT){const idx=await getRaw("news/index.json");
-    if(idx&&Array.isArray(idx.batches)&&(+idx.since||Infinity)<=lastT){let out=[],ok=true;
-      for(const b of idx.batches.filter(b=>+b.t>lastT)){const j=await getRaw("news/b-"+b.t+".json");if(!j||!Array.isArray(j.items)){ok=false;break;}out=out.concat(j.items);}
-      if(ok){lsSet("sdlNewsBatch",String(+idx.updatedAt||lastT));if(idx.updatedAt)lsSet("sdlNewsServerAt",String(idx.updatedAt));return out.length?out:[{__empty:true}];}}}
-  let j=null;
-  if(haveSome&&last&&Date.now()-last<2.5*DAY)j=await getJSON("news-recent.json");
-  if(!j||(!j.items.length&&!haveSome))j=await getJSON("news.json");
-  if(!j)return [];
-  if(j.updatedAt){lsSet("sdlNewsServerAt",String(j.updatedAt));lsSet("sdlNewsBatch",String(j.updatedAt));}
-  return j.items.length?j.items:[{__empty:true}];
-}
 async function fetchNews(){
-  NEWSBYTES=0;const before=(NEWS.items||[]).length;let fresh=await readNewsFile(),res=[];
-  if(!fresh.length){res=await Promise.allSettled(FEEDS.map(readFeed));fresh=[].concat(...res.filter(r=>r.status==="fulfilled").map(r=>r.value));}
-  if(!fresh.length)throw new Error("news");
-  fresh=fresh.filter(n=>!n.__empty);
-  const key=newsKey,now=Date.now(),have=new Map((NEWS.items||[]).map(n=>[key(n),n])),urls=new Set((NEWS.items||[]).map(n=>n.url));
-  fresh.forEach(n=>{if(!n||!n.title||!/^https:\/\//i.test(String(n.url||"")))return;const k=key(n);if(!have.has(k)&&!urls.has(n.url)){n=Object.assign({},n,{addedAt:now});have.set(k,n);urls.add(n.url);}});
-  const cutoff=now-60*DAY;
-  NEWS={updatedAt:now,items:[...have.values()].filter(n=>(+n.ts||Date.parse(n.date)||now)>=cutoff).sort((a,b)=>(+b.ts||0)-(+a.ts||0)).slice(0,300),failed:res.filter(r=>r.status==="rejected").length};
-  lsSet("sdlNews",JSON.stringify(NEWS));
-  return {added:NEWS.items.filter(n=>n.addedAt===now).length,bytes:NEWSBYTES};
+  NEWSBYTES=0;const now=Date.now(),idx=await getRaw("news/index.json");if(!idx||!Array.isArray(idx.batches))throw new Error("news");
+  const lastT=+(lsGet("sdlNewsBatch")||0),have=(NEWS.items||[]).length>0,v2=lsGet("sdlNewsV")==="2";
+  const full=!have||!lastT||!v2||(+idx.since||Infinity)>lastT,todo=idx.batches.filter(b=>full||+b.t>lastT).map(b=>+b.t);
+  let fresh=[],ok=true;
+  for(let i=0;i<todo.length;i+=6){const got=await Promise.all(todo.slice(i,i+6).map(t=>getRaw("news/b-"+t+".json")));got.forEach(j=>{if(j&&Array.isArray(j.items))fresh=fresh.concat(j.items);else ok=false;});}
+  if(todo.length||!NEWS.market){const m=await getRaw("news/market.json");if(m&&(m.sensex||m.nifty))NEWS.market=m;}
+  const map=new Map((NEWS.items||[]).map(n=>[newsKey(n),n])),urls=new Set((NEWS.items||[]).map(n=>n.url));let added=0;
+  fresh.forEach(n=>{if(!n||!n.title||!/^https:\/\//i.test(String(n.url||"")))return;const k=newsKey(n);
+    if(map.has(k)){const o=map.get(k);if(!o.points&&n.points){Object.assign(o,{points:n.points,img:n.img,price:n.price,sec:n.sec,topic:n.topic});}return;}
+    if(urls.has(n.url))return;map.set(k,Object.assign({},n,{addedAt:now}));urls.add(n.url);added++;});
+  const cutoff=now-30*DAY;
+  NEWS=Object.assign({},NEWS,{updatedAt:now,items:[...map.values()].filter(n=>(+n.ts||Date.parse(n.date)||+n.addedAt||now)>=cutoff).sort((a,b)=>(+b.ts||0)-(+a.ts||0))});
+  try{await nPut("kv","news",NEWS);}catch(e){}
+  lsSet("sdlNewsV","2");if(ok)lsSet("sdlNewsBatch",String(+idx.updatedAt||lastT));
+  /* photos of stories that have left the 30 days (and aren't saved) are removed too */
+  try{const keep=new Set((NEWS.items||[]).map(n=>n.img).concat(Object.values(SAVED).map(n=>n.img)).filter(Boolean));for(const k of await nKeys("img"))if(!keep.has(k))await nDel("img",k);}catch(e){}
+  return {added,bytes:NEWSBYTES};
 }
 
 /* ======================= Sync (only when pressed) ======================= */
@@ -1846,6 +1860,6 @@ S=JSON.parse(JSON.stringify(EXAMPLE)); /* placeholder until unlocked; nothing is
 applyTheme();
 if(APP_V){const t="Version "+APP_V.slice(0,8)+"."+APP_V.slice(8);if($("appVer"))$("appVer").textContent="App "+t;if($("railVer"))$("railVer").textContent=t;}
 if(/[?&]v=/.test(location.search))history.replaceState(null,"",location.pathname+location.hash);
-function boot(){takeCarry();syncSegs();render();renderAccount();renderUploadState();planDefaults();renderSecurity();show(location.hash.slice(1)||"dashboard");}
+function boot(){loadNews();takeCarry();syncSegs();render();renderAccount();renderUploadState();planDefaults();renderSecurity();show(location.hash.slice(1)||"dashboard");}
 lockStart();
 })();

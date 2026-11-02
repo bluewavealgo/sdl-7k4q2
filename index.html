@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202611021042">
+<link rel="stylesheet" href="app.css?v=202611021121">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body class="locked">
@@ -43,7 +43,7 @@
       <a href="#bank" data-v="docs" data-group="bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13h8M8 16h5"/></svg><span><span class="lbl-long">Document bank</span><span class="lbl-short">Docs</span></span><b class="badge" id="bankBadge" hidden>0</b></a>
       <div class="sep"></div>
       <a href="#notices" data-v="notices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg><span>Notices</span><b class="badge" id="noticeBadge" hidden>0</b></a>
-      <a href="#news" data-v="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/></svg><span><span class="lbl-long">Maritime </span>News</span><b class="badge" id="newsBadge" hidden>0</b></a>
+      <a href="#news" data-v="news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2M8 8h5M8 12h5M8 16h3"/></svg><span>News</span><b class="badge" id="newsBadge" hidden>0</b></a>
       <div class="sep"></div>
       <a href="#account" data-v="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Account</span></a>
       <a href="#help" data-v="help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg><span><span class="lbl-long">How it works</span><span class="lbl-short">Help</span></span></a>
@@ -306,11 +306,13 @@
     </section>
 
     <!-- NEWS -->
-    <section class="view" id="v-news" data-title="Maritime news" hidden>
-      <div class="vhead"><div><h1>Maritime news</h1><p class="muted">Headlines from Marine Insight, gCaptain, Splash247, SAFETY4SEA and Google News. Nothing loads by itself; press <b>Sync</b> when you want the latest.</p><p class="small muted" id="newsUpdated" style="margin-top:4px"></p></div></div>
+    <section class="view" id="v-news" data-title="News" hidden>
+      <div class="vhead"><div><h1>News</h1><p class="muted">Maritime, India, market and tech news with the key points. Tap a headline to read the points; photos load only when you open a story. Nothing loads by itself; press <b>Sync</b> for the latest.</p><p class="small muted" id="newsUpdated"></p></div></div>
+      <nav class="bb-tabs news-secs" id="newsSecs" aria-label="News sections"></nav>
+      <div class="card mline" id="marketLine" hidden></div>
       <div class="card card-b"><div class="filters">
         <div class="f" style="flex:0 0 auto"><span>Show</span><div class="chips" id="newsShow" role="group" aria-label="Show"><button type="button" data-show="all" aria-pressed="true">All</button><button type="button" data-show="new" aria-pressed="false">New since last visit</button><button type="button" data-show="saved" aria-pressed="false">★ Saved<span id="savedCount"></span></button></div></div>
-        <label class="f wide"><span>Search headlines</span><input id="newsSearch" placeholder="e.g. tanker, DG Shipping" autocomplete="off"></label>
+        <label class="f wide"><span>Search</span><input id="newsSearch" autocomplete="off"></label>
         <div class="f wide" style="flex-basis:100%"><span>Topic</span><div class="chips" id="newsTopics" role="group" aria-label="Topic"></div></div>
       </div></div>
       <div class="card" id="newsList"></div>
@@ -406,6 +408,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202611021042"></script>
+<script src="app.js?v=202611021121"></script>
 </body>
 </html>
