@@ -741,7 +741,8 @@ async function fetchNews(){
   if(todo.length||!NEWS.market){const m=await getRaw("news/market.json");if(m&&(m.sensex||m.nifty))NEWS.market=m;}
   const map=new Map((NEWS.items||[]).map(n=>[newsKey(n),n])),urls=new Set((NEWS.items||[]).map(n=>n.url));let added=0;
   fresh.forEach(n=>{if(!n||!n.title||!/^https:\/\//i.test(String(n.url||"")))return;const k=newsKey(n);
-    if(map.has(k)){const o=map.get(k);if(!o.points&&n.points){Object.assign(o,{points:n.points,img:n.img,price:n.price,sec:n.sec,topic:n.topic});}return;}
+    if(map.has(k)){const o=map.get(k),ow=(o.points||[]).join(" ").length,nw=(n.points||[]).join(" ").length;
+      if(nw>ow){Object.assign(o,{points:n.points,sec:n.sec||o.sec,topic:n.topic||o.topic});if(n.img)o.img=n.img;if(n.price)o.price=n.price;}return;}
     if(urls.has(n.url))return;map.set(k,Object.assign({},n,{addedAt:now}));urls.add(n.url);added++;});
   const cutoff=now-30*DAY;
   NEWS=Object.assign({},NEWS,{updatedAt:now,items:[...map.values()].filter(n=>(+n.ts||Date.parse(n.date)||+n.addedAt||now)>=cutoff).sort((a,b)=>(+b.ts||0)-(+a.ts||0))});
