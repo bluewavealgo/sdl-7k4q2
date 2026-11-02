@@ -89,11 +89,13 @@ def topic(sec, t):
 
 ABBR = re.compile(r"\b(Rs|Mr|Mrs|Ms|Dr|No|Nos|vs|Ltd|Inc|Co|St|Jr|Sr|Govt|Dept|approx|est|e\.g|i\.e|U\.S|U\.K)\.\s?", re.I)
 
+SENT_JUNK = re.compile(r"(subscri|premium stor|unlock|e-?paper|\blog ?in\b|\bsign ?in\b|already have an account|account benefits|free trial|paywall|this article is|you have reached|limit of free|register now|download app|install app|share this|copy link|font size|listen to this|minutes? read\b|story continues below|advertisement)", re.I)
+
 def sentences(text):
     text = BOILER.sub("", text)
     text = ABBR.sub(lambda m: m.group(1).replace(".", "\u2024") + "\u2024 " if m.group(1).lower() != "rs" else "Rs ", text)
     parts = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"“‘₹(])", text)
-    return [p.strip().replace("\u2024", ".") for p in parts if 40 <= len(p.strip()) <= 320]
+    return [p.strip().replace("\u2024", ".") for p in parts if 40 <= len(p.strip()) <= 320 and not SENT_JUNK.search(p)]
 
 def key_points(title, text, n=MAX_POINTS):
     """Pick the most informative sentences (facts: numbers, names, places), keep them in article order."""
@@ -207,7 +209,7 @@ def key(n):
 from html.parser import HTMLParser
 from concurrent.futures import ThreadPoolExecutor
 SKIP_TAGS = {"script", "style", "nav", "footer", "aside", "header", "figure", "figcaption", "form", "noscript", "button", "select", "svg"}
-JUNK = re.compile(r"(subscribe|sign up|newsletter|follow us|download (the|our) app|all rights reserved|copyright|advertisement|also read|read more|click here|whatsapp channel|telegram channel|first published|updated on|published on|terms of use|privacy policy|cookies?)", re.I)
+JUNK = re.compile(r"(subscri|premium|unlock|e-?paper|already have an account|sign up|newsletter|follow us|download (the|our) app|all rights reserved|copyright|advertisement|also read|read more|click here|whatsapp channel|telegram channel|first published|updated on|published on|terms of use|privacy policy|cookies?)", re.I)
 
 class Paras(HTMLParser):
     def __init__(self):
