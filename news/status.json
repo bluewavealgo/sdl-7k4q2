@@ -1,5 +1,5 @@
 {
- "at": 1793777252436,
+ "at": 1793798183729,
  "feeds": {
   "Marine Insight (maritime)": 15,
   "gCaptain (maritime)": 12,
@@ -11,7 +11,7 @@
   "Times of India (india)": 20,
   "NDTV (india)": 20,
   "Hindustan Times (india)": 40,
-  "Moneycontrol (markets)": "failed: not well-formed (invalid token): line 6, column 305",
+  "Moneycontrol (markets)": 15,
   "Economic Times (markets)": 40,
   "Mint (markets)": 35,
   "Business Standard (markets)": 35,
@@ -24,14 +24,14 @@
   "Smartprix (tech)": 20,
   "Beebom (tech)": 10
  },
- "new": 193,
+ "new": 268,
  "bySection": {
-  "maritime": 8,
-  "india": 70,
-  "markets": 85,
-  "tech": 30
+  "maritime": 47,
+  "india": 103,
+  "markets": 73,
+  "tech": 45
  },
- "withPoints": 186,
- "withImage": 189,
- "withPrice": 3
+ "withPoints": 254,
+ "withImage": 242,
+ "withPrice": 4
 }
