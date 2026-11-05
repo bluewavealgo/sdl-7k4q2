@@ -1,10 +1,10 @@
 {
- "at": 1793905577544,
+ "at": 1793915771961,
  "feeds": {
   "Marine Insight (maritime)": 15,
   "gCaptain (maritime)": 12,
   "Splash247 (maritime)": 10,
-  "Hellenic Shipping News (maritime)": "failed: HTTP Error 403: Forbidden",
+  "Hellenic Shipping News (maritime)": 20,
   "Google News (maritime)": 30,
   "The Hindu (india)": 40,
   "India Today (india)": 20,
@@ -24,14 +24,14 @@
   "Smartprix (tech)": 20,
   "Beebom (tech)": 10
  },
- "new": 135,
+ "new": 46,
  "bySection": {
-  "maritime": 6,
-  "india": 78,
-  "markets": 38,
-  "tech": 13
+  "maritime": 16,
+  "india": 24,
+  "markets": 6,
+  "tech": 0
  },
- "withPoints": 125,
- "withImage": 134,
- "withPrice": 1
+ "withPoints": 34,
+ "withImage": 33,
+ "withPrice": 0
 }
