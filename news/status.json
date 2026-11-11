@@ -1,11 +1,11 @@
 {
- "at": 1794382037287,
+ "at": 1794391740051,
  "feeds": {
   "Marine Insight (maritime)": 15,
   "gCaptain (maritime)": 12,
   "Splash247 (maritime)": 10,
   "Hellenic Shipping News (maritime)": 20,
-  "Google News (maritime)": 23,
+  "Google News (maritime)": 22,
   "The Hindu (india)": 40,
   "India Today (india)": 20,
   "Times of India (india)": 20,
@@ -24,14 +24,14 @@
   "Smartprix (tech)": 20,
   "Beebom (tech)": 10
  },
- "new": 168,
+ "new": 124,
  "bySection": {
-  "maritime": 20,
-  "india": 57,
-  "markets": 70,
+  "maritime": 6,
+  "india": 68,
+  "markets": 29,
   "tech": 21
  },
- "withPoints": 121,
- "withImage": 155,
- "withPrice": 1
+ "withPoints": 114,
+ "withImage": 121,
+ "withPrice": 2
 }
