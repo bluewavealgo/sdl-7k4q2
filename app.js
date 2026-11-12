@@ -443,7 +443,13 @@ $("cform").addEventListener("submit",e=>{e.preventDefault();const c=readForm(),e
   if(S.example)leaveExample();c.u=Date.now();const ex=S.contracts.find(x=>x.id===c.id);
   if(ex){["source"].forEach(k=>{if(ex[k]!=null)c[k]=ex[k];});if(ex.passEst){const pe={};["left","arr"].forEach(k=>{if(ex.passEst[k]&&ex[k]===c[k])pe[k]=true;});if(Object.keys(pe).length)c.passEst=pe;}S.contracts=S.contracts.map(x=>x.id===c.id?c:x);}else S.contracts.push(c);
   saveLocal();closeForm();render();toast(ex?"Contract updated":"Contract saved on this device");});
-$("addBtn").addEventListener("click",()=>openForm(null));$("formClose").addEventListener("click",closeForm);$("cancelBtn").addEventListener("click",closeForm);
+$("addBtn").addEventListener("click",()=>openForm(null));
+/* hand the ship list (CDC dates only) to BlueWave Finance through the clipboard — nothing else is copied */
+$("bwfCopy")&&$("bwfCopy").addEventListener("click",async()=>{if(S.example){toast("Add your own contracts first");return;}
+  const L=(S.contracts||[]).filter(c=>c.on).map(c=>({id:c.id,vessel:c.vessel||"",type:c.type||"",company:c.company||"",rank:c.rank||"",flag:c.flag||"",on:c.on,off:c.off||""})).sort((a,b)=>a.on.localeCompare(b.on));
+  if(!L.length){toast("No contracts with a CDC sign-on date yet");return;}
+  const t="BWF-SHIPS:1:"+btoa(unescape(encodeURIComponent(JSON.stringify(L))));
+  try{await navigator.clipboard.writeText(t);toast(L.length+" ships copied. Now open BlueWave Finance → Me → Income → Paste ships.",6000);}catch(e){prompt("Copy this text and paste it in BlueWave Finance (Me → Income → Paste ships):",t);}});$("formClose").addEventListener("click",closeForm);$("cancelBtn").addEventListener("click",closeForm);
 let pendingDel=null;
 $("ctable").addEventListener("click",e=>{
   const ed=e.target.closest("[data-edit]");if(ed){openForm(S.contracts.find(x=>x.id===ed.dataset.edit));return;}

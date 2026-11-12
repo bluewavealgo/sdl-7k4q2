@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sea Days">
 <link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="app.css?v=202611021215">
+<link rel="stylesheet" href="app.css?v=202611121800">
 <script>try{var t=localStorage.getItem("sdlTheme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body class="locked">
@@ -108,7 +108,7 @@
 
     <!-- SHIPS -->
     <section class="view" id="v-ships" data-title="Sea service" hidden>
-      <div class="vhead"><div><h1>Sea service</h1><p class="muted">Every contract you have sailed, with CDC and passport dates.</p></div><button type="button" class="btn-primary" id="addBtn">+ Add contract</button></div>
+      <div class="vhead"><div><h1>Sea service</h1><p class="muted">Every contract you have sailed, with CDC and passport dates.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn-sm" id="bwfCopy" title="Copies vessel, company, rank and CDC sign-on / sign-off dates only">📋 Copy ships for BlueWave Finance</button><button type="button" class="btn-primary" id="addBtn">+ Add contract</button></div></div>
       <div class="card" id="formCard" hidden>
         <div class="card-h"><h2 id="formTitle">Add contract</h2><button type="button" class="btn-ghost btn-sm" id="formClose">Close</button></div>
         <form id="cform" class="card-b" novalidate>
@@ -408,6 +408,6 @@
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 })();
 </script>
-<script src="app.js?v=202611021215"></script>
+<script src="app.js?v=202611121800"></script>
 </body>
 </html>
