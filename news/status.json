@@ -1,11 +1,11 @@
 {
- "at": 1795712068977,
+ "at": 1795743882948,
  "feeds": {
   "Marine Insight (maritime)": 15,
   "gCaptain (maritime)": 12,
   "Splash247 (maritime)": "failed: HTTP Error 415: Unsupported Media Type",
   "Hellenic Shipping News (maritime)": 20,
-  "Google News (maritime)": 40,
+  "Google News (maritime)": 24,
   "The Hindu (india)": 40,
   "India Today (india)": 20,
   "Times of India (india)": 20,
@@ -15,7 +15,7 @@
   "Economic Times (markets)": 40,
   "Mint (markets)": 35,
   "Business Standard (markets)": 35,
-  "BusinessLine (markets)": 40,
+  "BusinessLine (markets)": "failed: The read operation timed out",
   "Rushlane (tech)": "failed: HTTP Error 415: Unsupported Media Type",
   "MotorBeam (tech)": 15,
   "CarToq (tech)": 30,
@@ -24,14 +24,14 @@
   "Smartprix (tech)": 20,
   "Beebom (tech)": 10
  },
- "new": 363,
+ "new": 151,
  "bySection": {
-  "maritime": 60,
-  "india": 120,
-  "markets": 104,
-  "tech": 79
+  "maritime": 30,
+  "india": 97,
+  "markets": 15,
+  "tech": 9
  },
- "withPoints": 331,
- "withImage": 318,
- "withPrice": 20
+ "withPoints": 132,
+ "withImage": 118,
+ "withPrice": 0
 }
